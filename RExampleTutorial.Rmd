@@ -825,6 +825,58 @@ print(mean(prediction$sq_diff))
 ```
 [lm()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/lm)
 
+## 5.11 Fit a neural network model.
+
+### a) Fit a multi-layer perceptron classification model on training data and assess against testing data using a confusion matrix.
+```{r, warning = FALSE, message = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/digits_train.csv')
+test <- read.csv('/Users/digits_test.csv')
+
+trainInputs <- subset(train, select = -c(Target))
+testInputs <- subset(test, select = -c(Target))
+
+# The package we need to fit a neural network model (RSNNS) must 
+# first be installed and then called to use
+library(RSNNS)
+
+set.seed(29)
+
+trainTarget <- decodeClassLabels(train$Target)
+testTarget <- decodeClassLabels(test$Target)
+
+model <- mlp(trainInputs, trainTarget, inputsTest=testInputs, targetsTest=testTarget, size = 100, maxit = 200)
+
+predictions <- predict(model, testInputs)
+confusionMatrix(testTarget, predictions)
+```
+[RSNNS](https://cran.r-project.org/web/packages/RSNNS/RSNNS.pdf)
+
+### b) Fit a multi-layer perceptron regression model on training data and assess against testing data.
+```{r, warning = FALSE, message = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/boston_train.csv')
+test <- read.csv('/Users/boston_test.csv')
+
+# Scale input data
+scaled_train <- data.frame(scale(subset(train, select = -c(Target))))
+scaled_train$Target <- train$Target
+scaled_test <- data.frame(scale(subset(test, select = -c(Target))))
+
+# Fit neural network regression model, dividing target by 50 for scaling
+model <- mlp(scaled_train, train$Target / 50, inputsTest=scaled_test, targetsTest=test$Target / 50, maxit = 1000)
+
+# Assess against testing data, remembering to multiply by 50
+preds = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+preds$predY <- predict(model, scaled_test)*50
+preds$target <- test$Target
+preds$sq_error <- (preds$predY - preds$target)**2
+print(mean(preds$sq_error))
+```
+[scale()](https://www.rdocumentation.org/packages/raster/versions/2.5-8/topics/scale)
+
 ***
 
 # 6 Model Evaluation & Selection
@@ -1082,24 +1134,49 @@ print(paste0("Accuracy: ", round(mean(accuracy)*100, digits=2), "% +/- ", round(
 
 \newpage
 
+# Appendix
+
+## 1 Built-in R-Objects
+
+### [Vectors](#vectors)
+* [Logical](#logical)
+* [Numeric](#numeric)
+* [Integer](#int)
+* [Complex](#complex)
+* [Character](#char)
+* [Raw](#raw)
+
+### [Lists](#list)
+
+### [Matrics](#matrix)
+
+### [Arrays](#array)
+
+### [Factors](#factors)
+
+### [Data Frames](#DataFrame)
+
+
+***
+
 # Alphabetical Index
 
-## caret {#CARET}
+## [Array](https://www.tutorialspoint.com/r/r_arrays.htm) {#array}
+A one-dimensional data frame.  Please see the following example of array creation and access:
+```{r}
+my_array <- c(1, 3, 5, 9)
+print(my_array)
+print(my_array[1])
+```
 
-[caret](https://www.rdocumentation.org/packages/caret/versions/6.0-76) is an R programming package of tools for training and plotting classification and regression models.
+## [caret](https://www.rdocumentation.org/packages/caret/versions/6.0-76) {#CARET}
+An R programming package of tools for training and plotting classification and regression models.
 
-***
-
-## Data Frame {#DataFrame}
-
-An [R Data Frame](https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html) is a two-dimensional tabular structure with labeled axes (rows and columns), where data observations are represented by rows and data variables are represented by columns.
-
-***
+## [Data Frame](https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html) {#DataFrame}
+An R Data Frame is a two-dimensional tabular structure with labeled axes (rows and columns), where data observations are represented by rows and data variables are represented by columns.
 
 ## Dictionary
-
 A dictionary is an associative array which is indexed by keys which map to values.  Therefore, a dictionary is an unordered set of key:value pairs where each key is unique.  In R, a dictionary can be implemented using a [named list](http://www.r-tutor.com/r-introduction/list/named-list-members).  Please see the following example of named list creation and access:
-
 ```{r}
 student <- read.csv('/Users/class.csv')
 values <- student$Age
@@ -1107,29 +1184,17 @@ names(values) <- student$Name
 print(values["James"])
 ```
 
-***
+## [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html) {#DPLYR}
+An R programming package of tools for workng with [data frame](#DataFrame) like objects.
 
-## dplyr {#DPLYR}
+## [gbm](https://cran.r-project.org/web/packages/gbm/index.html) {#GBM}
+An R programming package useful for building and analyzing gradient boosting models.
 
-[dplyr](https://cran.r-project.org/web/packages/dplyr/index.html) is an R programming package of tools for workng with [data frame](#DataFrame) like objects.
+## [gdata](https://cran.r-project.org/web/packages/gdata/index.html) {#GDATA}
+An R programming package of tools useful for data manipulation.
 
-***
-
-## gbm {#GBM}
-
-[gbm](https://cran.r-project.org/web/packages/gbm/index.html) is an R programming package useful for building and analyzing gradient boosting models.
-
-***
-
-## gdata {#GDATA}
-
-[gdata](https://cran.r-project.org/web/packages/gdata/index.html) is an R programming package of tools useful for data manipulation.
-
-***
-
-## List
-
-An [R list](http://www.r-tutor.com/r-introduction/list) is a sequence of comma-separated objects that need not be of the same type.  Please see the following example of list creation and access:
+## [List](http://www.r-tutor.com/r-introduction/list) {#list}
+An R list is a sequence of comma-separated objects that need not be of the same type.  Please see the following example of list creation and access:
 
 ```{r}
 list1 <- list('item1', 102)
@@ -1137,35 +1202,17 @@ print(list1)
 print(list1[1])
 ```
 
-***
+## [randomForest](https://cran.r-project.org/web/packages/randomForest/index.html) {#RANDOM}
+An R programming package of tools useful for building and analyzing classification and regression random forest models.
 
-## randomForest {#RANDOM}
+## [rjson](https://cran.r-project.org/web/packages/rjson/index.html) {#RJSON}
+An R programming package of tools useful for converting R objects into JSON objects, and JSON objects into R objects.
 
-[randomForest](https://cran.r-project.org/web/packages/randomForest/index.html) is an R programming package of tools useful for building and analyzing classification and regression random forest models.
+## [tree](https://cran.r-project.org/web/packages/tree/index.html) {#TREE}
+An R programming package of tools useful for building and analyzing classification and regression decision trees.
 
-***
-
-## rjson {#RJSON}
-
-[rjson](https://cran.r-project.org/web/packages/rjson/index.html) is an R programming package of tools useful for converting R objects into JSON objects, and JSON objects into R objects.
-
-***
-
-## Series/Array
-
-A series is a one-dimensional data frame, which is also called an [array](https://www.tutorialspoint.com/r/r_arrays.htm) in R.  Please see the following example of array creation and access:
-
-```{r}
-my_array <- c(1, 3, 5, 9)
-print(my_array)
-print(my_array[1])
-```
-
-***
-
-## tree {#TREE}
-
-[tree](https://cran.r-project.org/web/packages/tree/index.html) is an R programming package of tools useful for building and analyzing classification and regression decision trees.
+## [Vector](https://www.tutorialspoint.com/r/r_data_types.htm) {#vector}
+A one-dimensional data structure which is able to hold different classes of elements, but only one class per vector.
 
 ***
 
