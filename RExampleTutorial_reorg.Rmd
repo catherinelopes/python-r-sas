@@ -1,0 +1,1305 @@
+---
+title: "R Tutorial"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In R, comments are indicated in code with a "#" character. 
+
+# 1 Reading in Data and Basic Statistical Functions
+
+## 1.1 Read in the data.
+
+### a) Read the data in as a .csv file.
+
+```{r student1}
+student <- read.csv('/Users/class.csv')
+```
+
+[read.csv()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/read.table)
+
+### b) Read the data in as a .xls file.
+
+First we need to install the [gdata](#GDATA) package, and then call the package to use.
+```{r, eval=FALSE}
+# The package we need to read in a .xls file (gdata) must first be
+# installed and then called to use
+library(gdata)
+
+student_xls <- read.xls('/Users/class.xls', 1)
+```
+
+[read.xls()](https://www.rdocumentation.org/packages/gdata/versions/2.18.0/topics/read.xls)
+
+###c) Read the data in as a .json file.
+
+First we need to install the [rjson](#RJSON) (install.packages(pkgs='rjson')), and then call the package to use.  There is more code involved in reading a .json file into R so it becomes a proper data frame, however we will not at this time dive into the explanation for all this code, but it should become evident throughout the tutorial.
+```{r, eval = FALSE}
+# The package we need to read in a .json file (rjson) must first be
+# installed and then called to use
+library(rjson)
+
+temp <- fromJSON(file = '/Users/class.json')
+temp <- do.call('rbind', temp)
+temp <- data.frame(temp, stringsAsFactors = TRUE)
+temp <- transform(temp, Name=unlist(Name), Sex=unlist(Sex), Age=unlist(Age), 
+                  Height=unlist(Height), Weight=unlist(Weight))
+temp$Name <- as.factor(temp$Name)
+temp$Sex <- as.factor(temp$Sex)
+temp$Age <- as.integer(temp$Age)
+
+student_json <- temp
+```
+
+[fromJSON()](https://www.rdocumentation.org/packages/rjson/versions/0.2.15/topics/fromJSON)
+
+## 1.2 Find the dimensions of the data set.
+
+Information about an R [data frame](#DataFrame) is available by calling the [dim()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/dim) function, with the data name as an argument.
+```{r}
+dim(student)
+```
+
+## 1.3 Find basic information about the data set.
+
+```{r structure}
+str(student)
+```
+
+[str()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/str)
+
+## 1.4 Look at the first 5 observations.
+
+The first 5 observations of a [data frame](#DataFrame) are available by calling the [head()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function, with the data name as an argument.  By default, head() returns 4 observations, but we can alter the function to return 5 observations in the way shown below.  The [tail()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function is analogous and returns the last observations.
+```{r head}
+head(student, n=5)
+```
+
+## 1.5 Calculate mean of numeric variables.
+
+```{r mean, include=TRUE}
+# We must apply the is.numeric function to the data set which returns a 
+# matrix of booleans that we then use to subset the dataset to return 
+# only numeric variables  
+
+# Then we can use the colMeans function to return the mean of 
+# column variables
+colMeans(student[sapply(student, is.numeric)])
+```
+
+[colMeans()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/colSums) [sapply()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/lapply) [is.numeric](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/numeric)
+
+## 1.6 Compute summary statistics of the data set.
+
+Summary statistics of a [data frame](#DataFrame) are available by calling the [summary()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/summary) function, with the data name as an argument.
+```{r summary}
+summary(student)
+```
+
+## 1.7 Descriptive statistics functions applied to columns of the data set.
+
+```{r stats}
+# Notice the subsetting of student with the $ character 
+sd(student$Weight)
+sum(student$Weight)
+length(student$Weight)
+max(student$Weight)
+min(student$Weight)
+median(student$Weight)
+```
+
+[sd()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/sd) [sum()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/sum) [length()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/length) [max()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/Extremes) [min()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/Extremes) [median()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/median)
+
+## 1.8 Produce a one-way table to describe the frequency of a variable.
+
+### a) Produce a one-way table of a discrete variable.
+```{r}
+table(student$Age)
+```
+
+### b) Produce a one-way table of a categorical variable.
+```{r}
+table(student$Sex)
+```
+
+[table()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/table)
+
+## 1.9 Produce a two-way table to visualize the frequency of two categorical (or discrete) variables.
+
+```{r two-way}
+table(student$Age, student$Sex)
+```
+
+[table()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/table)
+
+## 1.10 Select a subset of the data that meets a certain criterion.
+
+```{r subset}
+# The "," character tells R to select all columns of the data set
+females <- student[which(student$Sex == 'F'), ]
+head(females, n=5)
+```
+
+[which()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/which)
+
+## 1.11 Determine the correlation between two continuous variables.
+
+```{r}
+height_weight <- subset(student, select = c(Height, Weight))
+cor(height_weight, method = "pearson")
+```
+
+[cor()](https://www.rdocumentation.org/packages/WGCNA/versions/1.51/topics/cor)
+
+***
+
+\newpage
+
+# 2 Basic Graphing and Plotting Functions
+
+## 2.1 Visualize a single continuous variable by producing a histogram.
+
+```{r histogram}
+# Setting student$Weight to a new variable “Weight” cleans up the labeling of 
+# the histogram 
+Weight <- student$Weight
+hist(Weight)
+```
+
+[hist()](https://www.rdocumentation.org/packages/graphics/versions/3.4.0/topics/hist)
+
+## 2.2 Visualize a single continuous variable by producing a boxplot.
+
+```{r boxplot}
+# points(mean(Weight)) tells R to plot the mean of the variable
+# on the boxplot 
+boxplot(Weight, ylab="Weight")
+points(mean(Weight))
+```
+
+[boxplot()](https://www.rdocumentation.org/packages/graphics/versions/3.4.0/topics/boxplot) [points()](https://www.rdocumentation.org/packages/graphics/versions/3.4.0/topics/points)
+
+## 2.3 Visualize two continuous variables by producing a scatterplot.
+
+```{r scatter}
+Height <- student$Height
+# Notice here you specify the x variable first and then the y variable 
+plot(Height, Weight)
+```
+
+[plot()](https://www.rdocumentation.org/packages/graphics/versions/3.4.0/topics/plot)
+
+## 2.4 Visualize a relationship between two continuous variables by producing a scatterplot and a plotted line of best fit.
+
+```{r scatterline}
+plot(Height, Weight)
+
+# lm() models Weight as a function of Height and returns the parameters 
+# of the line of best fit
+model <- lm(Weight~Height)
+coeff <- coef(model)
+intercept <- as.matrix(coeff[1])[1]
+slope <- as.matrix(coeff[2])[1]
+
+# abline() prints the line of best fit 
+abline(lm(Weight~Height))
+
+# text() prints the equation of the line of best fit, with the first 
+# two arguments specifying the x and y location, respectively, of where 
+# the text should be printed on the graph 
+text(60, 140, bquote(Line: y == .(slope) * x + .(intercept)))
+```
+
+[lm()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/lm) [coef()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/coef) [as.matrix()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/matrix) [abline()](https://www.rdocumentation.org/packages/graphics/versions/3.4.0/topics/abline) [text()](https://www.rdocumentation.org/packages/graphics/versions/3.4.0/topics/text) [bquote()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/bquote)
+
+## 2.5 Visualize a categorical variable by producing a bar chart.
+
+```{r bar}
+counts <- table(student$Sex)
+# beside = TRUE indicates to print the bars side by side instead of on top of 
+# each other 
+# names.arg indicates which names to use to label the bars 
+barplot(counts, beside=TRUE, ylab= "Frequency", xlab= "Sex", names.arg=names(counts))
+```
+
+[barplot()](https://www.rdocumentation.org/packages/graphics/versions/3.4.0/topics/barplot) [names()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/names)
+
+## 2.6 Visualize a continuous variable, grouped by a categorical variable, using side-by-side boxplots.
+
+### a) Simple side-by-side boxplot without color.
+```{r contcat}
+# Subset data set to return only female weights, and then only male weights 
+Female_Weight <- student[which(student$Sex == 'F'), "Weight"]
+Male_Weight <- student[which(student$Sex == 'M'), "Weight"]
+
+# Find the mean of both arrays 
+means <- c(mean(Female_Weight), mean(Male_Weight))
+ 
+# Syntax indicates Weight as a function of Sex 
+boxplot(student$Weight ~ student$Sex, ylab= "Weight", xlab= "Sex")
+
+# Plot means on boxplots in blue 
+points(means, col= "blue")
+```
+
+### b) More advanced side-by-side boxplot with color.
+```{r, message = FALSE, warning = FALSE}
+library(ggplot2)
+student$Sex <- factor(student$Sex, levels = c("F","M"), 
+                      labels = c("Female", "Male"))
+ggplot(data = student, aes(x = Sex, y = Weight, fill = Sex)) + 
+  geom_boxplot() + stat_summary(fun.y = mean, 
+                                color = "black", geom = "point", 
+                                shape = 18, size = 3)
+```
+
+[ggplot2](http://www.statmethods.net/advgraphs/ggplot2.html) [factor()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/factor) [c()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/c) [aes()](https://www.rdocumentation.org/packages/ggplot2/versions/2.2.1/topics/aes) [geom_boxplot()](https://www.rdocumentation.org/packages/ggplot2/versions/2.2.1/topics/geom_boxplot) [stat_summary()](https://www.rdocumentation.org/packages/ggplot2/versions/2.2.1/topics/stat_summary_bin)
+
+***
+
+\newpage
+
+# 3 Basic Data Wrangling and Manipulation
+
+## 3.1 Create a new variable in a data set as a function of existing variables in the data set.
+
+```{r newvar}
+# Notice here how you can create the BMI column in the data set just by 
+# naming it 
+student$BMI <- student$Weight / (student$Height)**2 * 703
+head(student, n=5)
+```
+
+## 3.2 Create a new variable in a data set using if/else logic of existing variables in the data set.
+
+```{r newvarlogic}
+# Notice the use of the ifelse() function for a single if condition
+student$BMI_Class <- ifelse(student$BMI<19.0, "Underweight", "Healthy")
+head(student, n=5)
+```
+
+[ifelse()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/ifelse)
+
+## 3.3 Create a new variable in a data set using mathemtical functions applied to existing variables in the data set.
+
+Using the [log()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/log) function, the [exp()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/log) function, the [sqrt()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/MathFun) function, and the [abs()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/MathFun) function.
+```{r log}
+student$LogWeight <- log(student$Weight)
+student$ExpAge <- exp(student$Age)
+student$SqrtHeight <- sqrt(student$Height)
+student$BMI_Neg <- ifelse(student$BMI < 19.0, -student$BMI, student$BMI)
+student$BMI_Pos <- abs(student$BMI_Neg)
+
+# Create a boolean variable
+student$BMI_Check <- (student$BMI == student$BMI_Pos)
+head(student, n=5)
+```
+
+## 3.4 Drop variables from a data set.
+
+```{r drop}
+# -c() function tells R not to select the columns listed 1
+student <- subset(student, select = -c(LogWeight, ExpAge, SqrtHeight, BMI_Neg, 
+                                       BMI_Pos, BMI_Check))
+head(student, n=5)
+```
+
+[subset()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/subset)
+
+## 3.5 Sort a data set by a variable.
+
+### a) Sort data set by a continuous variable.
+```{r sortcont}
+student <- student[order(student$Age), ]
+# Notice that R uses a stable sorting algorithm by default
+head(student, n=5)
+```
+
+### b) Sort data set by a categorical variable.
+```{r sortcat}
+student <- student[order(student$Sex), ]
+# Notice that the data is now sorted first by Sex and then within Sex by Age 
+head(student, n=5)
+```
+
+[order()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/order)
+
+## 3.6 Compute descriptive statistics of continuous variables, grouped by a categorical variable.
+
+```{r descstats}
+# Notice the syntax of Age, Height, Weight, and BMI as a function of Sex 
+aggregate(cbind(Age, Height, Weight, BMI) ~ Sex, student, mean)
+```
+
+[aggregate()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/aggregate) [cbind()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/cbind)
+
+## 3.7 Add a new row to the bottom of a data set.
+
+```{r newrow}
+# Look at the tail of the data currently
+tail(student, n=5)
+
+# rbind.data.frame() function binds two data frames together by rows 
+student <- rbind.data.frame(student, data.frame(Name='Jane', Sex = 'F', Age = 14, 
+                                                Height = 56.3, Weight = 77.0, 
+                                                BMI = 17.077695, 
+                                                BMI_Class = 'Underweight'))
+tail(student, n=5)
+```
+
+[data.frame()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/data.frame) [rbind.data.frame()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/cbind)
+
+## 3.8 Create a user defined function and apply it to a variable in the data set to create a new variable in the data set.
+
+```{r userfunc}
+toKG <- function(lb) {
+  return(0.45359237 * lb)
+}
+
+student$Weight_KG <- toKG(student$Weight)
+head(student, n=5)
+```
+
+***
+
+\newpage
+
+# 4 More Advanced Data Wrangling
+
+## 4.1 Drop observations with missing information.
+
+```{r dropmissing}
+# Notice the use of the fish data set because it has some missing 
+# observations 
+fish <- read.csv('/Users/fish.csv')
+
+# First sort by Weight, requesting those with NA for Weight first 
+fish <- fish[order(fish$Weight, na.last=FALSE), ]
+head(fish, n=5)
+
+new_fish <- na.omit(fish)
+head(new_fish, n=5)
+```
+
+[na.omit()](https://www.rdocumentation.org/packages/data.table/versions/1.10.4/topics/na.omit.data.table)
+
+## 4.2 Merge two data sets together on a common variable.
+
+### a) First, select specific columns of a data set to create two smaller data sets.
+
+```{r selectvar}
+# Notice the use of the student data set again, however we want to reload 
+# it without the changes we've made previously  
+student <- read.csv('/Users/class.csv')
+student1 <- subset(student, select=c(Name, Sex, Age))
+head(student1, n=5)
+
+student2 <- subset(student, select=c(Name, Height, Weight))
+head(student2, n=5)
+```
+
+### b) Second, we want to merge the two smaller data sets on the common variable.
+
+```{r mergevar}
+new <- merge(student1, student2)
+head(new, n=5)
+```
+
+[merge()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/merge)
+
+### c) Finally, we want to check to see if the merged data set is the same as the original data set.
+
+```{r checkvar}
+all.equal(student, new)
+```
+
+[all.equal()](https://www.rdocumentation.org/packages/data.table/versions/1.10.4/topics/all.equal)
+
+## 4.3 Merge two data sets together by index number only.
+
+### a) First, select specific columns of a data set to create two smaller data sets.
+
+```{r smaller}
+newstudent1 <- subset(student, select=c(Name, Sex, Age))
+head(newstudent1, n=5)
+
+newstudent2 <- subset(student, select=c(Height, Weight))
+head(newstudent2, n=5)
+```
+
+### b) Second, we want to join the two smaller data sets.
+
+```{r join}
+new2 <- cbind(newstudent1, newstudent2)
+head(new2, n=5)
+```
+
+### c) Finally, we want to check to see if the joined data set is the same as the original data set.
+
+```{r verify}
+all.equal(student, new2)
+```
+
+## 4.4 Create a pivot table to summarize information about a data set.
+
+```{r, message= FALSE, warning=FALSE}
+# Notice we are using a new data set that needs to be read into the 
+# environment
+price <- read.csv('/Users/price.csv')
+
+# The package we need (dplyr) must first be
+# installed and then called to use
+require(dplyr)
+
+# The following code is used to remove the "," and "$" characters from the 
+# ACTUAL column so that values can be summed 
+price$ACTUAL <- gsub('[$]', '', price$ACTUAL)
+price$ACTUAL <- as.numeric(gsub(',', '', price$ACTUAL))
+
+filtered = group_by(price, COUNTRY, STATE, PRODTYPE, PRODUCT)
+basic_sum = summarise(filtered, REVENUE = sum(ACTUAL))
+head(basic_sum, n=5)
+```
+
+[dplyr](#DPLYR) [group_by](https://www.rdocumentation.org/packages/dplyr/versions/0.5.0/topics/group_by) [summarise()](https://www.rdocumentation.org/packages/dplyr/versions/0.5.0/topics/summarise)
+
+## 4.5 Return all unique values from a text variable.
+```{r pivot, message= FALSE, warning=FALSE}
+print(unique(price$STATE))
+```
+[unique()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/unique)
+
+***
+
+\newpage
+
+# 5 Preparation & Basic Regression
+
+## 5.1 Pre-process a data set using principal component analysis.
+
+```{r}
+# Notice we are using a new data set that needs to be read into the 
+# environment
+iris <- read.csv('/Users/iris.csv')
+features <- subset(iris, select = -c(Target))
+
+pca <- prcomp(x = features, scale = TRUE)
+print(pca)
+```
+
+[prcomp()](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prcomp.html)
+
+## 5.2 Split data into training and testing data and export as a .csv file.
+
+```{r, eval = FALSE}
+# Set the sample size of the training data
+smp_size <- floor(0.7 * nrow(iris))
+
+# set.seed() is used to specify a seed for a random integer so that the 
+# results are reproducible
+set.seed(29)
+train_ind <- sample(seq_len(nrow(iris)), size = smp_size)
+
+train <- iris[train_ind, ]
+test <- iris[-train_ind, ]
+
+write.csv(train, file = "/Users/iris_train.csv")
+write.csv(test, file = "/Users/iris_test.csv")
+```
+[floor()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/Round) [nrow()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/nrow) [set.seed()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/Random) [sample()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/sample) [seq_len()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/seq) [write.csv()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/write.table)
+
+## 5.3 Fit a logistic regression model.
+
+```{r logistic}
+# Notice we are using a new data set that needs to be read into the 
+# environment
+tips <- read.csv('/Users/tips.csv')
+
+# The following code is used to determine if the individual left more 
+# than a 15% tip 
+tips$fifteen <- 0.15 * tips$total_bill
+tips$greater15 <- ifelse(tips$tip > tips$fifteen, 1, 0)
+
+# Notice the syntax of greater15 as a function of total_bill 
+logreg <- glm(greater15 ~ total_bill, data = tips, family = "binomial"(link='logit'))
+summary(logreg)
+```
+[glm()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/glm)
+
+## 5.4 Fit a linear regression model.
+
+```{r linear}
+# Notice we are using the same data set, but it needs to be read in again
+# without the previous changes we made
+tips <- read.csv('/Users/tips.csv')
+
+# Notice the syntax of tip as function of total_bill
+linreg <- lm(tip ~ total_bill, data = tips)
+summary(linreg)
+```
+
+# 6 Regression & Machine Learning: Modeling & Prediction
+
+Many of the following models will make use of the [predict()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/predict) function.
+
+## 6.1 Fit a logistic regression model on training data and assess against testing data.
+
+### a) Fit a logistic regression model on training data.
+```{r}
+# Notice we are using new data sets that need to be read into the environment
+train <- read.csv('/Users/tips_train.csv')
+test <- read.csv('/Users/tips_test.csv')
+
+# The following code is used to determine if the individual left more 
+# than a 15% tip 
+train$fifteen <- 0.15 * train$total_bill
+train$greater15 <- ifelse(train$tip > train$fifteen, 1, 0)
+test$fifteen <- 0.15 * test$total_bill
+test$greater15 <- ifelse(test$tip > test$fifteen, 1, 0)
+
+# Notice the syntax of greater15 as a function of total_bill 
+logreg <- glm(greater15 ~ total_bill, data = train, family = "binomial"(link='logit'))
+summary(logreg)
+```
+
+### b) Assess the model against the testing data.
+```{r}
+# Prediction on testing data
+predictions <- predict(logreg, test, type = 'response')
+predY <- ifelse(predictions < 0.5, 0, 1)
+
+# Determine how many were correctly classified
+Results <- ifelse(predY == test$greater15, "Correct", "Wrong")
+table(Results)
+```
+
+## 6.2 Fit a linear regression model on training data and assess against testing data.
+
+### a) Fit a linear regression model on training data.
+```{r}
+# Notice we are using new data sets that need to be read into the environment
+train <- read.csv('/Users/boston_train.csv')
+test <- read.csv('/Users/boston_test.csv')
+
+# Notice the syntax of tip as function of total_bill
+linreg <- lm(Target ~ ., data = train)
+summary(linreg)
+```
+
+### b) Assess the model against the testing data.
+```{r }
+# Predict the tip based on the total_bill given in the testing data 
+prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction$target_hat = predict(linreg, newdata = test)
+
+# Compute the squared difference between predicted tip and actual tip 
+prediction$sq_diff <- (prediction$target_hat - test$Target)**2
+
+# Compute the mean of the squared differences (mean squared error) 
+# as an assessment of the model 
+mean_sq_error <- mean(prediction$sq_diff)
+print(mean_sq_error)
+```
+
+## 6.3 Fit a decision tree model on training data and assess against testing data.
+
+### a) Fit a decision tree classification model.
+
+#### i) Fit a decision tree classification model on training data, plot the tree, and determine variable importance.
+```{r, message = FALSE, warning = FALSE}
+# Notice we are using new data sets that need to be read into the environment
+train <- read.csv('/Users/breastcancer_train.csv')
+test <- read.csv('/Users/breastcancer_test.csv')
+
+# The package we need to fit a tree model (tree) must first be
+# installed and then called to use
+library(tree)
+
+# The "." character tells the model to use all variables except the response 
+# variabe (Target)
+treeMod <- tree(Target ~ ., data = train, method = "class")
+
+# Plot the decision tree
+plot(treeMod)
+text(treeMod)
+
+# Determine variable importance
+summary(treeMod)
+```
+
+#### ii) Assess the model against the testing data.
+```{r}
+# Prediction on testing data
+out <- predict(treeMod, test)
+out <- unname(out)
+pred.response <- ifelse(out < 0.5, 0, 1) 
+
+# Determine how many were correctly classified
+Results <- ifelse(test$Target == pred.response, "Correct", "Wrong")
+table(Results)
+```
+
+### b) Fit a decision tree regression model.
+
+#### i) Fit a decision tree regression model on training data, plot the tree, and determine variable importance.
+```{r, message = FALSE, warning = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/boston_train.csv')
+test <- read.csv('/Users/boston_test.csv')
+
+treeMod <- tree(Target ~ ., data = train, method = "anova")
+
+# Plot the decision tree
+plot(treeMod)
+text(treeMod)
+
+# Determine variable importance
+summary(treeMod)
+```
+
+#### ii) Assess the model against the testing data.
+```{r}
+# Predict the tip based on the total_bill given in the testing data 
+prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction$target_hat = predict(treeMod, newdata = test)
+
+# Compute the squared difference between predicted tip and actual tip 
+prediction$sq_diff <- (prediction$target_hat - test$Target)**2
+
+# Compute the mean of the squared differences (mean squared error) 
+# as an assessment of the model 
+mean_sq_error <- mean(prediction$sq_diff)
+print(mean_sq_error)
+```
+
+[tree](#TREE)
+
+## 6.4 Fit a random forest model on training data and assess against testing data.
+
+### a) Fit a random forest classification model.
+
+#### i) Fit a random forest classification model on training data and determine variable importance.
+```{r, message = FALSE, warning = FALSE}
+# Notice we are using new data sets that need to be read into the environment
+train <- read.csv('/Users/breastcancer_train.csv')
+test <- read.csv('/Users/breastcancer_test.csv')
+
+# The package we need to fit a random forest model (randomForest) must 
+# first be installed and then called to use
+require(randomForest)
+set.seed(29)
+
+rfMod <- randomForest(as.factor(Target) ~ ., data = train)
+
+# Determine variable importance
+print(importance(rfMod))
+```
+
+#### ii) Assess the model against the testing data.
+```{r}
+# Prediction on testing data
+pred.response <- predict(rfMod, test)
+
+# Determine how many were correctly classified
+Results <- ifelse(test$Target == pred.response, "Correct", "Wrong")
+table(Results)
+```
+
+### b) Fit a random forest regression model.
+
+#### i) Fit a random forest regression model on training data and determine variable importance.
+```{r, message = FALSE, warning = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/boston_train.csv')
+test <- read.csv('/Users/boston_test.csv')
+
+# The package we need to fit a random forest model (randomForest) must 
+# first be installed and then called to use
+require(randomForest)
+set.seed(29)
+
+rfMod <- randomForest(Target ~ ., data = train)
+
+# Determine variable importance
+print(importance(rfMod))
+```
+
+#### ii) Assess the model against the testing data.
+```{r}
+# Predict the Target in the testing data 
+prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction$target_hat = predict(rfMod, newdata = test)
+
+# Compute the squared difference between predicted tip and actual tip 
+prediction$sq_diff <- (prediction$target_hat - test$Target)**2
+
+# Compute the mean of the squared differences (mean squared error) 
+# as an assessment of the model 
+mean_sq_error <- mean(prediction$sq_diff)
+print(mean_sq_error)
+```
+
+[randomForest](#RANDOM)
+
+## 6.5 Fit a gradient boosting model on training data and assess against testing data.
+
+### a) Fit a gradient boosting classification model.
+
+#### i) Fit a gradient boosting classification model on training data and determine variable importance.
+```{r, message = FALSE, warning = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/breastcancer_train.csv')
+test <- read.csv('/Users/breastcancer_test.csv')
+
+# The package we need to fit a gradient boosting model (gbm) must first 
+# be installed and then called to use
+require(gbm)
+set.seed(29)
+
+# distribution = "bernoulli" is appropriate when there are only 2 
+# unique values
+# n.trees = total number of trees to fit which is analogous to the number 
+# of iterations
+# shrinkage = learning rate or step-size reduction, whereas a lower 
+# learning rate requires more iterations
+gbMod <- gbm(Target ~ ., distribution = "bernoulli", data = train, n.trees = 2500, shrinkage = .01)
+
+# Determine variable importance
+summary(gbMod)
+```
+
+#### ii) Assess the model against the testing data.
+```{r}
+# Prediction on testing data
+out <- predict(object = gbMod, newdata = test, 
+                         type = "response", n.trees = 2500)
+pred.response <- ifelse(out < 0.5, 0, 1)
+
+# Determine how many were correctly classified
+Results <- ifelse(test$Target == pred.response, "Correct", "Wrong")
+table(Results)
+```
+
+### b) Fit a gradient boosting regression model.
+
+#### i) Fit a gradient boosting regression model on training data and determine variable importance.
+```{r, message = FALSE, warning = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/boston_train.csv')
+test <- read.csv('/Users/boston_test.csv')
+
+# The package we need to fit a gradient boosting model (gbm) must first 
+# be installed and then called to use
+require(gbm)
+set.seed(29)
+
+# distribution = "bernoulli" is appropriate when there are only 2 
+# unique values
+# n.trees = total number of trees to fit which is analogous to the number 
+# of iterations
+# shrinkage = learning rate or step-size reduction, whereas a lower 
+# learning rate requires more iterations
+
+# Fit the model, dividing target by 50 for scaling
+gbMod <- gbm(Target / 50 ~ ., data = train, distribution = "gaussian", n.trees = 2500, shrinkage = .01)
+
+# Determine variable importance
+summary(gbMod)
+```
+#### ii) Assess the model against the testing data.
+```{r}
+# Predict the Target in the testing data, remembeing to multiply by 50
+prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction$target_hat <- predict(object = gbMod, newdata = test, 
+                         type = "response", n.trees = 2500)*50
+
+# Compute the squared difference between predicted tip and actual tip 
+prediction$sq_diff <- (prediction$target_hat - test$Target)**2
+
+# Compute the mean of the squared differences (mean squared error) 
+# as an assessment of the model 
+mean_sq_error <- mean(prediction$sq_diff)
+print(mean_sq_error)
+```
+
+[gbm](#GBM)
+
+## 6.6 Fit an extreme gradient boosting model on training data and assess against testing data.
+
+### a) Fit an extreme gradient boosting classification model.
+
+#### i) Fit an extreme gradient boosting classification model on training data.
+```{r, message = FALSE, warning = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/breastcancer_train.csv')
+test <- read.csv('/Users/breastcancer_test.csv')
+
+# The package we need to fit an extreme gradient boosting model (xgboost) 
+# must first be installed and then called to use
+require(xgboost)
+set.seed(29)
+
+# Fit the model
+xgbMod <- xgboost(data.matrix(subset(train, select = -c(Target))), 
+                 data.matrix(train$Target), max_depth = 3, nrounds = 2,
+                 objective = "binary:logistic", n_estimators = 2500, 
+                 shrinkage = .01)
+```
+
+#### ii) Assess the model against the testing data.
+```{r}
+# Prediction on testing data
+predictions <- predict(xgbMod, data.matrix(subset(test, select = -c(Target))))
+pred.response <- ifelse(predictions < 0.5, 0, 1)
+
+# Determine how many were correctly classified
+Results <- ifelse(test$Target == pred.response, "Correct", "Wrong")
+table(Results)
+```
+
+### b) Fit an extreme gradient boosting regression model.
+
+#### i) Fit an extreme gradient boosting regression model on training data.
+```{r, message = FALSE, warning = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/boston_train.csv')
+test <- read.csv('/Users/boston_test.csv')
+
+# The package we need to fit an extreme gradient boosting model (xgboost) 
+# must first be installed and then called to use
+require(xgboost)
+set.seed(29)
+
+# Fit the model, dividing target by 50 for scaling
+xgbMod <- xgboost(data.matrix(subset(train, select = -c(Target))), 
+                 data.matrix(train$Target / 50), max_depth = 3, nrounds = 2,
+                 n_estimators = 2500, shrinkage = .01)
+```
+
+#### ii) Assess the model against the testing data.
+```{r}
+# Predict the target in the testing data, remembering to 
+# multiply by 50 
+prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction$target_hat <- predict(xgbMod, 
+                                 data.matrix(subset(test, select = -c(Target))))*50
+
+# Compute the squared difference between predicted tip and actual tip 
+prediction$sq_diff <- (prediction$target_hat - test$Target)**2
+
+# Compute the mean of the squared differences (mean squared error) 
+# as an assessment of the model 
+mean_sq_error <- mean(prediction$sq_diff)
+print(mean_sq_error)
+```
+
+[xgboost](#XGBOOST)
+
+## 6.7 Fit a support vector model on training data and assess against testing data.
+
+### a) Fit a support vector classification model.
+
+#### i) Fit a support vector classification model on training data.
+```{r, warning = FALSE, message = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/breastcancer_train.csv')
+test <- read.csv('/Users/breastcancer_test.csv')
+
+# The package we need to fit an svm model (e1071) must first 
+# be installed and then called to use
+library(e1071)
+
+# Fit a support vector classification model 
+svMod <- svm(Target ~ ., train, type = 'C-classification', kernel = 'linear')
+```
+
+#### ii) Assess the model against the testing data.
+```{r}
+# Prediction on testing data
+pred.response <- unname(predict(svMod, test))
+
+# Determine how many were correctly classified
+Results <- ifelse(test$Target == pred.response, "Correct", "Wrong")
+table(Results)
+```
+
+### b) Fit a support vector regression model.
+
+#### i) Generate random data based on a sine curve.
+```{r}
+set.seed(29)
+# Generate the time variable
+t <- seq(from = 0, to = 0.5*pi,length.out=100)
+
+# Generate the sine curve with uniform noise
+y1 <- 5*sin(3*t) + runif(100)
+
+# Create a data frame for the generated data
+random_data <- data.frame(matrix(ncol=0, nrow = 100))
+random_data$X <- t
+random_data$Y <- y1
+
+# Plot the generated data
+plot(t,y1)
+```
+
+[seq()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/seq) [runif()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/Uniform)
+
+#### ii) Fit a support vector regression model to the data and assess the predictions.
+```{r, message = FALSE, warning = FALSE}
+# The package we need to fit an svm model (e1071) must first 
+# be installed and then called to use
+library(e1071)
+
+model <- svm(Y ~ X, random_data)
+predictedY <- predict(model, random_data)
+plot.new()
+plot(random_data$X, random_data$Y)
+points(random_data$X, predictedY, col = "red", pch = 4)
+
+prediction = data.frame(matrix(ncol = 0, nrow = nrow(random_data)))
+prediction$predY <- predictedY
+prediction$actual <- random_data$Y
+prediction$sq_diff <- (prediction$predY - prediction$actual)**2
+print(mean(prediction$sq_diff))
+```
+
+[e1071](https://cran.r-project.org/web/packages/e1071/e1071.pdf) [svm()](https://www.rdocumentation.org/packages/e1071/versions/1.6-8/topics/svm)
+
+## 6.8 Fit a neural network model on training data and assess against testing data.
+
+### a) Fit a neural network classification model.
+
+#### i) Fit a neural network classification model on training data.
+```{r, warning = FALSE, message = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/digits_train.csv')
+test <- read.csv('/Users/digits_test.csv')
+
+trainInputs <- subset(train, select = -c(Target))
+testInputs <- subset(test, select = -c(Target))
+
+# The package we need to fit a neural network model (RSNNS) must 
+# first be installed and then called to use
+library(RSNNS)
+
+set.seed(29)
+
+trainTarget <- decodeClassLabels(train$Target)
+testTarget <- decodeClassLabels(test$Target)
+
+nnMod <- mlp(trainInputs, trainTarget, inputsTest=testInputs, targetsTest=testTarget, size = 100, maxit = 200)
+```
+
+#### ii) Assess the model against the testing data.
+```{r}
+predictions <- predict(nnMod, testInputs)
+confusionMatrix(testTarget, predictions)
+```
+
+[confusionMatrix()](https://www.rdocumentation.org/packages/RSNNS/versions/0.4-9/topics/confusionMatrix)
+
+### b) Fit a neural network regression model.
+
+#### i) Fit a neural network regression model on training data.
+```{r, warning = FALSE, message = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/boston_train.csv')
+test <- read.csv('/Users/boston_test.csv')
+
+# Scale input data
+scaled_train <- data.frame(scale(subset(train, select = -c(Target))))
+scaled_test <- data.frame(scale(subset(test, select = -c(Target))))
+
+# Fit neural network regression model, dividing target by 50 for scaling
+nnMod <- mlp(scaled_train, train$Target / 50, inputsTest=scaled_test, targetsTest=test$Target / 50, maxit = 1000)
+```
+
+[scale()](https://www.rdocumentation.org/packages/raster/versions/2.5-8/topics/scale)
+
+```{r}
+# Assess against testing data, remembering to multiply by 50
+preds = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+preds$predY <- predict(nnMod, scaled_test)*50
+preds$target <- test$Target
+preds$sq_error <- (preds$predY - preds$target)**2
+print(mean(preds$sq_error))
+```
+
+[RSNNS](#RSNNS)
+
+***
+
+# 7 Model Evaluation & Selection
+
+## 7.1 Evaluate the accuracy of regression models.
+
+### a) Evaluation on training data.
+```{r}
+# Notice we are re-using data sets but it is good to re-read the original 
+# version back into the environment
+train <- read.csv('/Users/boston_train.csv')
+test <- read.csv('/Users/boston_test.csv')
+
+# Random Forest Regression Model
+set.seed(29)
+rfMod <- randomForest(Target ~ ., data = train)
+
+# Evaluation on training data
+pred_rf <- predict(rfMod, train)
+pred_rf <- unname(pred_rf)
+
+# Determine coefficient of determination score
+r2_rf <- 1 - ( (sum((train$Target - pred_rf)**2)) / (sum((train$Target - mean(train$Target))**2)) )
+print(paste0("Random forest regression model r^2 score (coefficient of determination): ", r2_rf))
+```
+
+[unname()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/unname)
+
+### b) Evaluation on testing data.
+```{r}
+# Random Forest Regression Model (rfMod) 
+
+# Evaluation on testing data
+pred_rf <- predict(rfMod, test)
+pred_rf <- unname(pred_rf)
+
+# Determine coefficient of determination score
+r2_rf = 1 - ( (sum((test$Target - pred_rf)**2)) / (sum((test$Target - mean(test$Target))**2)) )
+print(paste0("Random forest regression model r^2 score (coefficient of determination): ", r2_rf))
+```
+
+The formula used here for the coefficient score is based off the Python skearn formula for [r2_score](http://scikit-learn.org/stable/modules/model_evaluation.html#r2-score-the-coefficient-of-determination).  For more information about model assessment in R, please review information about the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).
+
+## 7.2 Evaluate the accuracy of classification models.
+
+### a) Evaluation on training data.
+```{r, message = FALSE, warning = FALSE}
+# Notice we are using new data sets that need to be read into 
+# the environment
+train <- read.csv('/Users/digits_train.csv')
+test <- read.csv('/Users/digits_test.csv')
+set.seed(29)
+
+# Random Forest Classification Model
+
+rfMod <- randomForest(as.factor(Target) ~ ., data = train)
+
+# Evaluation on training data
+pred_rf <- predict(rfMod, train)
+pred_rf <- unname(pred_rf)
+
+# Determine accuracy score
+accuracy_rf <- (1/nrow(train)) * sum(as.numeric(pred_rf == train$Target))
+print(paste0("Random forest model accuracy: ", accuracy_rf))
+```
+
+### b) Evaluation on testing data.
+
+```{r, message = FALSE, warning = FALSE}
+
+# Random Forest Classification Model (rfMod)
+
+# Evaluation on testing data
+pred_rf <- predict(rfMod, test)
+pred_rf <- unname(pred_rf)
+
+# Determine accuracy score
+accuracy_rf <- (1/nrow(test)) * sum(as.numeric(pred_rf == test$Target))
+print(paste0("Random forest model accuracy: ", accuracy_rf))
+```
+
+The formula used here for the accuracy score is based off the Python skearn formula for [accuracy_score](http://scikit-learn.org/stable/modules/model_evaluation.html#accuracy-score).  For more information about model assessment in R, please review information about the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).
+
+## 7.3 Evaluation with cross validation.
+
+### a) KFold
+```{r, warning = FALSE, message = FALSE}
+# Notice we are using a new data set that needs to be read into the 
+# environment 
+breastcancer = read.csv('/Users/breastcancer.csv')
+
+# The packages we need (caret & randomForest) must first 
+# be installed and then called to use
+library(caret)
+library(randomForest)
+
+# Create the 5 cross validation folds
+train_control <- trainControl(method = "cv", number = 5, savePredictions = TRUE)
+
+# Convert Target into a factor variable for the random forest model
+breastcancer$Target <- factor(breastcancer$Target, levels = c(1,0), 
+                      labels = c(1, 0))
+
+# Train the model, using the 5 cross validation folds
+model <- train(Target~., data = breastcancer, trControl = train_control, method = "rf")
+
+# Assess the accuracy of the model
+tab <- model$pred
+tab$correct <- (tab$pred == tab$obs)
+tab$correct_num <- ifelse(tab$correct=="TRUE", 1, 0)
+aggdata <- unname(as.matrix(aggregate(correct_num ~ Resample, tab, sum)))
+aggdata <- as.numeric(aggdata[,2])
+counts <- unname(table(tab$Resample))
+accuracy <- c(0,0,0,0,0)
+for (i in 1:5) {
+  accuracy[i] <- aggdata[i]/counts[i]
+}
+
+print(paste0("Accuracy: ", round(mean(accuracy)*100, digits=2), "% +/- ", round(sd(accuracy)*100, digits=2), "%"))
+```
+
+[caret](#CARET)
+
+### b) ShuffleSplit
+```{r, warning = FALSE, message = FALSE}
+# Notice we are using a new data set that needs to be read into the 
+# environment 
+breastcancer = read.csv('/Users/breastcancer.csv')
+
+# The package we need to create a data partition (caret) must first 
+# be installed and then called to use
+require(caret)
+require(randomForest)
+set.seed(29)
+
+X = subset(breastcancer, select = -c(Target))
+Y = breastcancer$Target
+
+# Create the data partition
+trainIndex <- createDataPartition(Y, times = 5, p = 0.7, list = FALSE)
+accuracy <- c(0, 0, 0, 0, 0)
+
+for (i in 1:5) {
+  nam <- paste("data_train", i, sep ="")
+  assign(nam, breastcancer[trainIndex[,i],])
+  nam <- paste("data_test", i, sep ="")
+  assign(nam, breastcancer[-trainIndex[,i],])
+}
+
+data_train <- list(data_train1, data_train2, data_train3, data_train4, data_train5)
+data_test <- list(data_test1, data_test2, data_test3, data_test4, data_test5)
+
+# Train the model and assess the accuracy
+for (i in 1:5) {
+  fit <- randomForest(as.factor(Target) ~ ., data = data_train[[i]])
+  Prediction <- predict(fit, data_test[[i]])
+  Prediction <- unname(Prediction)
+  correct <- (data_test[[i]]$Target == Prediction)
+  counts <- unname(table(correct))
+  accuracy[i] <- counts[2] / sum(counts)
+}
+
+print(paste0("Accuracy: ", round(mean(accuracy)*100, digits=2), "% +/- ", round(sd(accuracy)*100, digits=2), "%"))
+```
+
+[createDataPartition](https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/createDataPartition) 
+
+***
+
+\newpage
+
+# Appendix
+
+## 1 Built-in R-Objects
+
+### [Vectors](#vectors)
+* [Logical](#logical)
+* [Numeric](#numeric)
+* [Integer](#int)
+* [Complex](#complex)
+* [Character](#char)
+* [Raw](#raw)
+
+### [Lists](#list)
+
+### [Matrics](#matrix)
+
+### [Arrays](#array)
+
+### [Factors](#factors)
+
+### [Data Frames](#DataFrame)
+
+
+***
+
+# Alphabetical Index
+
+## [Array](https://www.tutorialspoint.com/r/r_arrays.htm) {#array}
+A one-dimensional data frame.  Please see the following example of array creation and access:
+```{r}
+my_array <- c(1, 3, 5, 9)
+print(my_array)
+print(my_array[1])
+```
+
+## [caret](https://www.rdocumentation.org/packages/caret/versions/6.0-76) {#CARET}
+An R programming package of tools for training and plotting classification and regression models.
+
+## [Data Frame](https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html) {#DataFrame}
+An R Data Frame is a two-dimensional tabular structure with labeled axes (rows and columns), where data observations are represented by rows and data variables are represented by columns.
+
+## Dictionary
+A dictionary is an associative array which is indexed by keys which map to values.  Therefore, a dictionary is an unordered set of key:value pairs where each key is unique.  In R, a dictionary can be implemented using a [named list](http://www.r-tutor.com/r-introduction/list/named-list-members).  Please see the following example of named list creation and access:
+```{r}
+student <- read.csv('/Users/class.csv')
+values <- student$Age
+names(values) <- student$Name
+print(values["James"])
+```
+
+## [dplyr](https://cran.r-project.org/web/packages/dplyr/dplyr.pdf) {#DPLYR}
+An R programming package of tools for workng with [data frame](#DataFrame) like objects.
+
+## [gbm](https://cran.r-project.org/web/packages/gbm/gbm.pdf) {#GBM}
+An R programming package useful for building and analyzing gradient boosting models.
+
+## [gdata](https://cran.r-project.org/web/packages/gdata/gdata.pdf) {#GDATA}
+An R programming package of tools useful for data manipulation.
+
+## [List](http://www.r-tutor.com/r-introduction/list) {#list}
+An R list is a sequence of comma-separated objects that need not be of the same type.  Please see the following example of list creation and access:
+
+```{r}
+list1 <- list('item1', 102)
+print(list1)
+print(list1[1])
+```
+
+## [randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf) {#RANDOM}
+An R programming package of tools useful for building and analyzing classification and regression random forest models.
+
+## [RSNNS](https://cran.r-project.org/web/packages/RSNNS/RSNNS.pdf) [#RSNNS]
+An R programming package of tools useful for building and analyzing classification and regression neural network models.
+
+## [rjson](https://cran.r-project.org/web/packages/rjson/rjson.pdf) {#RJSON}
+An R programming package of tools useful for converting R objects into JSON objects, and JSON objects into R objects.
+
+## [tree](https://cran.r-project.org/web/packages/tree/index.html) {#TREE}
+An R programming package of tools useful for building and analyzing classification and regression decision trees.
+
+## [Vector](https://www.tutorialspoint.com/r/r_data_types.htm) {#vector}
+A one-dimensional data structure which is able to hold different classes of elements, but only one class per vector.
+
+## [xgboost](https://cran.r-project.org/web/packages/xgboost/xgboost.pdf) {#XGBOOST}
+An R programming package of tools useful for building and analyzing classification and regression extreme gradient boosting models.
+
+***
+
+For more information on R packages and functions, along with helpful examples, please see [R](https://www.rdocumentation.org/).
+
