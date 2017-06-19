@@ -1,0 +1,2305 @@
+---
+title: "SAS Tutorial"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r, message=FALSE, echo=FALSE}
+require(knitr)
+saspath <- "C:/Program Files/SASHome/SASFoundation/9.4/sas.exe"
+sasopts <- "-nosplash -ls 75"
+opts_chunk$set(engine="sas", engine.path=saspath, engine.opts=sasopts, comment="")
+
+```
+
+In SAS, 
+```{r}
+*  This is a single line comment ;
+/* This is a paragraph 
+   comment */
+```
+
+# 1 Reading in Data and Basic Statistical Functions
+
+## 1.1 Read in the data.
+
+The [IMPORT Procedure](#import) is useful for reading in [SAS data sets](#DATASET) of a variety of different types.
+
+### a) Read the data in as a .csv file.
+
+```{r, eval = FALSE}
+proc import out = student
+  datafile = 'C:/Users/class.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+```
+
+### b) Read the data in as a .xls file.
+
+```{r, eval=FALSE}
+proc import out = student_xls
+  datafile = 'C:/Users/class.xls'
+  dbms = xls replace;
+  getnames = yes;
+run;
+```
+
+### c) Read the data in as a .json file.
+
+```{r, eval = FALSE}
+data student_json; 
+  INFILE 'C:/Users/class.json' LRECL  = 3456677  TRUNCOVER SCANOVER 
+    dsd 
+    dlm=",}"; 
+  INPUT 
+    @'"Name":' Name : $12. 
+    @'"Sex":' Sex : $2. 
+    @'"Age":' Age :  
+    @'"Height":' Height :  
+    @'"Weight":' Weight :  
+    @@; 
+run;
+```
+[DATA step](#step)([infile](#infile) & [input](#input) statements)
+
+## 1.2 Find the dimensions of the data set.
+
+```{r, eval = FALSE}
+/* SAS automatically prints this information when proc import is run */
+```
+Output:
+![output](procimport.png)
+
+## 1.3 Find basic information about the data set.
+
+The [CONTENTS procedure](#contents) prints information about a [SAS data set](#DATASET).
+```{r, echo=6:7}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+proc contents data = student short;
+run;
+```
+
+## 1.4 Look at the first 5 observations.
+
+The [PRINT procedure](#print) prints a [SAS data set](#DATASET), according to the specifications and options provided
+```{r, echo=6:9}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+/* obs= option tells SAS how many observations to print, starting
+   with the first observation */
+proc print data = student (obs=5);
+run;
+```
+
+## 1.5 Calculate mean of numeric variables.
+
+The [MEANS procedure](#means) prints the mean of numeric variables of a [SAS data set](#DATASET), as well as other descriptive statistics.
+```{r, echo=6:8}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+/* SAS automatically prints the mean of all numeric variables */
+proc means data = student mean;
+run;
+```
+
+## 1.6 Compute summary statistics of the data set.
+
+```{r, echo=6:11}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+/* SAS uses a different method than Python and R to compute compute
+   quartiles, but the method in each language can be changed */
+/* maxdec= option tells SAS to print at most 2 numbers behind
+   the decimal point */
+proc means data = student min q1 median mean q3 max n maxdec=2; 
+run;
+```
+[MEANS Procedure](#means)
+
+## 1.7 Descriptive statistics functions applied to columns of the data set.
+
+```{r, echo=6:10}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+/* The var statement tells SAS which variable to use for the
+   procedure */
+proc means data = student stddev sum n max min median maxdec=2; 
+  var Weight; 
+run;
+```
+[MEANS Procedure](#means)
+
+## 1.8 Produce a one-way table to describe the frequency of a variable.
+
+The [FREQ procedure](#freq) prints the frequency of categorical or discrete variables of a [SAS data set](#DATASET).
+
+### a) Produce a one-way table of a discrete variable.
+```{r, echo=6:8}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+proc freq data = student; 
+  tables Age; 
+run;
+```
+
+### b) Produce a one-way table of a categorical variable.
+```{r, echo=6:8}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+proc freq data = student; 
+  tables Sex; 
+run;
+```
+
+The tables statement allows you to specify multiple variables at once, separated only by a space, so both of these tables could have been created with one [FREQ procedure](#freq) call.
+
+## 1.9 Produce a two-way table to visualize the frequency of two categorical (or discrete) variables.
+
+```{r, echo=6:10}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+/* The "*" between two variables on the tables statement
+   indicates to produce a two-way table of the two variables */
+proc freq data = student; 
+  tables Age*Sex; 
+run;
+```
+[FREQ Procedure](#freq)
+
+## 1.10 Select a subset of the data that meets a certain criterion.
+
+```{r, echo=6:11}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data females; 
+  set student; 
+  where Sex = "F"; 
+run;	
+proc print data = females(obs=5); 
+run; 
+```
+[DATA step](#step)([set](#set) & [where](#where) statements)
+
+## 1.11 Determine the correlation between two continuous variables.
+
+```{r, echo=6:8}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+proc corr data = student pearson;
+var Height Weight;
+run; 
+```
+[CORR Procedure](#corr)
+
+***
+
+\newpage
+
+# 2 Basic Graphing and Plotting Functions
+
+The [SGPLOT procedure](#sgplot) is a very useful SAS procedure for producing plots from data.  For more information on other statements within the SGPLOT procedure, please see the Appendix Section 2.
+
+## 2.1 Visualize a single continuous variable by producing a histogram.
+
+```{r, eval = FALSE}
+/* Notice the specifcation of the bins, as well as the xaxis values */
+/* SAS denotes "count" as what R & Python denote as "frequency" */
+proc sgplot data = student;
+  histogram weight / binwidth=20 binstart=40 scale=count;
+  xaxis values=(40 to 160 by 20);
+run;
+```
+
+Output:
+![output](WeightHist.png)
+
+## 2.2 Visualize a single continuous variable by producing a boxplot.
+
+```{r, eval = FALSE}
+proc sgplot data = student; 
+  vbox Weight; 
+run;
+```
+
+Output:
+![output](WeightBox.png)
+
+## 2.3 Visualize two continuous variables by producing a scatterplot.
+
+```{r, eval = FALSE}
+/* Notice here you specify the y variable first and then the x variable */
+/* Also, SAS automatically plots the mean on the boxplot */
+proc sgscatter data = student; 
+  plot Weight * Height; 
+run; 
+```
+
+Output:
+![output](SGScatterPlot.png)
+
+[SGSCATTER Procedure](#sgscatter)
+
+## 2.4 Visualize a relationship between two continuous variables by producing a scatterplot and a plotted line of best fit.
+
+```{r, eval = FALSE}
+/* Use proc reg to get the parameter estimates for the line of best fit, 
+   but don't print the graph (ods graphics off) */
+ods graphics off; 
+proc reg data = student; 
+  /* Syntax indicates Weight as a function of Height */
+  model Weight = Height; 
+  ods output ParameterEstimates=PE; 
+run; 
+ods graphics on; 
+
+/* data _null_ indicates to not create a data set, but
+   run the code within the data step to create macro 
+   variables to store the parameter estimates */
+data _null_; 
+  set PE; 
+  if _n_=1 then call symput('Int', put(estimate, BEST6.)); 
+  else call symput('Slope', put(estimate, BEST6.)); 
+run; 
+
+/* Use proc sgplot with the reg statement so it prints the line of best fit, 
+   and use the inset statement to print the equation of the line 
+   of best fit */
+proc sgplot data = student noautolegend; 
+  reg y = Weight x = Height; 
+  inset "Line: Y = &Slope x + &Int" / position=topleft; 
+run; 
+```
+
+Output:
+![output](ScatterLine.png)
+
+[REG Procedure](#reg), [DATA step](#step)([set](#set) statement), [macro variables](https://v8doc.sas.com/sashtml/macro/z1071889.htm), [call symput()](https://v8doc.sas.com/sashtml/macro/z0210266.htm) function
+
+## 2.5 Visualize a categorical variable by producing a bar chart.
+
+```{r, eval = FALSE}
+/* Notice here you must first sort by Sex and then plot the vertical 
+  bar chart */
+proc sort data = student; 
+  by Sex; 
+run; 
+proc sgplot data = student; 
+  vbar Sex; 
+run; 
+```
+
+Output:
+![output](BarChart.png)
+
+[SORT Procedure](#sort)
+
+## 2.6 Visualize a continuous variable, grouped by a categorical variable, using side-by-side boxplots.
+### More advanced side-by-side boxplot with color.
+```{r sidebyside, eval=FALSE}
+proc sgplot data = student; 
+  vbox Weight / group=Sex; 
+run; 
+```
+
+Output:
+![output](SGPlot.png)
+
+***
+
+\newpage
+
+# 3 Basic Data Wrangling and Manipulation
+
+Many of the following examples make use of the [SAS DATA step](#step) for manipulating and altering data sets, and a main part of the DATA step is the [set](#set) statement.
+
+## 3.1 Create a new variable in a data set as a function of existing variables in the data set.
+
+```{r, echo=6:11}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+  set student; 
+  BMI = Weight / (Height**2) * 703; 
+run; 
+proc print data = student(obs=5); 
+run;
+```
+
+## 3.2 Create a new variable in a data set using if/else logic of existing variables in the data set.
+
+```{r, echo=10:16}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+set student; 
+BMI = Weight / (Height**2) * 703; 
+run;
+data student; 
+  set student; 
+  if (BMI < 19.0) then BMI_class = "Underweight"; 
+  else BMI_class = "Healthy"; 
+run; 
+proc print data = student(obs=5); 
+run;
+```
+[if-then/else](#if) statement
+
+## 3.3 Create a new variable in a data set using mathemtical functions applied to existing variables in the data set.
+
+Using the log() function, the exp() function, the sqrt() function, and the abs() function.
+```{r, echo=12:25}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+set student; 
+BMI = Weight / (Height**2) * 703; 
+if (BMI < 19.0) then BMI_class = "Underweight"; 
+else BMI_class = "Healthy"; 
+run; 
+data student; 
+  set student; 
+  LogWeight = log(Weight); 
+  ExpAge = exp(Age); 
+  SqrtHeight = sqrt(Height); 
+  if (BMI < 19.0) then BMI_Neg = -BMI; 
+  else BMI_Neg = BMI; 
+  BMI_Pos = abs(BMI_Neg); 
+  /* Create a boolean variable, which is handled differently
+     in SAS than in Python and R */
+  BMI_Check = (BMI_Pos = BMI); 
+run; 
+proc print data = student(obs=5); 
+run; 
+```
+[if-then/else](#if) statement
+
+[log()](http://support.sas.com/documentation/cdl/en/lefunctionsref/63354/HTML/default/viewer.htm#p0urbseuxrkrlyn1tr04y30nt25s.htm), [exp()](http://support.sas.com/documentation/cdl/en/lefunctionsref/63354/HTML/default/viewer.htm#n0ocutx9jgosdln17xg1z75jmkbv.htm), [sqrt()](http://support.sas.com/documentation/cdl/en/lefunctionsref/63354/HTML/default/viewer.htm#n0uc20qbw3wi2jn1y1tan8rq8mnm.htm), & [abs()](http://support.sas.com/documentation/cdl/en/lefunctionsref/63354/HTML/default/viewer.htm#p0xkrj83an7dknn1sgukpmnphcje.htm) functions
+
+## 3.4 Drop variables from a data set.
+
+```{r echo=19:23}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+set student; 
+BMI = Weight / (Height**2) * 703; 
+if (BMI < 19.0) then BMI_class = "Underweight"; 
+else BMI_class = "Healthy"; 
+LogWeight = log(Weight); 
+ExpAge = exp(Age); 
+SqrtHeight = sqrt(Height); 
+if (BMI < 19.0) then BMI_Neg = -BMI; 
+else BMI_Neg = BMI; 
+BMI_Pos = abs(BMI_Neg); 
+BMI_Check = (BMI_Pos = BMI);
+run; 
+data student; 
+  set student (drop = LogWeight ExpAge SqrtHeight BMI_Neg BMI_Pos BMI_Check); 
+run; 
+proc print data = student(obs=5); 
+run;
+```
+[drop=](http://support.sas.com/documentation/cdl/en/ledsoptsref/63326/HTML/default/viewer.htm#n15goor3q758g5n1eykstufkpdhy.htm) data set option
+
+## 3.5 Sort a data set by a variable.
+
+### a) Sort data set by a continuous variable.
+```{r, echo=12:16}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+set student; 
+BMI = Weight / (Height**2) * 703; 
+if (BMI < 19.0) then BMI_class = "Underweight"; 
+else BMI_class = "Healthy"; 
+run; 
+proc sort data = student; 
+  by Age; 
+run; 
+proc print data = student(obs=5); 
+run;
+```
+[SORT Procedure](#sort)
+
+### b) Sort data set by a categorical variable.
+```{r, echo=15:21}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+set student; 
+BMI = Weight / (Height**2) * 703; 
+if (BMI < 19.0) then BMI_class = "Underweight"; 
+else BMI_class = "Healthy"; 
+run; 
+proc sort data = student; 
+by Age; 
+run;
+proc sort data = student; 
+  by Sex; 
+run; 
+/* Notice that the data is now sorted first by Sex and
+   then within Sex by Age */
+proc print data = student(obs=5); 
+run;
+```
+[SORT Procedure](#sort)
+
+## 3.6 Compute descriptive statistics of continuous variables, grouped by a categorical variable.
+
+```{r, echo=18:21, warning=FALSE}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+set student; 
+BMI = Weight / (Height**2) * 703; 
+if (BMI < 19.0) then BMI_class = "Underweight"; 
+else BMI_class = "Healthy"; 
+run;
+proc sort data = student; 
+by Age; 
+run; 
+proc sort data = student; 
+by Sex; 
+run; 
+proc means data = student mean; 
+  by Sex; 
+  var Age Height Weight BMI; 
+run;
+```
+[MEANS Procedure](#means)
+
+## 3.7 Add a new row to the bottom of a data set.
+
+```{r, echo=18:20}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+set student; 
+BMI = Weight / (Height**2) * 703; 
+if (BMI < 19.0) then BMI_class = "Underweight"; 
+else BMI_class = "Healthy"; 
+run;
+proc sort data = student; 
+by Age; 
+run; 
+proc sort data = student; 
+by Sex; 
+run;
+/* Look at the tail of the data currently */
+proc print data = student(firstobs=15); 
+run; 
+```
+
+```{r, echo=18:33}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+set student; 
+BMI = Weight / (Height**2) * 703; 
+if (BMI < 19.0) then BMI_class = "Underweight"; 
+else BMI_class = "Healthy"; 
+run;
+proc sort data = student; 
+by Age; 
+run; 
+proc sort data = student; 
+by Sex; 
+run;
+data student; 
+  set student end = eof; 
+  output; 
+  if eof then do; 
+    Name = 'Jane'; 
+    Sex = 'F'; 
+    Age = 14; 
+    Height = 56.3; 
+    Weight = 77.0; 
+    BMI = 17.077695; 
+    BMI_Class = 'Underweight'; 
+    output; 
+  end; 
+run; 
+proc print data = student(firstobs=16); 
+run;
+```
+[if-then/else](#if) & [output] statements, [do loop](#do), [end=](#step) & [firstobs=](http://support.sas.com/documentation/cdl/en/ledsoptsref/69751/HTML/default/viewer.htm#p0wjxoxrco6dsgn1ls5n3mbybcng.htm) data set options
+
+## 3.8 Create a user defined function and apply it to a variable in the data set to create a new variable in the data set.
+
+```{r, echo=18:32}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student; 
+set student; 
+BMI = Weight / (Height**2) * 703; 
+if (BMI < 19.0) then BMI_class = "Underweight"; 
+else BMI_class = "Healthy"; 
+run;
+proc sort data = student; 
+by Age; 
+run; 
+proc sort data = student; 
+by Sex; 
+run;
+proc fcmp outlib=sasuser.userfuncs.myfunc; 
+  function toKG(lb); 
+    kg = 0.45359237 * lb; 
+  return(kg); 
+endsub;
+
+options cmplib=sasuser.userfuncs; 
+
+data studentKG; 
+  set student; 
+  Weight_KG = toKG(Weight); 
+run;
+
+proc print data = studentKG(obs=5);
+run;
+```
+[FCMP Procedure](#fcmp)
+
+***
+
+\newpage
+
+# 4 More Advanced Data Wrangling
+
+## 4.1 Drop observations with missing information.
+
+```{r}
+/* Notice the use of the fish data set because it has some missing 
+   observations */
+proc import out = fish 
+  datafile='C:/Users/fish.csv' 
+  dbms = csv replace; 
+  getnames = yes; 
+run; 
+
+/* First sort by Weight, requesting those with NA for Weight first,
+   which SAS does automatically */
+proc sort data = fish; 
+  by Weight; 
+run; 
+proc print data = fish(obs=5); 
+run;
+```
+
+```{r, echo=9:16}
+proc import out = fish 
+datafile='C:/Users/fish.csv' 
+dbms = csv replace; 
+getnames = yes; 
+run; 
+proc sort data = fish; 
+by Weight; 
+run; 
+data new_fish; 
+  set fish; 
+  /* Notice the not-equal operator (^=) and how SAS denotes
+     missing values (.) */
+  if (Weight ^= .); 
+run; 
+proc print data = new_fish(obs=5); 
+run;
+```
+[SORT Procedure](#sort), [if-then/else](#if) statement
+
+## 4.2 Merge two data sets together on a common variable.
+
+### a) First, select specific columns of a data set to create two smaller data sets.
+
+```{r}
+/* Notice the use of the student data set again, however we want to reload it 
+   without the changes we've made previously  */
+proc import out = student
+  datafile = 'C:/Users/class.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+data student1; 
+  set student(keep= Name Sex Age); 
+run; 
+proc print data = student1(obs=5); 
+run; 
+```
+
+```{r, echo=6:10}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student2; 
+  set student(keep= Name Height Weight); 
+run; 
+proc print data = student2(obs=5); 
+run;
+```
+[keep=](http://support.sas.com/documentation/cdl/en/ledsoptsref/69751/HTML/default/viewer.htm#p0vw9lyyxk1cxkn0zzfemrsr3t9a.htm) data set option
+
+### b) Second, we want to merge the two smaller data sets on the common variable.
+
+```{r, echo=12:17}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student1; 
+set student(keep= Name Sex Age); 
+run; 
+data student2; 
+set student(keep= Name Height Weight); 
+run; 
+data new; 
+  merge student1 student2; 
+  by Name; 
+run; 
+proc print data = new(obs=5); 
+run;
+```
+[merge](#merge) statement
+
+### c) Finally, we want to check to see if the merged data set is the same as the original data set.
+
+```{r, echo=16:17}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data student1; 
+set student(keep= Name Sex Age); 
+run; 
+data student2; 
+set student(keep= Name Height Weight); 
+run; 
+data new; 
+merge student1 student2; 
+by Name; 
+run; 
+proc compare base = student compare = new brief; 
+run;
+```
+[COMPARE Procedure](#compare)
+
+## 4.3 Merge two data sets together by index number only.
+
+### a) First, select specific columns of a data set to create two smaller data sets.
+
+```{r, echo=6:10}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data newstudent1; 
+  set student(keep= Name Sex Age); 
+run; 
+proc print data = newstudent1(obs=5); 
+run;
+```
+
+```{r, echo=6:10}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data newstudent2; 
+  set student(keep= Height Weight); 
+run; 
+proc print data = newstudent2(obs=5); 
+run;
+```
+[keep=](http://support.sas.com/documentation/cdl/en/ledsoptsref/69751/HTML/default/viewer.htm#p0vw9lyyxk1cxkn0zzfemrsr3t9a.htm) data set option
+
+### b) Second, we want to join the two smaller data sets.
+
+```{r, echo=12:16}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data newstudent1; 
+set student(keep= Name Sex Age); 
+run; 
+data newstudent2; 
+set student(keep= Height Weight); 
+run;
+data new2; 
+  merge newstudent1 newstudent2; 
+run; 
+proc print data = new2(obs=5); 
+run;
+```
+[merge](#merge) statement
+
+### c) Finally, we want to check to see if the joined data set is the same as the original data set.
+
+```{r, echo=15:16 }
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+data newstudent1; 
+set student(keep= Name Sex Age); 
+run; 
+data newstudent2; 
+set student(keep= Height Weight); 
+run;
+data new2; 
+merge newstudent1 newstudent2; 
+run; 
+proc compare base = student compare = new2 brief; 
+run;
+```
+
+## 4.4 Create a pivot table to summarize information about a data set.
+
+```{r}
+/* Notice we are using a new data set that needs to be read into the 
+   environment */
+proc import out = price
+  datafile = 'C:/Users/price.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+  
+/* The following code is used to remove the "," and "$" characters from the 
+  ACTUAL column so that values can be summed */
+data price;
+  set price;
+  num_actual = input(actual, dollar10.);
+run;
+
+proc sql; 
+  create table categorysales as  
+    select country, state, prodtype,   
+    product, sum(num_actual) as REVENUE 
+    from price 
+  group by country, state, prodtype, product; 
+quit; 
+proc print data = categorysales(obs=5); 
+run;
+```
+[input()](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000180357.htm) function, [SQL Procedure](#sql)
+
+***
+
+\newpage
+
+# 5 Preparation & Basic Regression
+
+## 5.1 Pre-process a data set using principal component analysis.
+
+```{r}
+/* Notice we are using a new data set that needs to be read into the 
+   environment */
+proc import out = iris
+  datafile = 'C:/Users/iris.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+  
+data features;
+set iris(drop=Target);
+run;
+
+proc princomp data = features noprint outstat = feat_princomp;
+var SepalLength SepalWidth PetalLength PetalWidth;
+run;
+
+data eigenvectors;
+	set feat_princomp;
+	where _TYPE_ = "SCORE";
+run;
+proc print data = eigenvectors;
+run;
+```
+[drop=](http://support.sas.com/documentation/cdl/en/ledsoptsref/63326/HTML/default/viewer.htm#n15goor3q758g5n1eykstufkpdhy.htm) data set option, [PRINCOMP Procedure](#princomp)
+
+## 5.2 Split data into training and testing data and export as a .csv file.
+
+```{r, eval = FALSE}
+/* outall option tells SAS to add a flag showing which observations were 
+   chosen */
+/* seed = 29 specifies the seed for random values so the results are 
+   reproducible */
+proc surveyselect data = iris outall out = all method = srs samprate = 0.7 
+                              seed = 29;
+run;
+
+data train (drop = selected);
+	set all;
+	where (selected = 1);
+run;
+data test (drop = selected);
+	set all;
+	where (selected = 0);
+run;
+
+proc export data = train
+   outfile = 'C:\Users\iris_train.csv'
+   dbms = csv;
+run;
+proc export data = test
+   outfile = 'C:\Users\iris_test.csv'
+   dbms = csv;
+run;
+```
+[SURVEYSELECT Procedure](#surveyselect), [drop= ](http://support.sas.com/documentation/cdl/en/ledsoptsref/63326/HTML/default/viewer.htm#n15goor3q758g5n1eykstufkpdhy.htm) data set option, [EXPORT Procedure](#export)
+
+## 5.3 Fit a logistic regression model.
+
+```{r}
+/* Notice we are using a new data set that needs to be read into the 
+   environment */
+proc import out = tips
+  datafile = 'C:/Users/tips.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+
+/* The following code is used to determine if the individual left more than
+   a 15% tip */
+data tips; 
+  set tips; 
+  if (tip > 0.15*total_bill) then greater15 = 1; 
+  else greater15 = 0; 
+run; 
+
+/* The descending option tells SAS to model the probability that 
+  greater15 = 1 */
+proc genmod data=tips descending; 
+  model greater15 = total_bill / dist = bin link = logit lrci; 
+run; 
+```
+[if-then/else](#if) statement, [GENMOD Procedure](#genmod)
+
+## 5.4 Fit a linear regression model.
+
+```{r, echo = 6:9}
+proc import out = tips
+  datafile = 'C:/Users/tips.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+/* Fit a linear regression model of tip by total_bill */
+proc reg data = tips outest=RegOut;
+	tip_hat: model tip = total_bill;
+quit;
+```
+[REG Procedure](#reg)
+
+# 6 Regression & Machine Learning: Modeling & Prediction
+
+## 6.1 Fit a logistic regression model on training data and assess against testing data.
+
+### a) Fit a logistic regression model on training data.
+```{r}
+/* Notice we are using new data sets that need to be read into the 
+   environment */
+proc import out = train
+  datafile = 'C:/Users/tips_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/tips_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+
+/* The following code is used to determine if the individual left more than
+   a 15% tip */
+data train; 
+  set train; 
+  if (tip > 0.15*total_bill) then greater15 = 1; 
+  else greater15 = 0; 
+run; 
+data test; 
+  set test; 
+  if (tip > 0.15*total_bill) then greater15 = 1; 
+  else greater15 = 0; 
+run; 
+
+/* The descending option tells SAS to model the probability that 
+  greater15 = 1 */
+proc genmod data=train descending; 
+  model greater15 = total_bill / dist = bin link = logit lrci; 
+  store out = logmod;
+run;
+```
+
+### b) Assess the model against the testing data.
+```{r, echo = 27:43}
+proc import out = train
+  datafile = 'C:/Users/tips_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/tips_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+data train; 
+  set train; 
+  if (tip > 0.15*total_bill) then greater15 = 1; 
+  else greater15 = 0; 
+run; 
+data test; 
+  set test; 
+  if (tip > 0.15*total_bill) then greater15 = 1; 
+  else greater15 = 0; 
+run; 
+ods select none;
+proc genmod data=train descending; 
+  model greater15 = total_bill / dist = bin link = logit lrci; 
+  store out = logmod;
+run;
+ods select all;
+/* Prediction on testing data */
+proc plm source = logmod noprint;
+	score data = test out = preds pred = pred / ilink;
+run;
+
+/* Determine how many were correctly classified */
+data preds;
+	set preds;
+	if (pred < 0.5) then label = 0;
+	else label = 1;
+	if (label = greater15) then Result = "Correct";
+	else Result = "Wrong";
+run;
+
+proc freq data = preds;
+tables Result;
+run;
+```
+
+## 6.2 Fit a linear regression model on training data and assess against testing data.
+
+### a) Fit a linear regression model on training data.
+```{r}
+/* Notice we are using new data sets that need to be read into the 
+  environment */
+proc import out = train
+  datafile = 'C:/Users/boston_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/boston_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+
+proc reg data = train outest=RegOut;
+  predY: model Target = _0-_12;
+quit;
+```
+
+### b) Assess the model against the testing data.
+```{r, echo = 14:29}
+proc import out = train
+  datafile = 'C:/Users/boston_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/boston_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc reg data = train outest=RegOut noprint;
+  predY: model Target = _0-_12;
+quit;
+/* Predicton on testing data */
+proc score data = test score=RegOut type=parms predict out = Pred;
+	var _0-_12;
+run;
+
+/* Compute the squared differences between predicted and target */
+data Pred;
+	set Pred;
+	sq_error = (predY - Target)**2;
+run;
+  
+/* Compute the mean of the squared differences (mean squared error) as an 
+   assessment of the model */
+proc means data = Pred mean;
+  var sq_error;
+run;
+```
+
+## 6.3 Fit a decision tree model on training data and assess against testing data.
+
+### a) Fit a decision tree classification model.
+
+#### i) Fit a decision tree classification model on training data, plot the tree, and determine variable importance
+```{r}
+/* Notice we are using new data sets that need to be read into the 
+   environment */
+proc import out = train
+	datafile = 'C:/Users/breastcancer_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/breastcancer_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+	
+/* HPSPLIT procedure is used to fit a decision tree model */
+proc hpsplit data = train;
+	target Target;
+	input _0-_29;
+	/* Export information about variable importance */
+	output importance=import;
+	/* Export the model code so this can be used to score testing data */
+	code file='hpbreastcancer.sas';
+run;
+	
+/* Output of this model gives assessment against training data, a plot of 
+	 the tree, and variable importance */
+```
+Output:
+![output](DT11.png)
+
+Output:
+![output](DT12.png)
+
+[HPSPLIT Procedure](#hpsplit)
+
+#### ii. Assess the model against the testing data.
+```{r, echo=19:41}
+proc import out = train
+	datafile = 'C:/Users/breastcancer_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/breastcancer_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc hpsplit data = train noprint;
+	target Target;
+	input _0-_29;
+	output importance=import;
+	prune none;
+	code file='hpbreastcancer.sas';
+	rules file='rules.txt';
+run;
+/* Score the test data using the model code */
+data scored;
+	set test;
+	%include 'hpbreastcancer.sas';
+run;	
+	
+/* Use prediction probabilities to generate predictions, and compare these to 
+	 the true responses */
+/* If the prediction probability is less than 0.5, classify this as a 0
+   and otherwise classify as a 1.  This isn't the best method -- a better 
+   method would be randomly assigning a 0 or 1 when a probability of 0.5 
+   occurrs, but this insures that results are consistent */
+data scored;
+	set scored;
+	if (P_Target1 < 0.5) then prediction = 0;
+	else prediction = 1;
+	if (Target = prediction) then Result = "Correct";
+  else Result = "Wrong";
+run;
+
+/* Determine how many were correctly classified */
+proc freq data = scored;
+  tables Result;
+run;
+```
+[%include](#include) & [if-then/else](#if) statements, [FREQ Procedure](#freq)
+
+### b) Fit a decision tree regression model.
+
+#### i) Fit a decision tree regression model on training data, plot the tree, and determine variable importance.
+```{r}
+/* Notice we are re-using data sets but it is good to re-read the 
+   original versions back into the environment */
+proc import out = train
+	datafile = 'C:/Users/boston_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/boston_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+	
+/* HPSPLIT procedure is used to fit a decision tree model */
+proc hpsplit data = train;
+	target Target / level = int;
+	input _0-_12;
+	/* Export information about variable importance */
+	output importance=import;
+	/* Export the model code so this can be used to score testing data */
+	code file='hpboston.sas';
+run;
+	
+/* Output of this model gives assessment against training data, 
+	 a plot of the tree, and variable importance */
+```
+
+Output:
+![output](DT22.png)
+
+Output:
+![output](DT21.png)
+
+```{r, echo=16:32}
+proc import out = train
+	datafile = 'C:/Users/boston_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/boston_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc hpsplit data = train noprint;
+	target Target / level = int;
+	input _0-_12;
+	code file='hpboston.sas';
+run;
+/* Score the test data using the model code */
+data scored;
+	set test;
+	%include 'hpboston.sas';
+run;	
+	
+/* Compute the squared differences between predicted and target */
+data scored;
+	set scored;
+	sq_error = (P_Target - Target)**2;
+run;
+  
+/* Compute the mean of the squared differences (mean squared error) as an assessment 
+  of the model */
+proc means data = scored mean;
+  var sq_error;
+run;
+```
+
+## 6.4 Fit a random forest model on training data and assess against testing data.
+
+### a) Fit a random forest classification model.
+
+#### i) Fit a random forest classification model on training data and determine variable importance.
+```{r}
+/* Notice we are re-using data sets but it is good to re-read the 
+   original version back into the environment */
+proc import out = train
+	datafile = 'C:/Users/breastcancer_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/breastcancer_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+	
+/* Output includes information about variable importance */
+proc hpforest data = train;
+	input _0 - _29 / level = interval;
+	target Target / level = nominal;
+	save file = 'hpbreastcancer2.bin';
+run;
+```
+
+#### ii) Assess the model against the testing data.
+```{r, echo = 18:33}
+proc import out = train
+	datafile = 'C:/Users/breastcancer_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/breastcancer_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+ods select none;
+proc hpforest data = train;
+	input _0 - _29 / level = interval;
+	target Target / level = nominal;
+	save file = 'hpbreastcancer2.bin';
+run;
+ods select all;
+/* Prediction on testing data */
+proc hp4score data = test seed = 29;
+	score file = 'hpbreastcancer2.bin' out = scored;
+run;
+
+/* Determine how many were correctly classified */
+data scored;
+	set scored;
+	if (I_Target = Target) then Result = "Correct";
+	else Result = "Wrong";
+run;
+
+proc freq data = scored;
+  tables Result;
+run;	
+```
+
+### b) Fit a random forest regression model.
+
+#### i) Fit a random forest regression model on training data and determine variable importance.
+```{r}
+/* Notice we are re-using data sets but it is good to re-read the original 
+  versions back into the environment */
+proc import out = train
+	datafile = 'C:/Users/boston_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/boston_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+	
+proc hpforest data = train;
+	input _0-_12 / level = interval;
+	target Target / level = interval;
+	save file = 'hpboston2.bin';
+run;
+```
+
+#### ii) Assess the model against the testing data.
+```{r, echo = 18:33}
+proc import out = train
+	datafile = 'C:/Users/boston_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/boston_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+ods select none;
+proc hpforest data = train;
+	input _0-_12 / level = interval;
+	target Target / level = interval;
+	save file = 'hpboston2.bin';
+run;
+ods select all;
+/* Prediction on testing data */
+proc hp4score data = test seed = 29;
+	score file = 'hpboston2.bin' out = scored;
+run;
+	
+/* Compute the squared differences between predicted and target */
+data scored;
+	set scored;
+	sq_error = (P_Target - Target)**2;
+run;
+  
+/* Compute the mean of the squared differences (mean squared error) as an 
+	 assessment of the model */
+proc means data = scored mean;
+  var sq_error;
+run;
+```
+
+## 6.5 Fit a gradient boosting model on training data and assess against testing data.
+
+### a) Fit a gradient boosting classification model.
+
+Currently, there is not a gradient boosting procedure available in SAS, currently.  Therefore, the best method to create a gradient boosting model currently is using SAS Enterprise Miner.  Create the following diagram in SAS Enterprise Miner:
+
+Output:
+![output](EM1.png)
+
+For the Gradient Boosting node, set Seed = 29, set Shrinkage = 0.01, and set Train Proportion = 100.
+
+This diagram results in the following variable importance and misclassification against training & testing data:
+
+Output:
+![output](VImpor1.png)
+
+Output:
+![output](Misclassification1.png)
+
+Output:
+![output](Misclassification2.png)
+
+### b) Fit a gradient boosting regression model.
+
+Again, there is not a gradient boosting procedure available in SAS, currently.  Create the following diagram in SAS Enterprise Miner:
+
+Output:
+![output](EM2.png)
+
+For the Gradient Boosting node, set Seed = 29, set Shrinkage = 0.01, and set Train Proportion = 100.
+
+This diagram results in the following variable importance and root mean squared error against training & testing data:
+
+Output:
+![output](VImpor.png)
+
+Output:
+![output](Misclassification3.png)
+
+## 6.6 Fit an extreme gradient boosting model on taining data and assess against testing data.
+
+### a) Fit an extreme gradient boosting classification model.
+
+#### Fit an extreme gradient boosting classification model on training data and assess the model against the testing data.
+```{r}
+proc iml;
+  submit / R;
+  	train = read.csv('C:/Users/breastcancer_train.csv')
+    test = read.csv('C:/Users/breastcancer_test.csv')
+    
+    library(xgboost)
+	  set.seed(29)
+	  
+    xgbMod <- xgboost(data.matrix(subset(train, select = -c(Target))), 
+                      data.matrix(train$Target), max_depth = 3, nrounds = 2, 
+                      objective = "binary:logistic", n_estimators = 2500,
+                      shrinkage = .01)
+    # Prediction on testing data
+    predictions <- predict(xgbMod, data.matrix(subset(test, select = - c(Target))))
+    pred.response <- ifelse(predictions < 0.5, 0, 1)
+    
+    # Determine how many were correctly classified
+    Results <- ifelse(test$Target == pred.response, "Correct", "Wrong") 
+    table(Results)
+  endsubmit;
+quit;
+```
+
+#### Fit an extreme gradient boosting regression model on training data and assess the model against the testing data.
+```{r}
+proc iml;
+  submit / R;
+  	train = read.csv('C:/Users/boston_train.csv')
+    test = read.csv('C:/Users/boston_test.csv')
+    
+    library(xgboost)
+	  set.seed(29)
+	  
+    xgbMod <- xgboost(data.matrix(subset(train, select = -c(Target))), 
+                      data.matrix(train$Target / 50), max_depth = 3, 
+                      nrounds = 2, n_estimators = 2500, shrinkage = .01)
+    
+    # Predict the target in the testing data, remembering to
+    # multiply by 50
+    prediction = data.frame(matrix(ncol = 0, nrow = nrow(test))) 
+    prediction$target_hat <- predict(xgbMod, 
+                                     data.matrix(subset(test, 
+                                                        select = - c(Target))))*50
+    
+    # Compute the squared difference between predicted tip and actual tip
+    prediction$sq_diff <- (prediction$target_hat - test$Target)**2
+    
+    # Compute the mean of the squared differences (mean squared error) # as an assessment of the model
+    mean_sq_error <- mean(prediction$sq_diff)
+    print(mean_sq_error)
+  endsubmit;
+quit;
+```
+
+## 6.7 Fit a support vector model on training data and assess against testing data.
+
+### a) Fit a support vector classification model.
+
+#### i) Fit a support vector classification model on training data.
+```{r} 
+/* Notice we are re-using data sets but it is good to re-read the original 
+   versions back into the environment */
+proc import out = train
+	datafile = 'C:/Users/breastcancer_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/breastcancer_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+	
+/* Fit a support vector classification model */
+proc hpsvm data = train;
+  input _0-_29 / level = interval;
+	target Target / level = nominal;
+	code file='hpbreastcancer3.sas';
+run;
+```
+
+#### ii) Assess the model against the testing data.
+```{r, echo = 18:33} 
+proc import out = train
+	datafile = 'C:/Users/breastcancer_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/breastcancer_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+ods select none;
+proc hpsvm data = train;
+  input _0-_29 / level = interval;
+	target Target / level = nominal;
+	code file='hpbreastcancer3.sas';
+run;	
+ods select all;
+/* Prediction on testing data */
+data scored;
+	set test;
+	%include 'hpbreastcancer3.sas';
+run;
+	
+/* Determine how many were correctly classified */
+data scored;
+	set scored;
+	if (I_Target = Target) then Result = "Correct";
+	else Result = "Wrong";
+run;
+
+proc freq data = scored;
+  tables Result;
+run;	
+```
+[HPSVM Procedure](#svm), [%include](#include) & [if-then/else](#if) statements, [FREQ Procedure](#freq)
+
+### b) Fit a support vector regression model.
+
+Not available in this current release.
+
+## 6.8 Fit a neural network model on training data and assess against testing data.
+
+### a) Fit a neural network classification model.
+
+#### i) Fit a neural network classification model on training data.
+```{r}
+/* Notice we are using new data sets that need to be read into the 
+   environment */
+proc import out = train
+  datafile = 'C:/Users/digits_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/digits_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+
+/* In order to use the NEURAL Procedure we first need to create a data
+   mining database (DMDB) that reflects the original data */
+proc dmdb batch data = train
+	out = dmtrain
+	dmdbcat = digits;
+  var _0 - _63;
+  class Target;
+  target Target;
+run;
+proc dmdb batch data = test
+	out = dmtest
+	dmdbcat = digits;
+  var _0 - _63;
+  class Target;
+  target Target;
+run;
+
+/* Now we can fit the neural network model */
+/* Neural network produces a lot of output which is why here
+	 "nloptions noprint" is specified */
+proc neural data = train dmdbcat = digits random = 29;
+  nloptions noprint;
+  input _0 - _63 / level = interval;
+  target Target / level = nominal;
+  hidden 100;
+  train maxiter = 200;
+  score out = out outfit = fit;
+  score data = test out = gridout;
+run;
+```
+
+#### ii) Assess the model against the testing data.
+```{r, echo = 34:43}
+proc import out = train
+  datafile = 'C:/Users/digits_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/digits_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc dmdb batch data = train
+	out = dmtrain
+	dmdbcat = digits;
+var _0 - _63;
+class Target;
+target Target;
+run;
+proc dmdb batch data = test
+	out = dmtest
+	dmdbcat = digits;
+var _0 - _63;
+class Target;
+target Target;
+run;
+proc neural data = train dmdbcat = digits random = 29;
+nloptions noprint;
+input _0 - _63 / level = interval;
+target Target / level = nominal;
+hidden 100;
+train maxiter = 200;
+score out = out outfit = fit;
+score data = test out = gridout;
+run;	
+/* Prediction on testing data */
+data scored;
+	set gridout;
+	rename I_Target = Prediction;
+run;
+	 
+/* This produces a confusion matrix */
+proc freq data = scored;
+	tables Target*Prediction / nopercent norow nocol;
+run;
+```
+
+### b) Fit a neural network regression model.
+
+#### i) Fit a neural network regression model on training data.
+```{r}
+/* Notice we are re-using data sets but it is good to re-read the original 
+   versions back into the environment */
+proc import out = train
+  datafile = 'C:/Users/boston_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/boston_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+
+/* In order to use the NEURAL Procedure we first need to create a data
+   mining database (DMDB) that reflects the original data */
+proc dmdb batch data = train
+	out = dmtrain
+	dmdbcat = boston;
+  var _0 - _12 Target;
+  target Target;
+run;
+proc dmdb batch data = test
+	out = dmtest
+	dmdbcat = boston;
+  var _0 - _12 Target;
+  target Target;
+run;
+
+/* Now we can fit the neural network model */
+/* Neural network produces a lot of output which is why here
+	 "nloptions noprint" is specified */
+proc neural data = train dmdbcat = boston random = 29;
+  nloptions noprint;
+  input _0 - _12 / level = interval;
+  hidden 100;
+  target Target / level = interval;
+  train maxiter = 200;
+  score data = test outfit = netfit out = gridout;
+run;
+```
+
+#### ii) Assess the model against the testing data.
+```{r, echo = 33:42}
+proc import out = train
+  datafile = 'C:/Users/boston_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/boston_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc dmdb batch data = train
+	out = dmtrain
+	dmdbcat = boston;
+var _0 - _12 Target;
+target Target;
+run;
+proc dmdb batch data = test
+	out = dmtest
+	dmdbcat = boston;
+var _0 - _12 Target;
+target Target;
+run;
+ods select none;
+proc neural data = train dmdbcat = boston random = 29;
+nloptions noprint;
+input _0 - _12 / level = interval;
+hidden 100;
+target Target / level = interval;
+train maxiter = 200;
+score data = test outfit = netfit out = gridout;
+run;
+ods select all;
+/* Prediction on testing data */
+data scored(keep = sq_error P_Target Target);
+	set gridout;
+	sq_error = (P_Target - Target)**2;
+run;
+
+/* Determine mean squared error */
+proc means data = scored mean;
+var sq_error;
+run;
+```
+
+***
+
+\newpage
+
+# 7 Model Evaluation & Selection
+
+## 7.1 Evaluate the accuracy of regression models.
+
+### a) Evaluation on training data.
+```{r}
+/* Notice we are re-using data sets but it is good to re-read the original 
+  version back into the environment */
+proc import out = train
+  datafile = 'C:/Users/boston_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/boston_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+
+/* Random Forest Regression Model */
+ods select none;
+proc hpforest data = train ;
+	input _0-_12 / level = interval;
+	target Target / level = interval;
+	save file = 'rfMod.bin';
+run;
+ods select all;
+
+/* Evaluation on training data  */
+proc hp4score data = train;
+	score file = 'rfMod.bin' out = scored_train;
+run;
+
+/* Determine coefficient of determination score */
+proc iml;
+  use scored_train;
+    read all var _ALL_ into data;
+  close scored_train;
+  tip = data[,1];
+  pred_rf = data[,2];
+  r2_rf = 1 - ( (sum((tip - pred_rf)##2)) / (sum((tip - mean(tip))##2)) );
+  print(r2_rf);
+quit;
+```
+
+### b) Evaluation on testing data.
+```{r, echo = 18:34}
+proc import out = train
+  datafile = 'C:/Users/boston_train.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc import out = test
+  datafile = 'C:/Users/boston_test.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+ods select none;
+proc hpforest data = train ;
+	input _0-_12 / level = interval;
+	target Target / level = interval;
+	save file = 'rfMod.bin';
+run;
+ods select all;
+/* Random Forest Regression Model (rfMod) */
+
+/* Evaluation on testing data  */
+proc hp4score data = test;
+	score file = 'rfMod.bin' out = scored_test;
+run;
+
+/* Determine coefficient of determination score */
+proc iml;
+  use scored_test;
+    read all var _ALL_ into data;
+  close scored_test;
+  tip = data[,1];
+  pred_rf = data[,2];
+  r2_rf = 1 - ( (sum((tip - pred_rf)##2)) / (sum((tip - mean(tip))##2)) );
+  print(r2_rf);
+quit;
+```
+The formula used here for the coefficient score is based off the Python skearn formula for [r2_score](http://scikit-learn.org/stable/modules/model_evaluation.html#r2-score-the-coefficient-of-determination).
+
+[REG Procedure](#reg), [SCORE Procedure](#score), [IML Procedure](#iml), [HPFOREST Procedure](#hpforest), [HP4SCORE Procedure](#hp4score)
+
+## 7.2 Evaluate the accuracy of classification models.
+
+### a) Evaluation on training data.
+```{r}
+/* Notice we are re-using data sets but it is good to re-read the original 
+   versions back into the environment */
+proc import out = train
+	datafile = 'C:/Users/digits_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/digits_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+
+/* Random Forest Classification Model */
+ods select none;
+proc hpforest data = train;
+	input _0-_63 / level = interval;
+	target Target / level = nominal;
+	save file = 'rfMod.bin';
+run;
+ods select all;
+
+/* Evaluation on training data */
+proc hp4score data = train;
+	score file = 'rfMod.bin' out = scored;
+run;
+
+data scored(keep = Target I_Target correct);
+	set scored;
+	correct = (I_Target = Target);
+run;
+
+/* Determine accuracy score */
+proc iml;
+	use scored;
+	  read all var _ALL_ into data;
+	close scored;
+	
+	accuracy_forest = (1/nrow(data)) * sum(data[,2]);
+	
+	print(accuracy_forest);
+quit;
+```
+
+
+### b) Evaluation on testing data.
+```{r, echo = 18:39}
+proc import out = train
+	datafile = 'C:/Users/digits_train.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+proc import out = test
+	datafile = 'C:/Users/digits_test.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+ods select none;
+proc hpforest data = train;
+	input _0-_63 / level = interval;
+	target Target / level = nominal;
+	save file = 'rfMod.bin';
+run;
+ods select all;
+/* Random Forest Classification Model (rfMod) */
+
+/* Evaluation on testing data */
+proc hp4score data = test;
+	score file = 'rfMod.bin' out = scored;
+run;
+
+data scored(keep = Target I_Target correct);
+	set scored;
+	correct = (I_Target = Target);
+run;
+
+/* Determine accuracy score */
+proc iml;
+	use scored;
+	  read all var _ALL_ into data;
+	close scored;
+	
+	accuracy_forest = (1/nrow(data)) * sum(data[,2]);
+	
+	print(accuracy_forest);
+quit; 
+```
+
+## 7.3 Evaluation with cross validation.
+
+### a) KFold
+
+The HPFOREST output for the 5 models has been removed from the output in this tutorial for the sake of space.
+```{r}
+proc import out = breastcancer
+	datafile = 'C:/Users/breastcancer.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+	
+data folds;
+	set breastcancer;
+	*randomly assign observation to one of K groups;
+	call streaminit(29);
+ 	rand=ceil(5*rand('UNIFORM'));
+ 	output;
+run;
+
+%macro hp_KFolds();
+	
+data train1 test1 train2 test2 train3 test3 
+	 train4 test4 train5 test5;
+	set folds;
+	%do i = 1 %to 5;
+		%do j = 1 %to 5;
+			if (rand = &j) then do;
+				if (&i ^= &j) then output train&i;
+				else output test&i;
+			end;
+		%end;
+	%end;
+	drop rand;
+run;
+
+%do i = 1 %to 5;
+	 
+ods select none;
+proc hpforest data = train&i;
+    input _0-_29 / level = interval;
+    target Target / level = nominal;
+    save file = 'hpbreastcancer&i.bin';
+run;
+	 
+proc hp4score data = test&i;
+    score file = 'hpbreastcancer&i.bin' out = scored_&i;
+run;
+ods select all;
+	 
+data scored_&i;
+    set scored_&i;
+    correct = (I_Target = Target);
+run;
+	 
+proc freq data = scored_&i noprint;
+  tables correct / out=FreqCount&i;
+run;   
+
+%end;
+	 
+%mend;
+
+%hp_KFolds()
+
+data FreqCount;
+	set FreqCount1 FreqCount2 FreqCount3 FreqCount4 FreqCount5;
+	if (correct = 1);
+run;
+
+proc means data = FreqCount mean std;
+  var PERCENT;
+run;
+```
+
+### b) ShuffleSplit
+
+The HPFOREST output for the 5 models has been removed from the output in this tutorial for the sake of space.
+```{r}
+proc import out = breastcancer
+	datafile = 'C:/Users/breastcancer.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+	
+proc surveyselect data = breastcancer out = cv seed = 29 samprate = 0.7 
+	                                    outall reps = 5;
+run;
+	
+data train1 train2 train3 train4 train5 test1 test2 test3 test4 test5;
+	 set cv;
+	 if (replicate = 1) then do;
+	    if (selected = 1) then output train1;
+	    else output test1;
+   end;
+   if (replicate = 2) then do;
+	    if (selected = 1) then output train2;
+	    else output test2;
+   end;
+   if (replicate = 3) then do;
+	    if (selected = 1) then output train3;
+	    else output test3;
+	 end;
+   if (replicate = 4) then do;
+	    if (selected = 1) then output train4;
+	    else output test4;
+   end;
+   if (replicate = 5) then do;
+	    if (selected = 1) then output train5;
+	    else output test5;
+	 end;
+run;
+	
+%macro hp_replicate();
+
+%do i = 1 %to 5;
+	                                    
+ods select none;
+proc hpforest data = train&i;
+    input _0-_29 / level = interval;
+    target Target / level = nominal;
+    save file = 'hpbreastcancer&i.bin';
+run;
+
+proc hp4score data = test&i;
+    score file = 'hpbreastcancer&i.bin' out = scored_&i;
+run;
+ods select all;
+	                                    
+data scored_&i;
+    set scored_&i;
+    correct = (I_Target = Target);
+run;
+	                                    
+proc freq data = scored_&i noprint;
+  tables correct / out=FreqCount&i;
+run;   
+
+%end;
+
+%mend;
+	
+%hp_replicate()
+	
+data FreqCount;
+	set FreqCount1 FreqCount2 FreqCount3 FreqCount4 FreqCount5;
+	if (correct = 1);
+run;
+
+proc means data = FreqCount mean std;
+  var PERCENT;
+run;
+```
+
+***
+
+\newpage
+
+# 8 Unsupervised Machine Learning
+
+## 8.1 KMeans Clustering
+```{r}
+proc import out = iris
+	datafile = 'C:/Users/iris.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+	
+data iris;
+	length Species $ 20;
+	set iris;
+	if (Target = 0) then Species = "Setosa";
+	if (Target = 1) then Species = "Versicolor";
+	if (Target = 2) then Species = "Virginica";
+run;
+
+proc fastclus data=iris maxclusters=3 out=kmeans random = 29; * noprint;
+	var PetalLength PetalWidth SepalLength SepalWidth;
+run;
+
+proc freq data = kmeans;
+	tables Cluster*Species;
+run;
+```
+
+## 8.2 Spectral Clustering
+```{r}
+proc iml;
+  submit / R;
+  	iris = read.csv('C:/Users/iris.csv')
+	  iris$Species = ifelse(iris$Target == 0, "Setosa", 
+	                        ifelse(iris$Target == 1, "Versicolor", "Virginica"))
+	  features <- as.matrix(subset(iris, select = c(PetalLength, 
+	                                                PetalWidth, SepalLength, SepalWidth)))
+  	library(kernlab) 
+  	set.seed(29)
+  	spectral <- specc(features, centers = 3)
+  	labels <- as.data.frame(spectral) 
+  	table(labels$spectral, iris$Species)
+  endsubmit;
+quit;
+```
+
+## 8.3 Ward Hierarchical Clustering
+```{r}
+proc import out = iris
+  datafile = '/folders/myfolders/ANZ/iris.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+
+data iris;
+  length Species $ 20;
+  set iris;
+    if (Target = 0) then Species = "Setosa";
+    if (Target = 1) then Species = "Versicolor";
+    if (Target = 2) then Species = "Virginica";
+run;
+
+proc cluster data = iris method = ward print=15 ccc pseudo noprint;
+   var petal: sepal:;
+   copy species;
+run;
+
+proc tree noprint ncl=3 out=out;
+   copy petal: sepal: species;
+run;
+
+proc freq data = out;
+  tables Cluster*Species;
+run;
+```
+
+## 8.4 DBSCAN
+```{r}
+proc iml;
+  submit / R;
+  	iris = read.csv('C:/Users/iris.csv')
+	  iris$Species = ifelse(iris$Target == 0, "Setosa", 
+	                        ifelse(iris$Target == 1, "Versicolor", "Virginica"))
+	  features <- as.matrix(subset(iris, select = c(PetalLength, 
+	                                                PetalWidth, SepalLength, SepalWidth)))
+    library(dbscan)
+	  set.seed(29)
+    dbscan <- dbscan(features, eps = 0.5)
+    labels <- dbscan$cluster table(labels, iris$Species)
+  endsubmit;
+quit;
+```
+
+***
+
+\newpage
+
+# Appendix
+
+## 1 Built-in SAS Data Types
+
+* [CHAR](#char)
+
+* [DOUBLE](#double)
+
+## 2 SAS Procedures
+
+### [COMPARE Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#n0c1y14wyd3u7yn1dmfcpaejllsn.htm)  {#compare} 
+
+### [CONTENTS Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#n1hqa4dk5tay0an15nrys1iwr5o2.htm) {#contents}
+
+### [CORR Procedure](http://support.sas.com/documentation/cdl/en/procstat/66703/HTML/default/viewer.htm#procstat_corr_overview.htm) {#corr}
+
+### [FCMP Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#n1aozmc89vjkpzn1q6a54nleh56o.htm) {#fcmp}
+
+### [EXPORT Procedure](http://support.sas.com/documentation/cdl/en/proc/70377/HTML/default/viewer.htm#p09k160vk93xxhn171zz1z6551w2.htm) {#export}
+
+### [FREQ Procedure](https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_freq_sect006.htm) {#freq}
+
+### [GENMOD Procedure](https://support.sas.com/documentation/cdl/en/statuggenmod/61787/PDF/default/statuggenmod.pdf) {#genmod}
+
+### [HP4SCORE Procedure](https://support.sas.com/documentation/onlinedoc/miner/em14/emhpprcref.pdf) {#hp4score}
+
+### [HPFOREST Procedure](https://support.sas.com/documentation/onlinedoc/miner/em14/emhpprcref.pdf) {#hpforest}
+
+### [HPSPLIT Procedure](http://support.sas.com/documentation/cdl/en/stathpug/66410/HTML/default/viewer.htm#stathpug_hpsplit_overview.htm) {#hpsplit}
+
+### [HPSVM Procedure](http://documentation.sas.com/?docsetId=emhpprcref&docsetVersion=14.2&docsetTarget=emhpprcref_hpsvm_overview.htm&locale=en) {#hpsvm}
+
+### [IML Procedure](https://support.sas.com/documentation/cdl/en/imlug/63541/PDF/default/imlug.pdf) {#iml}
+
+### [IMPORT Procedure](http://support.sas.com/documentation/cdl/en/acpcref/69731/HTML/default/viewer.htm#p0jf3o1i67m044n1j0kz51ifhpvs.htm) {#import}
+
+### [MEANS Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#p0f0fjpjeuco4gn1ri963f683mi4.htm) {#means}
+
+### [PRINCOMP Procedure](https://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#princomp_toc.htm) {#princomp}
+
+### [PRINT Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#p10qiuo2yicr4qn17rav8kptnjpu.htm) {#print}
+
+### [REG Procedure](https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.htm#statug_reg_sect007.htm) {#reg}
+
+### [SCORE Procedure](https://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#statug_score_sect001.htm) {#score}
+
+### [SGPLOT Procedure](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#p1t32i8511t1gfn17sw07yxtazad.htm) {#sgplot}
+
+* [histogram](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#n17xrpcduau1f8n1c1nhe477pv18.htm)
+
+* [inset](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#p0hz27ehuzdd6pn0zaic6x52pkav.htm)
+
+* [reg](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#p0mn6vl6clqbgyn1ivs69lezdxhf.htm)
+
+* [scatter](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#p1lcbd3lhs3t3bn1jk6d8sjt2yqx.htm)
+
+* [vbox](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#n1waawwbez01ppn15dn9ehmxzihf.htm)
+
+### [SGSCATTER Procedure](http://support.sas.com/documentation/cdl/en/grstatproc/62603/HTML/default/viewer.htm#sgscatter-syn.htm) {#sgscatter}
+
+### [SORT Procedure](http://support.sas.com/documentation/cdl/en/proc/70377/HTML/default/viewer.htm#p02bhn81rn4u64n1b6l00ftdnxge.htm) {#sort}
+
+### [SQL Procedure](https://support.sas.com/documentation/cdl/en/sqlproc/69822/HTML/default/viewer.htm#n1oihmdy7om5rmn1aorxui3kxizl.htm) {#sql}
+
+### [SURVEYSELECT Procedure](https://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#statug_surveyselect_sect001.htm) {#surveyselect}
+
+## 3 [SAS DATA step](http://support.sas.com/documentation/cdl/en/basess/68381/HTML/default/viewer.htm#n053a58fwk57v7n14h8x7y7u34y4.htm) {#step}
+
+### [%include](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000214504.htm) {#include} statement
+
+### [if-then/else](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202239.htm) {#if} statement
+
+### [infile](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146932.htm) {#infile} statement
+
+### [input](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146292.htm) {#input} statement
+
+### [merge](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202970.htm) {#merge} statement
+
+### [output](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000194540.htm) {#output} statement
+
+### [set](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000173782.htm) {#set} statement
+
+### [where](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202951.htm) {#where} statement
+
+\newpage
+
+# Alphabetical Index
+
+## [CHAR](http://support.sas.com/documentation/cdl/en/fedsqlref/67364/HTML/default/viewer.htm#n19bf2z7e9p646n0z224cokuj567.htm) {#char}
+The SAS implementation of a string as a fixed-length character string of length *n*.
+
+## [Data Frame](http://support.sas.com/documentation/cdl/en/lrcon/62955/HTML/default/viewer.htm#a001005709.htm) {#DATASET}
+A two-dimensional tabular structure with labeled axes (rows and columns), where data observations are represented by rows and data variables are represented by columns.
+
+## [Dictionary](https://www.google.com/url?q=http://support.sas.com/resources/papers/proceedings12/147-2012.pdf&ust=1496196720000000&usg=AFQjCNGcqLlU2Ur5Qv_62TM4zJEQY6LjTA&hl=en-US)
+An associative array which is indexed by keys which map to values.  Therefore, a dictionary is an unordered set of key:value pairs where each key is unique. In SAS, a dictionary can be implemented using a hash table.  Please see the following example.
+```{r, eval = FALSE}
+/* Results will be displayed in the log */
+data class_dict;
+declare hash mydict();
+mydict.defineKey("Name");
+mydict.defineData("Age");
+mydict.defineDone();
+do while (not eof);
+  set sashelp.class end = eof;
+  rc = mydict.add();
+  output;
+end;
+Name = 'James';
+rc = mydict.find();
+put rc= Name= Age=;
+```
+Output:
+![output](hash.png)
+
+## [DOUBLE](http://support.sas.com/documentation/cdl/en/fedsqlref/67364/HTML/default/viewer.htm#n19bf2z7e9p646n0z224cokuj567.htm) {#double}
+A decimal point number implemented as a 64-bit double precision, floating-point number.
+
+## [Series](http://support.sas.com/documentation/cdl/en/lestmtsref/69738/HTML/default/viewer.htm#p08do6szetrxe2n136ush727sbuo.htm)
+A series is a one-dimension data frame, which is also called an array in SAS.  Please see the following example.
+```{r, eval = FALSE}
+array my_array{4} a1-a4 (1 3 5 9);
+```
+
+For more information on SAS packages and functions, along with helpful examples, please see [SAS](https://support.sas.com/en/support-home.html).
+
+

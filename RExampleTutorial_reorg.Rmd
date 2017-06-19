@@ -543,7 +543,7 @@ linreg <- lm(tip ~ total_bill, data = tips)
 summary(linreg)
 ```
 
-# 6 Regression & Machine Learning: Modeling & Prediction
+# 6 Supervised Machine Learning
 
 Many of the following models will make use of the [predict()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/predict) function.
 
@@ -928,7 +928,7 @@ svMod <- svm(Target ~ ., train, type = 'C-classification', kernel = 'linear')
 #### ii) Assess the model against the testing data.
 ```{r}
 # Prediction on testing data
-pred.response <- unname(predict(svMod, test))
+pred.response <- unname(predict(svMod, subset(test, select = -c(Target))))
 
 # Determine how many were correctly classified
 Results <- ifelse(test$Target == pred.response, "Correct", "Wrong")
@@ -937,42 +937,26 @@ table(Results)
 
 ### b) Fit a support vector regression model.
 
-#### i) Generate random data based on a sine curve.
-```{r}
-set.seed(29)
-# Generate the time variable
-t <- seq(from = 0, to = 0.5*pi,length.out=100)
+#### i) Fit a support vector regression model on training data.
+```{r, warning = FALSE, message = FALSE}
+# Notice we are re-using data sets but it is good to re-read the original 
+# versions back into the environment
+train <- read.csv('/Users/boston_train.csv')
+test <- read.csv('/Users/boston_test.csv')
 
-# Generate the sine curve with uniform noise
-y1 <- 5*sin(3*t) + runif(100)
-
-# Create a data frame for the generated data
-random_data <- data.frame(matrix(ncol=0, nrow = 100))
-random_data$X <- t
-random_data$Y <- y1
-
-# Plot the generated data
-plot(t,y1)
-```
-
-[seq()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/seq) [runif()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/Uniform)
-
-#### ii) Fit a support vector regression model to the data and assess the predictions.
-```{r, message = FALSE, warning = FALSE}
 # The package we need to fit an svm model (e1071) must first 
 # be installed and then called to use
 library(e1071)
 
-model <- svm(Y ~ X, random_data)
-predictedY <- predict(model, random_data)
-plot.new()
-plot(random_data$X, random_data$Y)
-points(random_data$X, predictedY, col = "red", pch = 4)
+svMod <- svm(Target ~ ., train)
+```
 
-prediction = data.frame(matrix(ncol = 0, nrow = nrow(random_data)))
-prediction$predY <- predictedY
-prediction$actual <- random_data$Y
-prediction$sq_diff <- (prediction$predY - prediction$actual)**2
+#### ii) Assess the model against the testing data.
+```{r}
+# Prediction on testing data
+prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction$predY <- unname(predict(svMod, test))
+prediction$sq_diff <- (prediction$predY - test$Target)**2
 print(mean(prediction$sq_diff))
 ```
 
@@ -1021,6 +1005,10 @@ confusionMatrix(testTarget, predictions)
 train <- read.csv('/Users/boston_train.csv')
 test <- read.csv('/Users/boston_test.csv')
 
+library(RSNNS)
+
+set.seed(29)
+
 # Scale input data
 scaled_train <- data.frame(scale(subset(train, select = -c(Target))))
 scaled_test <- data.frame(scale(subset(test, select = -c(Target))))
@@ -1035,8 +1023,7 @@ nnMod <- mlp(scaled_train, train$Target / 50, inputsTest=scaled_test, targetsTes
 # Assess against testing data, remembering to multiply by 50
 preds = data.frame(matrix(ncol = 0, nrow = nrow(test)))
 preds$predY <- predict(nnMod, scaled_test)*50
-preds$target <- test$Target
-preds$sq_error <- (preds$predY - preds$target)**2
+preds$sq_error <- (preds$predY - test$Target)**2
 print(mean(preds$sq_error))
 ```
 
@@ -1208,6 +1195,90 @@ print(paste0("Accuracy: ", round(mean(accuracy)*100, digits=2), "% +/- ", round(
 ```
 
 [createDataPartition](https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/createDataPartition) 
+
+# 8 Unsupervised Machine Learning
+
+## 8.1 KMeans Clustering
+
+```{r}
+iris = read.csv('/Users/iris.csv')
+
+iris$Species = ifelse(iris$Target == 0, "Setosa", ifelse(iris$Target == 1, "Versicolor", "Virginica"))
+
+features <- as.matrix(subset(iris, select = c(PetalLength, PetalWidth, SepalLength, SepalWidth)))
+
+set.seed(29)
+
+kmeans <- kmeans(features, 3, nstart = 20)
+
+labels <- kmeans$cluster
+
+table(labels, iris$Species)
+```
+
+## 8.2 Spectral Clustering
+
+```{r, warning = FALSE, message = FALSE}
+library(kernlab)
+set.seed(29)
+
+spectral <- specc(features, centers = 3)
+
+labels <- as.data.frame(spectral)
+
+table(labels$spectral, iris$Species)
+```
+
+[kernlab](https://cran.r-project.org/web/packages/kernlab/kernlab.pdf) [specc()](https://artax.karlin.mff.cuni.cz/r-help/library/kernlab/html/specc.html)
+
+## 8.3 Ward Hierarchical Clustering
+
+```{r}
+set.seed(29)
+
+hclust <- hclust(dist(features), method = "ward.D2")
+
+labels <- cutree(hclust, 3)
+
+table(labels, iris$Species)
+```
+
+[Hierarchical Clustering in R](https://www.r-bloggers.com/hierarchical-clustering-in-r-2/)
+
+## 8.4 DBSCAN
+
+```{r, warning = FALSE, message = FALSE}
+set.seed(29)
+
+library(dbscan)
+
+# eps = 0.5 is default in Python
+dbscan <- dbscan(features, eps = 0.5)
+
+labels <- dbscan$cluster
+
+table(labels, iris$Species)
+```
+
+## 8.5 Self-organized map
+
+```{r, warning = FALSE, message = FALSE}
+set.seed(29)
+
+library(som)
+
+som <- som(features, xdim = 1, ydim = 3)
+
+plot(som)
+
+preds <- som$visual
+
+table(iris$Species, preds$y)
+
+
+```
+
+
 
 ***
 
