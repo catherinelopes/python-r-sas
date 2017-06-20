@@ -1402,7 +1402,7 @@ print(prediction["sq_diff"].mean())
 
 ## 7.1 Evaluate the accuracy of regression models.
 
-## a) Evaluation on training data.
+### a) Evaluation on training data.
 ```{python, echo=5:16}
 import pandas as pd
 import numpy as np
@@ -1422,7 +1422,7 @@ r2_rf = r2_score(train["tip"], predY)
 print("Random forest regression model r^2 score (coefficient of determination): %f" % r2_rf)
 ```
 
-## b) Evaluation on testing data.
+### b) Evaluation on testing data.
 ```{python, echo=10:17}
 import pandas as pd
 import numpy as np
@@ -1583,7 +1583,7 @@ print(pd.crosstab(index = iris["Species"], columns = aggl.labels_))
 ```
 [AgglomerativeClustering](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.AgglomerativeClustering.html#sklearn.cluster.AgglomerativeClustering)
 
-### 8.4 DBSCAN
+## 8.4 DBSCAN
 
 ```{python, echo = 6:10}
 import pandas as pd
@@ -1599,7 +1599,7 @@ print(pd.crosstab(index = iris["Species"], columns = dbscan.labels_))
 ```
 [DBCAN](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html#sklearn.cluster.DBSCAN)
 
-### 8.5 Self-organizing map
+## 8.5 Self-organizing map
 
 ```{python, echo = 6:19}
 import pandas as pd
