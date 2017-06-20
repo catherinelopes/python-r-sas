@@ -1,8 +1,9 @@
 ---
 title: "Python Tutorial"
 output:
-  word_document: default
-  html_document: default
+  word_document:
+    toc: yes
+    toc_depth: '3'
 ---
 
 ```{r setup, include=FALSE}
@@ -21,7 +22,7 @@ In Python, comments are indicated in code with a "#" character, and arrays and m
 
 ## 1.1 Read in the data.
 
-The following demonstrate importing data in Python given 3 different data formats.  The pandas package is able to read all 3 formats, as well as many others, using [Python IO tools](http://pandas.pydata.org/pandas-docs/version/0.20/io.html). 
+The following demonstrate importing data into Python given 3 different file formats.  The pandas package is able to read all 3 formats, as well as many others, using [Python IO tools](http://pandas.pydata.org/pandas-docs/version/0.20/io.html). 
 
 ### a) Read the data in as a .csv file.
 
@@ -46,7 +47,7 @@ student_json = pd.read_json('/Users/class.json')
 
 ## 1.2 Find the dimensions of the data set.
 
-The dimensions of a [DataFrame](#DataFrame) in Python are known as an attribute of the object.  Therefore, you can state the data name followed by ".shape" to return the dimensions of the data.
+The dimensions of a [DataFrame](#DataFrame) in Python are known as an attribute of the object.  Therefore, you can state the data name followed by [.shape](http://pandas.pydata.org/pandas-docs/version/0.17.0/generated/pandas.DataFrame.shape.html) to return the dimensions of the data, with the first integer indicating the number of rows and the second indicating the number of columns.
 
 ```{python, echo=3}
 import pandas as pd
@@ -56,18 +57,17 @@ print(student.shape)
 
 ## 1.3 Find basic information about the data set.
 
-Information about a [DataFrame](#DataFrame) is available by calling the ".info()" function on the data.
+Information about a [DataFrame](#DataFrame) is available by calling the [info()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.info.html) function on the data.
 
-```{python, echo=3:4}
+```{python, echo=3}
 import pandas as pd
 student = pd.read_csv('/Users/class.csv')
-# Notice that student is a DataFrame object
 print(student.info())
 ```
 
 ## 1.4 Look at the first 5 observations.
 
-The first 5 observations of a [DataFrame](#DataFrame) are available by calling the ".head()" function on the data.  By default, head() returns 5 observations.  To return the first *n* observations, pass the integer *n* into the function.  The tail() function is analogous and returns the last observations.
+The first 5 observations of a [DataFrame](#DataFrame) are available by calling the [head()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.head.html) function on the data.  By default, head() returns 5 observations.  To return the first *n* observations, pass the integer *n* into the function.  The [tail()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.tail.html) function is analogous and returns the last observations.
 
 ```{python, echo=3}
 import pandas as pd
@@ -77,17 +77,17 @@ print(student.head())
 
 ## 1.5 Calculate mean of numeric variables.
 
-```{python, echo=3:5}
+The mean of numeric variables of a [DataFrame](#DataFrame) are available by calling the [mean()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.mean.html) function on the data.
+
+```{python, echo=3}
 import pandas as pd
 student = pd.read_csv('/Users/class.csv')
-# By default, the mean() function returns the mean of numeric variables of 
-# the data only
 print(student.mean())
 ```
 
 ## 1.6 Compute summary statistics of the data set.
 
-Summary statistics of a [DataFrame](#DataFrame) are available by calling the ".describe()" function on the data.
+Summary statistics of a [DataFrame](#DataFrame) are available by calling the [describe()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.describe.html) function on the data.
 
 ```{python, echo=3}
 import pandas as pd
@@ -152,6 +152,7 @@ import pandas as pd
 student = pd.read_csv('/Users/class.csv')
 print(pd.crosstab(index=student["Sex"], columns="count"))
 ```
+[pd.crosstab()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.crosstab.html)
 
 ## 1.9 Produce a two-way table to describe the frequency of two categorical or discrete variables.
 
@@ -162,7 +163,7 @@ student = pd.read_csv('/Users/class.csv')
 # of "count"
 print(pd.crosstab(index=student["Age"], columns=student["Sex"]))
 ```
-[crosstab()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.crosstab.html)
+[pd.crosstab()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.crosstab.html)
 
 ## 1.10 Select a subset of the data that meets a certain criterion.
 
@@ -183,9 +184,7 @@ student = pd.read_csv('/Users/class.csv')
 height_weight = pd.concat([student["Height"], student["Weight"]], axis = 1)
 print(height_weight.corr(method = "pearson"))
 ```
-[pd.concat()](http://pandas.pydata.org/pandas-docs/version/0.20/generated/pandas.concat.html)
-
-[corr()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.corr.html)
+[pd.concat()](http://pandas.pydata.org/pandas-docs/version/0.20/generated/pandas.concat.html) | [corr()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.corr.html)
 
 ***
 
@@ -202,9 +201,7 @@ import matplotlib.pyplot as plt
 ## 2.1 Visualize a single continuous variable by producing a histogram.
 
 ```{python, eval=FALSE}
-# Notice how the bin endpoints are set so the histogram is the same
-# as that produced by SAS and R
-# Also notice the labeling of the axes
+# Notice the labeling of the axes
 plt.hist(student["Weight"], bins=[40,60,80,100,120,140,160])
 plt.xlabel('Weight')
 plt.ylabel('Frequency')
@@ -219,8 +216,10 @@ Output:
 ```{python, eval=FALSE}
 # showmeans=True tells Python to plot the mean of the variable on the boxplot 
 plt.boxplot(student["Weight"], showmeans=True)
- # prevents Python from printing a "1" at the bottom of the boxplot
-plt.xticks([]) # prevents Python from printing a "1" at the bottom of the boxplot
+
+# prevents Python from printing a "1" at the bottom of the boxplot
+plt.xticks([])
+
 plt.ylabel('Weight')
 plt.show()
 ```
@@ -231,7 +230,7 @@ Output:
 ## 2.3 Visualize two continuous variables by producing a scatterplot.
 
 ```{python, eval=FALSE}
-# Notice here you specify the x variable first followed by the y variable 
+# Notice here you specify the x variable, followed by the y variable 
 plt.scatter(student["Height"], student["Weight"])
 plt.xlabel("Height")
 plt.ylabel("Weight")
@@ -255,7 +254,7 @@ plt.scatter(x, y)
 # plt.text() prints the equation of the line of best fit, with the first two 
 # arguments specifying the x and y locations of the text, respectively 
 # %f indicates to print a floating point number, that is specified following
-# the string
+# the string and a % character
 plt.text(51, 140, "Line: y = %f x + %f"% (m,b))
 plt.plot(x, m*x + b)
 plt.xlabel("Height")
@@ -277,7 +276,9 @@ counts = pd.crosstab(index=student["Sex"], columns="count")
 # len() returns the number of categories of Sex (2)
 # np.arange() creates a vector of the specified length
 num = np.arange(len(counts))
-plt.bar(num,counts["count"], align='center', alpha=0.5)
+
+# alpha = 0.5 changes the transparency of the bars
+plt.bar(num, counts["count"], align='center', alpha=0.5)
 
 # Set the xticks to be the indices of counts
 plt.xticks(num, counts.index)
@@ -311,7 +312,7 @@ plt.show()
 Output:
 ![output](sboxplot.png)
 
-[np.array](https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html)
+[np.array()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html)
 
 ### b) More advanced side-by-side boxplot with color.
 
@@ -320,27 +321,22 @@ import seaborn as sns
 sns.boxplot(x="Sex", y="Weight", hue="Sex", data = student, showmeans=True)
 plt.show()
 ```
-[seaborn boxplot](http://seaborn.pydata.org/generated/seaborn.boxplot.html)
-
-[seaborn](#SEABORN)
 
 Output:
 ![output](snsboxplot.png)
+[seaborn](#SEABORN)
 
 ***
-
-\newpage
 
 # 3 Basic Data Wrangling and Manipulation
 
 ## 3.1 Create a new variable in a data set as a function of existing variables in the data set.
 
-```{python, echo=3:7}
+```{python, echo=3:6}
 import pandas as pd
 student = pd.read_csv('/Users/class.csv')
-# Notice here how you can create the BMI column in the 
-# data set just by naming it 
-
+# Notice here how you can create the BMI column in the data set 
+# just by naming it 
 student["BMI"] = student["Weight"] / student["Height"]**2 * 703
 print(student.head())
 ```
@@ -353,7 +349,8 @@ import numpy as np
 student = pd.read_csv('/Users/class.csv')
 student["BMI"] = student["Weight"] / student["Height"]**2 * 703
 # Notice the use of the np.where() function for a single condition 
-student["BMI Class"] = np.where(student["BMI"] < 19.0, "Underweight", "Healthy")
+student["BMI Class"] = np.where(student["BMI"] < 19.0, "Underweight", 
+                                "Healthy")
 print(student.head())
 ```
 
@@ -361,7 +358,7 @@ print(student.head())
 
 ## 3.3 Create new variables in a data set using mathematical functions applied to existing variables in the data set.
 
-Using the log() function, the exp() function, the sqrt() function, and the abs() function.
+Using the [np.log()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.log.html),  [np.exp()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.exp.html),  [np.sqrt()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.sqrt.html), [np.where()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.where.html), and [np.abs()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.absolute.html) functions.
 ```{python, echo=6:14}
 import pandas as pd
 import numpy as np
@@ -371,15 +368,14 @@ student["BMI Class"] = np.where(student["BMI"] < 19.0, "Underweight", "Healthy")
 student["LogWeight"] = np.log(student["Weight"])
 student["ExpAge"] = np.exp(student["Age"])
 student["SqrtHeight"] = np.sqrt(student["Height"])
-student["BMI Neg"] = np.where(student["BMI"] < 19.0, -student["BMI"], student["BMI"])
+student["BMI Neg"] = np.where(student["BMI"] < 19.0, -student["BMI"], 
+                              student["BMI"])
 student["BMI Pos"] = np.abs(student["BMI Neg"])
 
 # Create a boolean variable
 student["BMI Check"] = (student["BMI Pos"] == student["BMI"])
 print(student.head())
 ```
-
-[np.log()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.log.html), [np.exp()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.exp.html), [np.sqrt()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.sqrt.html), [np.where()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.where.html), [np.abs()](https://docs.scipy.org/doc/numpy/reference/generated/numpy.absolute.html)
 
 ## 3.4 Drop variables from a data set.
 
@@ -412,9 +408,9 @@ import numpy as np
 student = pd.read_csv('/Users/class.csv')
 student["BMI"] = student["Weight"] / student["Height"]**2 * 703
 student["BMI Class"] = np.where(student["BMI"] < 19.0, "Underweight", "Healthy")
-# Notice the kind="mergesort" which indicates to use a stable sorting 
+# Notice kind="mergesort" which indicates to use a stable sorting 
 # algorithm 
-student = student.sort_values(by="Age", kind = "mergesort")
+student = student.sort_values(by="Age", kind="mergesort")
 print(student.head())
 ```
 
@@ -426,12 +422,12 @@ import numpy as np
 student = pd.read_csv('/Users/class.csv')
 student["BMI"] = student["Weight"] / student["Height"]**2 * 703
 student["BMI Class"] = np.where(student["BMI"] < 19.0, "Underweight", "Healthy")
-student = student.sort_values(by="Age", kind = "mergesort")
-student = student.sort_values(by="Sex", kind = "mergesort")
+student = student.sort_values(by="Age", kind="mergesort")
+student = student.sort_values(by="Sex", kind="mergesort")
 # Notice that the data is now sorted first by Sex and then within Sex by Age 
 print(student.head())
 ```
-[sort_values](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.sort_values.html)
+[sort_values()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.sort_values.html)
 
 ## 3.6 Compute descriptive statistics of continuous variables, grouped by a categorical variable.
 
@@ -443,7 +439,7 @@ student["BMI"] = student["Weight"] / student["Height"]**2 * 703
 student["BMI Class"] = np.where(student["BMI"] < 19.0, "Underweight", "Healthy")
 student = student.sort_values(by="Age", kind = "mergesort")
 student = student.sort_values(by="Sex", kind = "mergesort")
-print(student.groupby(by = "Sex").mean())
+print(student.groupby(by="Sex").mean())
 ```
 [groupby()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.groupby.html)
 
@@ -482,7 +478,7 @@ print(student.tail())
 ```
 [append()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.append.html)
 
-## 3.8 Create a user defined function and apply it to a variable in the data set to create a new variable in the data set.
+## 3.8 Create a user-defined function and apply it to a variable in the data set to create a new variable in the data set.
 
 ```{python, echo=12:16}
 import pandas as pd
@@ -502,16 +498,20 @@ def toKG(lb):
 student["Weight KG"] = student["Weight"].apply(toKG)
 print(student.head())
 ```
-[apply()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.apply.html)
-
-[user defined functions](https://www.tutorialspoint.com/python/python_functions.htm)
+[apply()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.apply.html) | [user-defined functions](https://www.tutorialspoint.com/python/python_functions.htm)
 
 ## 3.9 Caste a [Data Frame](#DataFrame) to a different object type.
 
-```{python, echo=4}
+```{python, echo=10:13}
 import pandas as pd
 import numpy as np
 student = pd.read_csv('/Users/class.csv')
+student = student.sort_values(by="Age", kind = "mergesort")
+student = student.sort_values(by="Sex", kind = "mergesort")
+student = student.append({'Name':'Jane', 'Sex':'F', 'Age':14, 'Height':56.3, 
+                          'Weight':77.0, 'BMI':17.077695, 
+                          'BMI Class': 'Underweight'}, 
+                         ignore_index=True)
 student_num = pd.concat([student["Age"], student["Height"], 
                          student["Weight"]], axis = 1)
 student_float = student_num.astype(float)
@@ -553,7 +553,7 @@ print(new_fish.head())
 
 ### a) First, select specific columns of a data set to create two smaller data sets.
 
-```{python, echo=2:8}
+```{python, echo=2:7}
 import pandas as pd
 # Notice the use of the student data set again, however we want to reload it
 # without the changes we've made previously 
@@ -585,6 +585,7 @@ student2 = pd.concat([student["Name"], student["Height"], student["Weight"]],
 new = pd.merge(student1, student2, on="Name")
 print(new.head())
 ```
+[pd.merge()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.merge.html)
 
 ### c) Finally, we want to check to see if the merged data set is the same as the original data set.
 
@@ -598,7 +599,6 @@ student2 = pd.concat([student["Name"], student["Height"], student["Weight"]],
 new = pd.merge(student1, student2, on="Name")
 print(student.equals(new))
 ```
-[merge()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.merge.html)
 
 ## 4.3 Merge two data sets together by index number only.
 
@@ -611,6 +611,8 @@ newstudent1 = pd.concat([student["Name"], student["Sex"], student["Age"]],
                     axis = 1)
 print(newstudent1.head())
 ```
+
+--
 
 ```{python, echo=3:4}
 import pandas as pd
@@ -631,6 +633,7 @@ newstudent2 = pd.concat([student["Height"], student["Weight"]],
 new2 = newstudent1.join(newstudent2)
 print(new2.head())
 ```
+[join()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.join.html)
 
 ### c) Finally, we want to check to see if the joined data set is the same as the original data set.
 
@@ -644,11 +647,10 @@ newstudent2 = pd.concat([student["Height"], student["Weight"]],
 new2 = newstudent1.join(newstudent2)
 print(student.equals(new2))
 ```
-[join()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.join.html)
 
 ## 4.4 Create a pivot table to summarize information about a data set.
 
-```{python, echo=3:17}
+```{python, echo=3:18}
 import pandas as pd
 import numpy as np
 # Notice we are using a new data set that needs to be read into the 
@@ -664,17 +666,17 @@ def trim_money(money):
 
 price["REVENUE"] = price["ACTUAL"].apply(trim_money)
 table = pd.pivot_table(price, index=["COUNTRY", "STATE", "PRODTYPE", 
-                                     "PRODUCT"], values="REVENUE", aggfunc=np.sum)
+                                     "PRODUCT"], values="REVENUE", 
+                       aggfunc=np.sum)
 print(table.head())
 ```
-[sub](#SUB)
+Note: [pd.pivot_table()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.pivot_table.html) is similar to the [pd.pivot()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.pivot.html) function
 
-[Decimal](#DECIMAL) 
+[sub](#SUB) | [Decimal](#DECIMAL) 
 
-[pd.pivot_table()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.pivot_table.html) is similar to the [pd.pivot()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.pivot.html) function
 
 ## 4.5 Return all unique values from a text variable.
-```{python}
+```{python, echo = 4}
 import pandas as pd
 import numpy as np
 price = pd.read_csv('/Users/price.csv')
@@ -686,7 +688,7 @@ print(np.unique(price["STATE"]))
 
 \newpage
 
-The following sections focus on the Python [sklearn](#SKLEARN) package.  
+The following sections focus on the Python [sklearn](#SKLEARN) package.  Also, in the following sections several data set will be used more than once for prediction and modeling.  Often, they will be re-read into the environment so we are always going back to the original, raw data.
 
 # 5 Preparation & Basic Regression
 
@@ -706,7 +708,7 @@ pca = PCA(n_components = 4)
 pca = pca.fit(features)
 print(np.transpose(pca.components_))
 ```
-[PCA](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA) [pca.fit()]() [np.transpose()]()
+[PCA](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA) | [np.transpose()](https://docs.scipy.org/doc/numpy-1.12.0/reference/generated/numpy.transpose.html)
 
 ## 5.2 Split data into training and testing data and export as a .csv file.
 
@@ -730,11 +732,11 @@ test = pd.concat([test_x, test_y], axis = 1)
 train.to_csv('/Users/iris_train.csv', index = False)
 test.to_csv('/Users/iris_test.csv', index = False)
 ```
-[train_test_split](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)
+[train_test_split()](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)
 
 ## 5.3 Fit a logistic regression model.
 
-```{python, echo=3:17, fig.width = 5}
+```{python, echo=3:18}
 import pandas as pd
 import numpy as np
 # Notice we are using a new data set that needs to be read into the 
@@ -749,27 +751,27 @@ tips["greater15"] = np.where(tips["tip"] > tips["fifteen"], 1, 0)
 import statsmodels.api as sm
 
 # Notice the syntax of greater15 as a function of total_bill 
-logreg = sm.formula.glm("greater15 ~ total_bill", family=sm.families.Binomial(), 
-                     data=tips).fit()
+logreg = sm.formula.glm("greater15 ~ total_bill", 
+                       family=sm.families.Binomial(), 
+                       data=tips).fit()
 print(logreg.summary())
 ```
 A logistic regression model can be implemented using [sklearn](#SKLEARN), however [statsmodels.api](http://www.statsmodels.org/stable/glm.html#technical-documentation) provides a helpful summary about the model, so it is preferable for this example.
 
 ## 5.4 Fit a linear regression model.
 
-```{python, echo=3:23}
+```{python, echo=4:10}
 import pandas as pd
 import numpy as np
-# Notice we are using new data sets that need to be read into the environment 
-train = pd.read_csv('/Users/tips_train.csv')
-test = pd.read_csv('/Users/tips_test.csv')
-
+tips = pd.read_csv('/Users/tips.csv')
 # Fit a linear regression model of tip by total_bill on the training data 
-from sklearn import linear_model
-regr = linear_model.LinearRegression()
+from sklearn.linear_model import LinearRegression
+
 # If your data has one feature, you need to reshape the 1D array
-linreg = regr.fit(train["total_bill"].values.reshape(-1,1), train["tip"])
-print(linreg)
+linreg = LinearRegression()
+linreg.fit(tips["total_bill"].values.reshape(-1,1), tips["tip"])
+print(linreg.coef_)
+print(linreg.intercept_)
 ```
 [LinearRegression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
 
@@ -778,31 +780,27 @@ print(linreg)
 ## 6.1 Fit a logistic regression model on training data and assess against testing data.
 
 ### a) Fit a logistic regression model on training data.
-```{python, echo=3:20}
+```{python, echo=4:15}
 import pandas as pd
 import numpy as np
-# Notice we are using new data sets that need to be read into the 
-# environment 
+import statsmodels.api as sm
+# Notice we are using new data sets that need to be read into the environment 
 train = pd.read_csv('/Users/tips_train.csv')
 test = pd.read_csv('/Users/tips_test.csv')
 
-# The following code is used to determine if the individual left more 
-# than a 15% tip 
 train["fifteen"] = 0.15 * train["total_bill"]
 train["greater15"] = np.where(train["tip"] > train["fifteen"], 1, 0)
 test["fifteen"] = 0.15 * test["total_bill"]
 test["greater15"] = np.where(test["tip"] > test["fifteen"], 1, 0)
 
-import statsmodels.api as sm
-
-# Notice the syntax of greater15 as a function of total_bill 
-logreg = sm.formula.glm("greater15 ~ total_bill", family=sm.families.Binomial(), 
-                     data=train).fit()
+logreg = sm.formula.glm("greater15 ~ total_bill", 
+                       family=sm.families.Binomial(), 
+                       data=train).fit()
 print(logreg.summary())
 ```
 
 ### b) Assess the model against the testing data.
-```{python, echo=12:19}
+```{python, echo=12:18}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/tips_train.csv')
@@ -816,30 +814,30 @@ logreg = sm.formula.glm("greater15 ~ total_bill", family=sm.families.Binomial(),
                      data=train).fit()
 # Predict on testing data
 predictions = logreg.predict(test["total_bill"])
-scored = pd.DataFrame()
-scored["predY"] = np.where(predictions < 0.5, 0, 1)
+predY = np.where(predictions < 0.5, 0, 1)
 
 # Determine how many were correctly classified 
-scored["correct"] = (test["greater15"] == scored["predY"])
-print(pd.crosstab(index=scored["correct"], columns="count"))
+Results = np.where(predY == test["greater15"], "Correct", "Wrong")
+print(pd.crosstab(index=Results, columns="count"))
 ```
+A logistic regression model can be implemented using [sklearn](#SKLEARN), however [statsmodels.api](http://www.statsmodels.org/stable/glm.html#technical-documentation) provides a helpful summary about the model, so it is preferable for this example.
 
 ## 6.2 Fit a linear regression model on training data and assess against testing data.
 
 ### a) Fit a linear regression model on training data.
-```{python, echo=3:12}
+```{python, echo=4:12}
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import LinearRegression
 # Notice we are using new data sets that need to be read into the environment 
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
 
-# Fit a linear regression model of tip by total_bill on the training data 
-from sklearn import linear_model
-regr = linear_model.LinearRegression()
-# If your data has one feature, you need to reshape the 1D array
-linreg = regr.fit(train.drop(["Target"], axis = 1), train["Target"])
-print(linreg)
+# Fit a linear regression model
+linreg = LinearRegression()
+linreg.fit(train.drop(["Target"], axis = 1), train["Target"])
+print(linreg.coef_)
+print(linreg.intercept_)
 ```
 
 ### b) Assess the model against the testing data.
@@ -848,49 +846,38 @@ import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
-from sklearn import linear_model
-regr = linear_model.LinearRegression()
-linreg = regr.fit(train.drop(["Target"], axis = 1), train["Target"])
+from sklearn.linear_model import LinearRegression
+linreg = LinearRegression()
+linreg.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Predict on testing data
-scored = pd.DataFrame()
-scored["predY"] = linreg.predict(test.drop(["Target"], axis = 1))
+prediction = pd.DataFrame()
+prediction["predY"] = linreg.predict(test.drop(["Target"], axis = 1))
 
 # Determine mean squared error
-scored["sq_diff"] = (scored["predY"] - test["Target"])**2
-print(np.mean(scored["sq_diff"]))
+prediction["sq_diff"] = (prediction["predY"] - test["Target"])**2
+print(np.mean(prediction["sq_diff"]))
 ```
+[LinearRegression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
 
 ## 6.3 Fit a decision tree model on training data and assess against testing data.
 
 ### a) Fit a decision tree classification model.
 
-#### i) Fit a decision tree classification model on training data, plot the tree, and determine variable importance.
-```{python, echo=3:12}
+#### i) Fit a decision tree classification model on training data and determine variable importance.
+```{python, echo=3:20}
 import pandas as pd
 import numpy as np
 # Notice we are using new data sets that need to be read into the environment 
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
 
-from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier
 
 # random_state is used to specify a seed for a random integer so that the 
 # results are reproducible
-treeMod = tree.DecisionTreeClassifier(criterion='entropy', random_state=29)
-treeMod = treeMod.fit(train.drop(["Target"], axis = 1), train["Target"])
-```
+treeMod = DecisionTreeClassifier(criterion='entropy', random_state=29)
+treeMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 
-Output:
-![output](DT1.png)
-
-```{python, echo=8:14}
-import pandas as pd
-import numpy as np
-train = pd.read_csv('/Users/breastcancer_train.csv')
-test = pd.read_csv('/Users/breastcancer_test.csv')
-from sklearn import tree
-treeMod = tree.DecisionTreeClassifier(criterion='entropy', random_state=29)
-treeMod = treeMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Determine variable importance
 var_import = treeMod.feature_importances_
 var_import = pd.DataFrame(var_import)
@@ -906,14 +893,14 @@ import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
-from sklearn import tree
-treeMod = tree.DecisionTreeClassifier(criterion='entropy', random_state=29)
+from sklearn.tree import DecisionTreeClassifier
+treeMod = DecisionTreeClassifier(criterion='entropy', random_state=29)
 treeMod = treeMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-scored = treeMod.predict(test.drop(["Target"], axis = 1))
+predY = treeMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine how many were correctly classified
-Results = np.where(test["Target"] == scored, "Correct", "Wrong")
+Results = np.where(test["Target"] == predY, "Correct", "Wrong")
 print(pd.crosstab(index=Results, columns="count"))
 ```
 [DecisionTreeClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
@@ -921,17 +908,15 @@ print(pd.crosstab(index=Results, columns="count"))
 ### b) Fit a decision tree regression model.
 
 #### i) Fit a decision tree regression model on training data and determine variable importance.
-```{python, echo=4:10}
+```{python, echo=5:16}
 import pandas as pd
 import numpy as np
-from sklearn import tree
-# Notice we are re-using data sets but it is good to re-read the original
-# versions back into the environment
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
+from sklearn.tree import DecisionTreeRegressor
 
-treeMod = tree.DecisionTreeRegressor(random_state=29)
-treeMod = treeMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+treeMod = DecisionTreeRegressor(random_state=29)
+treeMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 
 # Determine variable importance
 var_import = treeMod.feature_importances_
@@ -948,16 +933,16 @@ import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
-from sklearn import tree
-treeMod = tree.DecisionTreeRegressor(random_state=29)
-treeMod = treeMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+from sklearn.tree import DecisionTreeRegressor
+treeMod = DecisionTreeRegressor(random_state=29)
+treeMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-scored = pd.DataFrame()
-scored["predY"] = treeMod.predict(test.drop(["Target"], axis = 1))
+prediction = pd.DataFrame()
+prediction["predY"] = treeMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine mean squared error
-scored["sq_diff"] = (scored["predY"] - test["Target"])**2
-print(np.mean(scored["sq_diff"]))
+prediction["sq_diff"] = (prediction["predY"] - test["Target"])**2
+print(np.mean(prediction["sq_diff"]))
 ```
 
 ## 6.4 Fit a random forest model on training data and assess against testing data.
@@ -965,18 +950,15 @@ print(np.mean(scored["sq_diff"]))
 ### a) Fit a random forest classification model.
 
 #### i) Fit a random forest classification model on training data and determine variable importance.
-```{python, echo = 3:19}
+```{python, echo = 5:16}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original
-# versions back into the environment
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
-
 from sklearn.ensemble import RandomForestClassifier
 
 rfMod = RandomForestClassifier(random_state=29)
-rfMod = rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 
 # Determine variable importance
 var_import = rfMod.feature_importances_
@@ -995,12 +977,12 @@ train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
 from sklearn.ensemble import RandomForestClassifier
 rfMod = RandomForestClassifier(random_state=29)
-rfMod = rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-scored = rfMod.predict(test.drop(["Target"], axis = 1))
+predY = rfMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine how many were correctly classified
-Results = np.where(test["Target"] == scored, "Correct", "Wrong")
+Results = np.where(test["Target"] == predY, "Correct", "Wrong")
 print(pd.crosstab(index=Results, columns="count"))
 ```
 [RandomForestClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)
@@ -1008,18 +990,15 @@ print(pd.crosstab(index=Results, columns="count"))
 ### b) Fit a random forest regression model.
 
 #### i) Fit a random forest regression model on training data and determine variable importance.
-```{python, echo = 3:19}
+```{python, echo = 5:16}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
-
 from sklearn.ensemble import RandomForestRegressor
 
 rfMod = RandomForestRegressor(random_state=29)
-rfMod = rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 
 # Determine variable importance
 var_import = rfMod.feature_importances_
@@ -1039,14 +1018,14 @@ train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
 from sklearn.ensemble import RandomForestRegressor
 rfMod = RandomForestRegressor(random_state=29)
-rfMod = rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-scored = pd.DataFrame()
-scored["predY"] = rfMod.predict(test.drop(["Target"], axis = 1))
+prediction = pd.DataFrame()
+prediction["predY"] = rfMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine mean squared error
-scored["diff"] = (test["Target"] - scored["predY"])**2
-print(scored["diff"].mean())
+prediction["sq_diff"] = (test["Target"] - prediction["predY"])**2
+print(prediction["sq_diff"].mean())
 ```
 [RandomForestRegressor](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)
 
@@ -1055,23 +1034,20 @@ print(scored["diff"].mean())
 ### a) Fit a gradient boosting classification model.
 
 #### i) Fit a gradient boosting classification model on training data and determine variable importance.
-```{python, echo = 3:24}
+```{python, echo = 5:21}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
-
 from sklearn.ensemble import GradientBoostingClassifier
 
 # n_estimators = total number of trees to fit which is analogous to the 
 # number of iterations
-# learning_rate = shrinkage or step-size reduction, whereas a lower 
+# learning_rate = shrinkage or step-size reduction, where a lower 
 # learning rate requires more iterations
-
-gbMod = GradientBoostingClassifier(random_state = 29, learning_rate = .01, n_estimators = 2500)
-gbMod = gbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+gbMod = GradientBoostingClassifier(random_state = 29, learning_rate = .01, 
+                                  n_estimators = 2500)
+gbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 
 # Determine variable importance
 var_import = gbMod.feature_importances_
@@ -1090,12 +1066,12 @@ train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
 from sklearn.ensemble import GradientBoostingClassifier
 gbMod = GradientBoostingClassifier(random_state = 29, learning_rate = .01, n_estimators = 2500)
-gbMod = gbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+gbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-scored = gbMod.predict(test.drop(["Target"], axis = 1))
+predY = gbMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine how many were correctly classified
-Results = np.where(test["Target"] == scored, "Correct", "Wrong")
+Results = np.where(test["Target"] == predY, "Correct", "Wrong")
 print(pd.crosstab(index=Results, columns="count"))
 ```
 [GradientBoostingClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
@@ -1103,18 +1079,16 @@ print(pd.crosstab(index=Results, columns="count"))
 ### b) Fit a gradient boosting regression model.
 
 #### i) Fit a gradient boosting regression model on training data and determine variable importance.
-```{python, echo = 3:24}
+```{python, echo = 5:17}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
-
 from sklearn.ensemble import GradientBoostingRegressor
 
-gbMod = GradientBoostingRegressor(random_state = 29, learning_rate = .01, n_estimators = 2500)
-gbMod = gbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+gbMod = GradientBoostingRegressor(random_state = 29, learning_rate = .01, 
+                                  n_estimators = 2500)
+gbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 
 # Determine variable importance
 var_import = gbMod.feature_importances_
@@ -1133,14 +1107,14 @@ train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
 from sklearn.ensemble import GradientBoostingRegressor
 gbMod = GradientBoostingRegressor(random_state = 29, learning_rate = .01, n_estimators = 2500)
-gbMod = gbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+gbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-scored = pd.DataFrame()
-scored["predY"] = gbMod.predict(test.drop(["Target"], axis = 1))
+prediction = pd.DataFrame()
+prediction["predY"] = gbMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine mean squared error
-scored["diff"] = (test["Target"] - scored["predY"])**2
-print(scored["diff"].mean())
+prediction["sq_diff"] = (test["Target"] - prediction["predY"])**2
+print(prediction["sq_diff"].mean())
 ```
 [GradientBoostingRegressor](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
 
@@ -1149,19 +1123,17 @@ print(scored["diff"].mean())
 ### a) Fit an extreme gradient boosting classification model on training data and assess against testing data.
 
 #### i) Fit an extreme gradient boosting classification model on training data.
-```{python, echo = 3:12}
+```{python, echo = 5:10}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
-
-import xgboost as xgb
+from xgboost import XGBClassifier
 
 # Fit XGBClassifier model on training data
-xgbMod = xgb.XGBClassifier(seed = 29, learning_rate = 0.01, n_estimators = 2500)
-xgbMod = xgbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+xgbMod = XGBClassifier(seed = 29, learning_rate = 0.01, 
+                       n_estimators = 2500)
+xgbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 ```
 
 #### ii) Assess the model against the testing data.
@@ -1170,33 +1142,31 @@ import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
-import xgboost as xgb
-xgbMod = xgb.XGBClassifier(seed = 29, learning_rate = 0.01, n_estimators = 2500)
-xgbMod = xgbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+from xgboost import XGBClassifier
+xgbMod = XGBClassifier(seed = 29, learning_rate = 0.01, n_estimators = 2500)
+xgbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-scored = xgbMod.predict(test.drop(["Target"], axis = 1))
+predY = xgbMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine how many were correctly classified
-Results = np.where(test["Target"] == scored, "Correct", "Wrong")
+Results = np.where(test["Target"] == predY, "Correct", "Wrong")
 print(pd.crosstab(index=Results, columns="count"))
 ```
 
 ### b) Fit an extreme gradient boosting regression model on training data and assess against testing data.
 
 #### i) Fit an extreme gradient boosting regression model on training data.
-```{python, echo = 3:12}
+```{python, echo = 5:10}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
+from xgboost import XGBRegressor
 
-import xgboost as xgb
-
-# Fit XGBClassifier model on training data
-xgbMod = xgb.XGBRegressor(seed = 29, learning_rate = 0.01, n_estimators = 2500)
-xgbMod = xgbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+# Fit XGBRegressor model on training data
+xgbMod = XGBRegressor(seed = 29, learning_rate = 0.01, 
+                      n_estimators = 2500)
+xgbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 ```
 
 #### ii) Assess the model against the testing data.
@@ -1205,16 +1175,16 @@ import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
-import xgboost as xgb
-xgbMod = xgb.XGBRegressor(seed = 29, learning_rate = 0.01, n_estimators = 2500)
-xgbMod = xgbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+from xgboost import XGBRegressor
+xgbMod = XGBRegressor(seed = 29, learning_rate = 0.01, n_estimators = 2500)
+xgbMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-scored = pd.DataFrame()
-scored["predY"] = xgbMod.predict(test.drop(["Target"], axis = 1))
+prediction = pd.DataFrame()
+prediction["predY"] = xgbMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine mean squared error
-scored["diff"] = (test["Target"] - scored["predY"])**2
-print(scored["diff"].mean())
+prediction["sq_diff"] = (test["Target"] - prediction["predY"])**2
+print(prediction["sq_diff"].mean())
 ```
 
 ## 6.7 Fit a support vector model on training data and assess against testing data.
@@ -1222,15 +1192,12 @@ print(scored["diff"].mean())
 ### a) Fit a support vector classification model.
 
 #### i) Fit a support vector classification model on training data.
-```{python, echo = 3:27}
+```{python, echo = 5:23}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
-
-# First we need to scale the data
+# First we should scale the data, since R does
 from sklearn.preprocessing import StandardScaler
 
 train_features = train.drop(["Target"], axis = 1)
@@ -1248,7 +1215,7 @@ test_scaled["Target"] = test["Target"]
 # Fit a support vector classification model
 from sklearn.svm import SVC
 svMod = SVC(random_state = 29, kernel = 'linear')
-svMod = svMod.fit(train_scaled.drop(["Target"], axis = 1), 
+svMod.fit(train_scaled.drop(["Target"], axis = 1), 
                   train_scaled["Target"])
 ```
 
@@ -1271,49 +1238,44 @@ test_scaled = pd.DataFrame(test_scaled)
 test_scaled["Target"] = test["Target"]
 from sklearn.svm import SVC
 svMod = SVC(random_state = 29, kernel = 'linear')
-svMod = svMod.fit(train_scaled.drop(["Target"], axis = 1), train_scaled["Target"])
+svMod.fit(train_scaled.drop(["Target"], axis = 1), train_scaled["Target"])
 # Prediction on testing data
-scored = svMod.predict(test_scaled.drop(["Target"], axis = 1))
+prediction = svMod.predict(test_scaled.drop(["Target"], axis = 1))
 
 # Determine how many were correctly classified
-Results = np.where(test_scaled["Target"] == scored, "Correct", "Wrong")
+Results = np.where(test_scaled["Target"] == prediction, "Correct", "Wrong")
 print(pd.crosstab(index=Results, columns="count"))
 ```
+[SVC](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
 
 ### b) Fit a support vector regression model.
 
 #### i) Fit a support vector regression model on training data.
-```{python, 3:11}
+```{python, 5:21}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
-
 from sklearn.preprocessing import StandardScaler 
 
 train_features = train.drop(["Target"], axis = 1) 
 scaler = StandardScaler().fit(np.array(train_features)) 
 train_scaled = scaler.transform(np.array(train_features)) 
 train_scaled = pd.DataFrame(train_scaled) 
-train_scaled["Target"] = train["Target"]
 
 test_features = test.drop(["Target"], axis = 1) 
 scaler = StandardScaler().fit(np.array(test_features)) 
 test_scaled = scaler.transform(np.array(test_features)) 
 test_scaled = pd.DataFrame(test_scaled) 
-test_scaled["Target"] = test["Target"]
 
 # Fit a support vector regression model
 from sklearn.svm import SVR
 svMod = SVR()
-svMod = svMod.fit(train_scaled.drop(["Target"], axis = 1), 
-                  train_scaled["Target"])
+svMod.fit(train_scaled, train["Target"])
 ```
 
 #### ii) Assess the model against the testing data.
-```{python, echo = 17:23}
+```{python, echo = 15:21}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
@@ -1323,24 +1285,21 @@ train_features = train.drop(["Target"], axis = 1)
 scaler = StandardScaler().fit(np.array(train_features)) 
 train_scaled = scaler.transform(np.array(train_features)) 
 train_scaled = pd.DataFrame(train_scaled) 
-train_scaled["Target"] = train["Target"]
 test_features = test.drop(["Target"], axis = 1) 
 scaler = StandardScaler().fit(np.array(test_features)) 
 test_scaled = scaler.transform(np.array(test_features)) 
 test_scaled = pd.DataFrame(test_scaled) 
-test_scaled["Target"] = test["Target"]
 from sklearn.svm import SVR
 svMod = SVR()
-svMod = svMod.fit(train_scaled.drop(["Target"], axis = 1), train_scaled["Target"])
+svMod.fit(train_scaled, train["Target"])
 # Prediction on testing data
-scored = pd.DataFrame()
-scored["predY"] = svMod.predict(test_scaled.drop(["Target"], axis = 1))
+prediction = pd.DataFrame()
+prediction["predY"] = svMod.predict(test_scaled)
 
 # Determine mean squared error
-scored["diff"] = (test_scaled["Target"] - scored["predY"])**2
-print(scored["diff"].mean())
+prediction["sq_diff"] = (test["Target"] - prediction["predY"])**2
+print(prediction["sq_diff"].mean())
 ```
-
 [SVR](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)
 
 ## 6.8 Fit a neural network model on training data and assess against testing data.
@@ -1357,39 +1316,39 @@ test = pd.read_csv('/Users/digits_test.csv')
 
 # Fit a neural network classification model on training data
 from sklearn.neural_network import MLPClassifier
-nnMod = MLPClassifier(max_iter = 200, hidden_layer_sizes=(100,), random_state = 29)
-nnMod = nnMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+nnMod = MLPClassifier(max_iter = 200, hidden_layer_sizes=(100,), 
+                      random_state = 29)
+nnMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 ```
 
 #### ii) Assess the model against the testing data.
-```{python}
+```{python, echo = 8:15}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/digits_train.csv')
 test = pd.read_csv('/Users/digits_test.csv')
 from sklearn.neural_network import MLPClassifier
 nnMod = MLPClassifier(max_iter = 200, hidden_layer_sizes=(100,), random_state = 29)
-nnMod = nnMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+nnMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-scored = nnMod.predict(test.drop(["Target"], axis = 1))
+predY = nnMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine how many were correctly classified
-Results = np.where(test["Target"] == scored, "Correct", "Wrong")
-print(pd.crosstab(index=Results, columns="count"))
+
+from sklearn.metrics import confusion_matrix
+
+print(confusion_matrix(test["Target"], predY))
 ```
-[MLPClassifier()](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html#sklearn.neural_network.MLPClassifier) [confusion_matrix()](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html)
+[MLPClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html#sklearn.neural_network.MLPClassifier) | [confusion_matrix()](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html)
 
 ### b) Fit a neural network regression model.
 
 #### i) Fit a neural network regression model on training data.
-```{python, echo = 3:24}
+```{python, echo = 5:21}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
-
 # Scale input data
 from sklearn.preprocessing import StandardScaler
 
@@ -1426,16 +1385,16 @@ test_scaled = scaler.transform(np.array(test_features))
 test_scaled = pd.DataFrame(test_scaled)
 from sklearn.neural_network import MLPRegressor
 nnMod = MLPRegressor(max_iter = 200, random_state = 29, solver = 'lbfgs')
-nnMod = nnMod.fit(train_scaled, train["Target"] / 50)
+nnMod.fit(train_scaled, train["Target"] / 50)
 # Prediction on testing data, remembering to multiply by 50
-scored = pd.DataFrame()
-scored["predY"] = nnMod.predict(test.drop(["Target"], axis = 1))*50
+prediction = pd.DataFrame()
+prediction["predY"] = nnMod.predict(test_scaled)*50
 
 # Determine mean squared error
-scored["diff"] = (test["Target"] - scored["predY"])**2
-print(scored["diff"].mean())
+prediction["sq_diff"] = (test["Target"] - prediction["predY"])**2
+print(prediction["sq_diff"].mean())
 ```
-[MLPRegressor()](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor)
+[MLPRegressor](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor)
 
 ***
 
@@ -1444,26 +1403,22 @@ print(scored["diff"].mean())
 ## 7.1 Evaluate the accuracy of regression models.
 
 ## a) Evaluation on training data.
-```{python, echo=3:20}
+```{python, echo=5:16}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/tips_train.csv')
 test = pd.read_csv('/Users/tips_test.csv')
-
-from sklearn.metrics import r2_score
-
 # Random Forest Regression Model
 from sklearn.ensemble import RandomForestRegressor
 rfMod = RandomForestRegressor(random_state=29)
-rfMod = rfMod.fit(train.drop(["tip"], axis = 1), train["tip"])
+rfMod.fit(train.drop(["tip"], axis = 1), train["tip"])
 
 # Evaluation on training data
-pred_rf = rfMod.predict(train.drop(["tip"], axis = 1))
+predY = rfMod.predict(train.drop(["tip"], axis = 1))
 
 # Determine coefficient of determination score
-r2_rf = r2_score(train["tip"], pred_rf)
+from sklearn.metrics import r2_score
+r2_rf = r2_score(train["tip"], predY)
 print("Random forest regression model r^2 score (coefficient of determination): %f" % r2_rf)
 ```
 
@@ -1476,15 +1431,15 @@ test = pd.read_csv('/Users/tips_test.csv')
 from sklearn.metrics import r2_score
 from sklearn.ensemble import RandomForestRegressor
 rfMod = RandomForestRegressor(random_state=29)
-rfMod = rfMod.fit(train.drop(["tip"], axis = 1), train["tip"])
+rfMod.fit(train.drop(["tip"], axis = 1), train["tip"])
 from sklearn.metrics import r2_score
 # Random Forest Regression Model (rfMod)
 
 # Evaluation on testing data
-pred_rf = rfMod.predict(test.drop(["tip"], axis = 1))
+predY = rfMod.predict(test.drop(["tip"], axis = 1))
 
 # Determine coefficient of determination score
-r2_rf = r2_score(test["tip"], pred_rf)
+r2_rf = r2_score(test["tip"], predY)
 print("Random forest regression model r^2 score (coefficient of determination): %f" % r2_rf)
 ```
 The sklearn metric [r2_score](http://scikit-learn.org/stable/modules/model_evaluation.html#r2-score-the-coefficient-of-determination) is only one option for assessing a regression model.  Please go [here](http://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics) for more information about other sklearn regression metrics.
@@ -1492,25 +1447,22 @@ The sklearn metric [r2_score](http://scikit-learn.org/stable/modules/model_evalu
 ## 7.2 Evaluate the accuracy of classification models.
 
 ### a) Evaluation on training data.
-```{python, echo = 3:19}
+```{python, echo = 5:16}
 import pandas as pd
 import numpy as np
-# Notice we are re-using data sets but it is good to re-read the original 
-# version back into the environment
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
-
 # Random Forest Classification Model
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 rfMod = RandomForestClassifier(random_state=29)
-rfMod = rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 
 # Evaluation on training data
-scored = rfMod.predict(train.drop(["Target"], axis = 1))
+predY = rfMod.predict(train.drop(["Target"], axis = 1))
 
 # Determine accuracy score
-accuracy_rf = accuracy_score(train["Target"], scored)
+accuracy_rf = accuracy_score(train["Target"], predY)
 print("Random forest model accuracy: %f" % accuracy_rf)
 ```
 
@@ -1523,14 +1475,14 @@ test = pd.read_csv('/Users/breastcancer_test.csv')
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 rfMod = RandomForestClassifier(random_state=29)
-rfMod = rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
+rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Random Forest Classification Model (rfMod)
 
 # Evaluation on testing data
-scored = rfMod.predict(test.drop(["Target"], axis = 1))
+predY = rfMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine accuracy score
-accuracy_rf = accuracy_score(test["Target"], scored)
+accuracy_rf = accuracy_score(test["Target"], predY)
 print("Random forest model accuracy: %f" % accuracy_rf)
 ```
 Note: The sklearn metric [accuracy_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html) is only one option for assessing a classification model.  Please go [here](http://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics) for more information about other sklearn classification metrics.
@@ -1552,8 +1504,8 @@ X = breastcancer.drop(["Target"], axis = 1)
 Y = breastcancer["Target"]
 
 kfold = model_selection.KFold(n_splits = 5, random_state = 29)
-model = RandomForestClassifier(random_state = 29)
-results = model_selection.cross_val_score(model, X, Y, cv = kfold)
+rfMod = RandomForestClassifier(random_state = 29)
+results = model_selection.cross_val_score(rfMod, X, Y, cv = kfold)
 
 print("Accuracy: %.2f%% +/- %.2f%%" % (results.mean()*100, 
                                        results.std()*100))
@@ -1570,8 +1522,8 @@ from sklearn.ensemble import RandomForestClassifier
 X = breastcancer.drop(["Target"], axis = 1)
 Y = breastcancer["Target"]
 shuffle = model_selection.ShuffleSplit(n_splits = 5, random_state = 29)
-model = RandomForestClassifier(random_state = 29)
-results = model_selection.cross_val_score(model, X, Y, cv = shuffle)
+rfMod = RandomForestClassifier(random_state = 29)
+results = model_selection.cross_val_score(rfMod, X, Y, cv = shuffle)
 
 print("Accuracy: %.2f%% +/- %.2f%%" % (results.mean()*100, 
                                        results.std()*100))
@@ -1581,75 +1533,96 @@ print("Accuracy: %.2f%% +/- %.2f%%" % (results.mean()*100,
 
 ## 8.1 KMeans Clustering
 
-```{python}
+```{python, echo = 3:13}
 import pandas as pd
 import numpy as np
 iris = pd.read_csv('/Users/iris.csv')
-
-iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
+iris["Species"] = np.where(iris["Target"] == 0, "Setosa", 
+                           np.where(iris["Target"] == 1, "Versicolor", 
+                                    "Virginica"))
+features = pd.concat([iris["PetalLength"], iris["PetalWidth"], 
+                     iris["SepalLength"], iris["SepalWidth"]], axis = 1)
 
 from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters = 3, random_state = 29).fit(features)
 
-kmeans = KMeans(n_clusters = 3, random_state = 29).fit(pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1))
-
-iris["labels"] = kmeans.labels_
-
-print(pd.crosstab(index = iris["labels"], columns = iris["Species"]))
+print(pd.crosstab(index = iris["Species"], columns = kmeans.labels_))
 ```
-
 [KMeans](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans)
 
 ## 8.2 Spectral Clustering
 
-```{python}
+```{python, echo = 6:11}
 import pandas as pd
 import numpy as np
 iris = pd.read_csv('/Users/iris.csv')
 iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
-
+features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
 from sklearn.cluster import SpectralClustering
 
-spectral = SpectralClustering(n_clusters = 3, random_state = 29).fit(pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1))
+spectral = SpectralClustering(n_clusters = 3, 
+                              random_state = 29).fit(features)
 
-iris["labels"] = spectral.labels_
-
-print(pd.crosstab(index = iris["labels"], columns = iris["Species"]))
+print(pd.crosstab(index = iris["Species"], columns = spectral.labels_))
 ```
+[SpectralClustering](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.SpectralClustering.html#sklearn.cluster.SpectralClustering)
 
 ## 8.3 Ward Hierarchical Clustering
 
-```{python}
+```{python, echo = 6:10}
 import pandas as pd
 import numpy as np
 iris = pd.read_csv('/Users/iris.csv')
 iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
-
+features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
 from sklearn.cluster import AgglomerativeClustering
 
-aggl = AgglomerativeClustering(n_clusters = 3).fit(pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1))
+aggl = AgglomerativeClustering(n_clusters = 3).fit(features)
 
-iris["labels"] = aggl.labels_
-
-print(pd.crosstab(index = iris["labels"], columns = iris["Species"]))
+print(pd.crosstab(index = iris["Species"], columns = aggl.labels_))
 ```
+[AgglomerativeClustering](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.AgglomerativeClustering.html#sklearn.cluster.AgglomerativeClustering)
 
 ### 8.4 DBSCAN
 
-```{python}
+```{python, echo = 6:10}
 import pandas as pd
 import numpy as np
 iris = pd.read_csv('/Users/iris.csv')
 iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
-
+features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
 from sklearn.cluster import DBSCAN
 
-dbscan = DBSCAN().fit(pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1))
+dbscan = DBSCAN().fit(features)
 
-iris["labels"] = dbscan.labels_
-
-print(pd.crosstab(index = iris["labels"], columns = iris["Species"]))
+print(pd.crosstab(index = iris["Species"], columns = dbscan.labels_))
 ```
+[DBCAN](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html#sklearn.cluster.DBSCAN)
 
+### 8.5 Self-organizing map
+
+```{python, echo = 6:19}
+import pandas as pd
+import numpy as np
+iris = pd.read_csv('/Users/iris.csv')
+iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
+features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
+from sompy.sompy import SOMFactory
+
+features_mat = features.as_matrix()
+
+msz0 = 1
+msz1 = 150
+
+sm = SOMFactory.build(features_mat, mapsize = [msz0, msz1], lattice = 'rect', initialization = 'random')
+
+sm.train(verbose = False)
+
+clust = sm.cluster(n_clusters = 3)
+
+print(pd.crosstab(index = iris["Species"], columns = clust))
+```
+[SOMPY](https://github.com/sevamoo/SOMPY)
 
 ***
 
