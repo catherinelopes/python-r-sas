@@ -2,9 +2,9 @@ This folder contains data science tutorials in Python, R and SAS, and seeks to h
 
 The tutorials were produced using R Markdown knitr in order that the examples and results might be reproducible.  All data used in these examples is included in this folder as well.  Please be advised before running the code in the tutorials that the file paths for the data must be changed to reflect your environment.  Also, there are several R & Python packages that need to be installed in order to go through the tutorial successfully.
 
-Python: pandas, NumPy, Matplotlib.PyPlot, seaborn, re, decimal, sklearn, statsmodels.api, xgboost
-  
-R: gdata, rjson, ggplot2, dplyr, tree, randomForest, gbm, xgboost, e1071, RSNNS, caret, kernlab, dbscan
+Python: pandas, NumPy, Matplotlib.PyPlot, seaborn, re, decimal, sklearn, statsmodels.api, xgboost, PyFlux
+
+R: gdata, rjson, ggplot2, dplyr, tree, randomForest, gbm, xgboost, e1071, RSNNS, caret, kernlab, dbscan, forecast
 
 In order to run the SAS tutorial successfully, you will need Base SAS, SAS Enterprise Miner, and access within SAS to call R in order to execute R code.
 
