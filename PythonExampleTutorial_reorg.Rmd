@@ -1360,7 +1360,7 @@ test_scaled = pd.DataFrame(test_scaled)
 
 # Fit neural network regression model, dividing target by 50 for scaling
 from sklearn.neural_network import MLPRegressor
-nnMod = MLPRegressor(max_iter = 200, random_state = 29, solver = 'lbfgs')
+nnMod = MLPRegressor(max_iter = 250, random_state = 29, solver = 'lbfgs')
 nnMod = nnMod.fit(train_scaled, train["Target"] / 50)
 ```
 
@@ -1380,7 +1380,7 @@ scaler = StandardScaler().fit(np.array(test_features))
 test_scaled = scaler.transform(np.array(test_features))
 test_scaled = pd.DataFrame(test_scaled)
 from sklearn.neural_network import MLPRegressor
-nnMod = MLPRegressor(max_iter = 200, random_state = 29, solver = 'lbfgs')
+nnMod = MLPRegressor(max_iter = 250, random_state = 29, solver = 'lbfgs')
 nnMod.fit(train_scaled, train["Target"] / 50)
 # Prediction on testing data, remembering to multiply by 50
 prediction = pd.DataFrame()
@@ -1394,28 +1394,258 @@ print(prediction["sq_diff"].mean())
 
 ***
 
-# 7 Model Evaluation & Selection
+# 7 Unsupervised Machine Learning
 
-## 7.1 Evaluate the accuracy of regression models.
+## 7.1 KMeans Clustering
+
+```{python, echo = 3:13}
+import pandas as pd
+import numpy as np
+iris = pd.read_csv('/Users/iris.csv')
+iris["Species"] = np.where(iris["Target"] == 0, "Setosa", 
+                           np.where(iris["Target"] == 1, "Versicolor", 
+                                    "Virginica"))
+features = pd.concat([iris["PetalLength"], iris["PetalWidth"], 
+                     iris["SepalLength"], iris["SepalWidth"]], axis = 1)
+
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters = 3, random_state = 29).fit(features)
+
+print(pd.crosstab(index = iris["Species"], columns = kmeans.labels_))
+```
+[KMeans](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans)
+
+## 7.2 Spectral Clustering
+
+```{python, echo = 6:11}
+import pandas as pd
+import numpy as np
+iris = pd.read_csv('/Users/iris.csv')
+iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
+features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
+from sklearn.cluster import SpectralClustering
+
+spectral = SpectralClustering(n_clusters = 3, 
+                              random_state = 29).fit(features)
+
+print(pd.crosstab(index = iris["Species"], columns = spectral.labels_))
+```
+[SpectralClustering](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.SpectralClustering.html#sklearn.cluster.SpectralClustering)
+
+## 7.3 Ward Hierarchical Clustering
+
+```{python, echo = 6:10}
+import pandas as pd
+import numpy as np
+iris = pd.read_csv('/Users/iris.csv')
+iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
+features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
+from sklearn.cluster import AgglomerativeClustering
+
+aggl = AgglomerativeClustering(n_clusters = 3).fit(features)
+
+print(pd.crosstab(index = iris["Species"], columns = aggl.labels_))
+```
+[AgglomerativeClustering](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.AgglomerativeClustering.html#sklearn.cluster.AgglomerativeClustering)
+
+## 7.4 DBSCAN
+
+```{python, echo = 6:10}
+import pandas as pd
+import numpy as np
+iris = pd.read_csv('/Users/iris.csv')
+iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
+features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
+from sklearn.cluster import DBSCAN
+
+dbscan = DBSCAN().fit(features)
+
+print(pd.crosstab(index = iris["Species"], columns = dbscan.labels_))
+```
+[DBCAN](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html#sklearn.cluster.DBSCAN)
+
+## 7.5 Self-organizing map
+
+```{python, eval = FALSE}
+from pyclustering.nnet import som
+
+sm = som.som(4,4)
+
+sm.train(features.as_matrix(), 100)
+
+sm.show_distance_matrix()
+```
+Output:
+![output](u-matrix.png)
+
+***
+
+# 8 Forecasting
+
+## 8.1 Fit an ARIMA model to a timeseries.
+
+### a) Plot the timeseries.
+```{python, eval = FALSE}
+air = pd.read_csv('/Users/air.csv')
+air["DATE"] = pd.to_datetime(air["DATE"], infer_datetime_format = True)
+air.index = air["DATE"].values
+plt.plot(air.index, air["AIR"])
+plt.show()
+```
+Output:
+![output](ARIMASeriess.png)
+
+### b) Fit an ARIMA model, predict 2 years (24 months) out and plot predictions.
+```{python, eval = FALSE}
+# ar = 12 is necessary to indicate the seasonality of data
+model = pf.ARIMA(data = air, ar = 12, ma = 1, integ = 0, target = 'AIR', family = pf.Normal())
+x = model.fit("MLE")
+model.plot_predict(h = 24)
+```
+Output:
+![output](ARIMAForecasts.png)
+
+[PyFlux ARIMA models](http://www.pyflux.com/docs/arima.html#class-description)
+
+## 8.2 Fit a Simple Exponential Smoothing model to a timeseries.
+
+### a) Plot the timeseries.
+```{python, eval = FALSE}
+usecon = pd.read_csv('/Users/usecon.csv')
+
+petrol = usecon["PETROL"]
+
+plt.plot(petrol)
+plt.show()
+```
+Output:
+![output](PetrolSeriess.png)
+
+### b) Fit a Simple Exponential Smoothing model, predict 2 years (24 months) out and plot predictions.
+
+Currently, there is not a good package in Python to fit a simple exponential smoothing model.  The formula for fitting an exponential smoothing model is not difficult, so we can do it by creating our own functions in Python.
+
+The simplest form of exponential smoothing is given by, where $t > 0$: 
+
+$$Eq1: s_0 = x_0$$
+
+$$Eq2: s_t = \alpha x_t + (1 - \alpha)s_{t-1}$$
+Therefore, we can implement a simple exponential smoothing model as follows:
+```{python, eval = FALSE}
+def simple_exp_smoothing(data, alpha, n_preds):
+    # Eq1:
+    output = [data[0]]
+    # Smooth given data plus we want to predict 24 units 
+    # past the end
+    for i in range(1, len(data) + n_preds):
+        # Eq2:
+        if (i < len(data)):
+            output.append(alpha * data[i] + (1 - alpha) * data[i-1])
+        else:
+            output.append(alpha * output[i-1] + (1 - alpha) * output[i-2])
+    return output
+    
+pred = simple_exp_smoothing(petrol, 0.9999, 24)
+
+plt.plot(pd.DataFrame(pred), color = "red")
+plt.plot(petrol, color = "blue")
+plt.show()Petro
+```
+Output:
+![output](PetrolForecasts.png)
+
+[Basis for code](https://grisha.org/blog/2016/01/29/triple-exponential-smoothing-forecasting/)
+
+## 8.3 Fit a Holt-Winters model to a timeseries.
+
+### a) Plot the timeseries.
+```{python, eval = FALSE}
+vehicle = usecon["VEHICLE"]
+
+plt.plot(vehicle)
+plt.show()
+```
+Output:
+![output](VehiclesSeriess.png)
+
+### b) Fit a Holt-Winters additive model, predict 2 years (24 months) out and plot predictions.
+Currently, there is not a good package in Python to fit a Holt-Winters additive model.  The formula for fitting a Holt-Winters additive model is not difficult, so we can do it by creating our own functions in Python.
+
+The following is an implementation of the Holt-Winters additive model given at [triple exponential smoothing code](https://grisha.org/blog/2016/01/29/triple-exponential-smoothing-forecasting/).
+
+```{python, eval = FALSE}
+def initial_trend(series, slen):
+    sum = 0.0
+    for i in range(slen):
+        sum += float(series[i+slen] - series[i]) / slen
+    return sum / slen
+def initial_seasonal_components(series, slen):
+    seasonals = {}
+    season_averages = []
+    n_seasons = int(len(series)/slen)
+    # compute season averages
+    for j in range(n_seasons):
+        season_averages.append(sum(series[slen*j:slen*j+slen])/float(slen))
+    # compute initial values
+    for i in range(slen):
+        sum_of_vals_over_avg = 0.0
+        for j in range(n_seasons):
+            sum_of_vals_over_avg += series[slen*j+i]-season_averages[j]
+        seasonals[i] = sum_of_vals_over_avg/n_seasons
+    return seasonals
+def triple_exponential_smoothing_add(series, slen, alpha, beta, gamma, n_preds):
+    result = []
+    seasonals = initial_seasonal_components(series, slen)
+    for i in range(len(series)+n_preds):
+        if i == 0: # initial values
+            smooth = series[0]
+            trend = initial_trend(series, slen)
+            result.append(series[0])
+            continue
+        if i >= len(series): # we are forecasting
+            m = i - len(series) + 1
+            result.append((smooth + m*trend) + seasonals[i%slen])
+        else:
+            val = series[i]
+            last_smooth, smooth = smooth, alpha*(val-seasonals[i%slen]) + (1-alpha)*(smooth+trend)
+            trend = beta * (smooth-last_smooth) + (1-beta)*trend
+            seasonals[i%slen] = gamma*(val-smooth) + (1-gamma)*seasonals[i%slen]
+            result.append(smooth+trend+seasonals[i%slen])
+    return result
+    
+add_preds = triple_exponential_smoothing_add(vehicles, 12, 0.5731265, 0, 0.7230956, 24)
+
+plt.plot(pd.DataFrame(add_preds), color = "red")
+plt.plot(vehicles, color = "blue")
+plt.show()
+```
+Output:
+![output](VehiclesForecasts1.png)
+
+***
+
+# 9 Model Evaluation & Selection
+
+## 9.1 Evaluate the accuracy of regression models.
 
 ### a) Evaluation on training data.
 ```{python, echo=3:17}
 import pandas as pd
 import numpy as np
-train = pd.read_csv('/Users/tips_train.csv')
-test = pd.read_csv('/Users/tips_test.csv')
+train = pd.read_csv('/Users/boston_train.csv')
+test = pd.read_csv('/Users/boston_test.csv')
 
 # Random Forest Regression Model
 from sklearn.ensemble import RandomForestRegressor
 rfMod = RandomForestRegressor(random_state=29)
-rfMod.fit(train.drop(["tip"], axis = 1), train["tip"])
+rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 
 # Evaluation on training data
-predY = rfMod.predict(train.drop(["tip"], axis = 1))
+predY = rfMod.predict(train.drop(["Target"], axis = 1))
 
 # Determine coefficient of determination score
 from sklearn.metrics import r2_score
-r2_rf = r2_score(train["tip"], predY)
+r2_rf = r2_score(train["Target"], predY)
 print("Random forest regression model r^2 score (coefficient of determination): %f" % r2_rf)
 ```
 
@@ -1423,32 +1653,32 @@ print("Random forest regression model r^2 score (coefficient of determination): 
 ```{python, echo=10:17}
 import pandas as pd
 import numpy as np
-train = pd.read_csv('/Users/tips_train.csv')
-test = pd.read_csv('/Users/tips_test.csv')
+train = pd.read_csv('/Users/boston_train.csv')
+test = pd.read_csv('/Users/boston_test.csv')
 from sklearn.metrics import r2_score
 from sklearn.ensemble import RandomForestRegressor
-rfMod = RandomForestRegressor(random_state=29, n_estimators = 500)
-rfMod.fit(train.drop(["tip"], axis = 1), train["tip"])
+rfMod = RandomForestRegressor(random_state=29)
+rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 from sklearn.metrics import r2_score
 # Random Forest Regression Model (rfMod)
 
 # Evaluation on testing data
-predY = rfMod.predict(test.drop(["tip"], axis = 1))
+predY = rfMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine coefficient of determination score
-r2_rf = r2_score(test["tip"], predY)
+r2_rf = r2_score(test["Target"], predY)
 print("Random forest regression model r^2 score (coefficient of determination): %f" % r2_rf)
 ```
 The sklearn metric [r2_score](http://scikit-learn.org/stable/modules/model_evaluation.html#r2-score-the-coefficient-of-determination) is only one option for assessing a regression model.  Please go [here](http://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics) for more information about other sklearn regression metrics.
 
-## 7.2 Evaluate the accuracy of classification models.
+## 9.2 Evaluate the accuracy of classification models.
 
 ### a) Evaluation on training data.
 ```{python, echo = 3:17}
 import pandas as pd
 import numpy as np
-train = pd.read_csv('/Users/breastcancer_train.csv')
-test = pd.read_csv('/Users/breastcancer_test.csv')
+train = pd.read_csv('/Users/digits_train.csv')
+test = pd.read_csv('/Users/digits_test.csv')
 
 # Random Forest Classification Model
 from sklearn.ensemble import RandomForestClassifier
@@ -1468,8 +1698,8 @@ print("Random forest model accuracy: %f" % accuracy_rf)
 ```{python, echo = 9:16}
 import pandas as pd
 import numpy as np
-train = pd.read_csv('/Users/breastcancer_train.csv')
-test = pd.read_csv('/Users/breastcancer_test.csv')
+train = pd.read_csv('/Users/digits_train.csv')
+test = pd.read_csv('/Users/digits_test.csv')
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 rfMod = RandomForestClassifier(random_state=29)
@@ -1485,7 +1715,7 @@ print("Random forest model accuracy: %f" % accuracy_rf)
 ```
 Note: The sklearn metric [accuracy_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html) is only one option for assessing a classification model.  Please go [here](http://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics) for more information about other sklearn classification metrics.
 
-## 7.3 Evaluation with cross validation.
+## 9.3 Evaluation with cross validation.
 
 ### a) KFold
 ```{python, echo = 3:18}
@@ -1527,100 +1757,13 @@ print("Accuracy: %.2f%% +/- %.2f%%" % (results.mean()*100,
                                        results.std()*100))
 ```
 
-# 8 Unsupervised Machine Learning
+***
 
-## 8.1 KMeans Clustering
+# 10 Text Analytics
 
-```{python, echo = 3:13}
-import pandas as pd
-import numpy as np
-iris = pd.read_csv('/Users/iris.csv')
-iris["Species"] = np.where(iris["Target"] == 0, "Setosa", 
-                           np.where(iris["Target"] == 1, "Versicolor", 
-                                    "Virginica"))
-features = pd.concat([iris["PetalLength"], iris["PetalWidth"], 
-                     iris["SepalLength"], iris["SepalWidth"]], axis = 1)
+***
 
-from sklearn.cluster import KMeans
-kmeans = KMeans(n_clusters = 3, random_state = 29).fit(features)
-
-print(pd.crosstab(index = iris["Species"], columns = kmeans.labels_))
-```
-[KMeans](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans)
-
-## 8.2 Spectral Clustering
-
-```{python, echo = 6:11}
-import pandas as pd
-import numpy as np
-iris = pd.read_csv('/Users/iris.csv')
-iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
-features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
-from sklearn.cluster import SpectralClustering
-
-spectral = SpectralClustering(n_clusters = 3, 
-                              random_state = 29).fit(features)
-
-print(pd.crosstab(index = iris["Species"], columns = spectral.labels_))
-```
-[SpectralClustering](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.SpectralClustering.html#sklearn.cluster.SpectralClustering)
-
-## 8.3 Ward Hierarchical Clustering
-
-```{python, echo = 6:10}
-import pandas as pd
-import numpy as np
-iris = pd.read_csv('/Users/iris.csv')
-iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
-features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
-from sklearn.cluster import AgglomerativeClustering
-
-aggl = AgglomerativeClustering(n_clusters = 3).fit(features)
-
-print(pd.crosstab(index = iris["Species"], columns = aggl.labels_))
-```
-[AgglomerativeClustering](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.AgglomerativeClustering.html#sklearn.cluster.AgglomerativeClustering)
-
-## 8.4 DBSCAN
-
-```{python, echo = 6:10}
-import pandas as pd
-import numpy as np
-iris = pd.read_csv('/Users/iris.csv')
-iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
-features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
-from sklearn.cluster import DBSCAN
-
-dbscan = DBSCAN().fit(features)
-
-print(pd.crosstab(index = iris["Species"], columns = dbscan.labels_))
-```
-[DBCAN](http://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html#sklearn.cluster.DBSCAN)
-
-## 8.5 Self-organizing map
-
-```{python, echo = 6:19}
-import pandas as pd
-import numpy as np
-iris = pd.read_csv('/Users/iris.csv')
-iris["Species"] = np.where(iris["Target"] == 0, "Setosa", np.where(iris["Target"] == 1, "Versicolor", "Virginica"))
-features = pd.concat([iris["PetalLength"], iris["PetalWidth"], iris["SepalLength"], iris["SepalWidth"]], axis = 1)
-from sompy.sompy import SOMFactory
-
-features_mat = features.as_matrix()
-
-msz0 = 1
-msz1 = 150
-
-sm = SOMFactory.build(features_mat, mapsize = [msz0, msz1], lattice = 'rect', initialization = 'random')
-
-sm.train(verbose = False)
-
-clust = sm.cluster(n_clusters = 3)
-
-print(pd.crosstab(index = iris["Species"], columns = clust))
-```
-[SOMPY](https://github.com/sevamoo/SOMPY)
+# 11 Deep Learning
 
 ***
 

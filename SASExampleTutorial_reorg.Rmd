@@ -1,9 +1,9 @@
 ---
 title: "SAS Tutorial"
 output:
-  word_document: default
-  pdf_document: default
-  html_document: default
+  word_document:
+    toc: yes
+    toc_depth: '3'
 ---
 
 ```{r, message=FALSE, echo=FALSE}
@@ -13,6 +13,8 @@ sasopts <- "-nosplash -ls 75"
 opts_chunk$set(engine="sas", engine.path=saspath, engine.opts=sasopts, comment="")
 
 ```
+
+Before beginning this tutorial, you need to insure that your [SAS environment is connected with an R environment](https://communities.sas.com/t5/General-SAS-Programming/Run-R-code-inside-SAS-easily/td-p/210116) so that the R code that SAS calls at the end of this tutorial from the [IML Procedure](#iml) run successfully.
 
 In SAS, 
 ```{r}
@@ -49,6 +51,7 @@ run;
 
 ### c) Read the data in as a .json file.
 
+There is more code involved in reading a .json file into SAS so that all the format is correct, however we will not at this time dive into the explanation for all this code, but please see the links below.
 ```{r, eval = FALSE}
 data student_json; 
   INFILE 'C:/Users/class.json' LRECL  = 3456677  TRUNCOVER SCANOVER 
@@ -63,12 +66,17 @@ data student_json;
     @@; 
 run;
 ```
-[DATA step](#step)([infile](#infile) & [input](#input) statements)
+[DATA step](#step): [infile](#infile) & [input](#input) statements
 
 ## 1.2 Find the dimensions of the data set.
 
+The shape of a SAS data set is available by running the [IMPORT Procedure](#import) and looking at the notes in the log file.
 ```{r, eval = FALSE}
-/* SAS automatically prints this information when proc import is run */
+proc import out = student
+  datafile = 'C:/Users/class.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
 ```
 Output:
 ![output](procimport.png)
@@ -82,13 +90,13 @@ datafile = 'C:/Users/class.csv'
 dbms = csv replace;
 getnames = yes;
 run;
-proc contents data = student short;
+proc contents data = student;
 run;
 ```
 
 ## 1.4 Look at the first 5 observations.
 
-The [PRINT procedure](#print) prints a [SAS data set](#DATASET), according to the specifications and options provided
+The [PRINT procedure](#print) prints a [SAS data set](#DATASET), according to the specifications and options provided.
 ```{r, echo=6:9}
 proc import out = student
 datafile = 'C:/Users/class.csv'
@@ -103,34 +111,33 @@ run;
 
 ## 1.5 Calculate mean of numeric variables.
 
-The [MEANS procedure](#means) prints the mean of numeric variables of a [SAS data set](#DATASET), as well as other descriptive statistics.
-```{r, echo=6:8}
+The [MEANS procedure](#means) prints the mean of all numeric variables of a [SAS data set](#DATASET), as well as other descriptive statistics.
+```{r, echo=6:7}
 proc import out = student
 datafile = 'C:/Users/class.csv'
 dbms = csv replace;
 getnames = yes;
 run;
-/* SAS automatically prints the mean of all numeric variables */
 proc means data = student mean;
 run;
 ```
 
 ## 1.6 Compute summary statistics of the data set.
 
+Summary statistics of a [SAS data set](#DATASET) are available by running the [MEANS procedure](#means) and specifying statistics to return.
 ```{r, echo=6:11}
 proc import out = student
 datafile = 'C:/Users/class.csv'
 dbms = csv replace;
 getnames = yes;
 run;
-/* SAS uses a different method than Python and R to compute compute
+/* SAS uses a different method than Python and R to compute
    quartiles, but the method in each language can be changed */
 /* maxdec= option tells SAS to print at most 2 numbers behind
    the decimal point */
 proc means data = student min q1 median mean q3 max n maxdec=2; 
 run;
 ```
-[MEANS Procedure](#means)
 
 ## 1.7 Descriptive statistics functions applied to columns of the data set.
 
@@ -146,7 +153,6 @@ proc means data = student stddev sum n max min median maxdec=2;
   var Weight; 
 run;
 ```
-[MEANS Procedure](#means)
 
 ## 1.8 Produce a one-way table to describe the frequency of a variable.
 
@@ -160,7 +166,7 @@ dbms = csv replace;
 getnames = yes;
 run;
 proc freq data = student; 
-  tables Age; 
+  tables Age / nopercent norow nocol; 
 run;
 ```
 
@@ -172,11 +178,13 @@ dbms = csv replace;
 getnames = yes;
 run;
 proc freq data = student; 
-  tables Sex; 
+  tables Sex / nopercent norow nocol; 
 run;
 ```
 
-The tables statement allows you to specify multiple variables at once, separated only by a space, so both of these tables could have been created with one [FREQ procedure](#freq) call.
+The tables statement allows you to specify multiple variables at once, separated only by a space, so both of these tables could have been created with one [FREQ procedure](#freq) call. The options on the tables statement (nopercent norow nocol) prevent SAS from printing percents in the table, which are printed by default.  
+
+**TRY THIS AT HOME**: Run this procedure without the options on the tables statment.
 
 ## 1.9 Produce a two-way table to visualize the frequency of two categorical (or discrete) variables.
 
@@ -189,13 +197,14 @@ run;
 /* The "*" between two variables on the tables statement
    indicates to produce a two-way table of the two variables */
 proc freq data = student; 
-  tables Age*Sex; 
+  tables Age*Sex / nopercent norow nocol; 
 run;
 ```
 [FREQ Procedure](#freq)
 
 ## 1.10 Select a subset of the data that meets a certain criterion.
 
+The [SAS DATA step](#step) is used for all things data manipulation and in Section 2 we will explore it further.
 ```{r, echo=6:11}
 proc import out = student
 datafile = 'C:/Users/class.csv'
@@ -209,21 +218,26 @@ run;
 proc print data = females(obs=5); 
 run; 
 ```
-[DATA step](#step)([set](#set) & [where](#where) statements)
+[DATA step](#step): [set](#set) & [where](#where) statements
+
+**TRY THIS AT HOME**: Run this procedure to return all *male* students.
 
 ## 1.11 Determine the correlation between two continuous variables.
 
-```{r, echo=6:8}
+```{r, echo=6:9}
 proc import out = student
 datafile = 'C:/Users/class.csv'
 dbms = csv replace;
 getnames = yes;
 run;
-proc corr data = student pearson;
+/* The nosimple option reduces the output of this procedure */
+proc corr data = student pearson nosimple;
 var Height Weight;
 run; 
 ```
 [CORR Procedure](#corr)
+
+**TRY THIS AT HOME**: Run this procedure and do not reduce the output.
 
 ***
 
@@ -250,6 +264,7 @@ Output:
 ## 2.2 Visualize a single continuous variable by producing a boxplot.
 
 ```{r, eval = FALSE}
+/* SAS automatically prints the mean on the boxplot */
 proc sgplot data = student; 
   vbox Weight; 
 run;
@@ -261,8 +276,7 @@ Output:
 ## 2.3 Visualize two continuous variables by producing a scatterplot.
 
 ```{r, eval = FALSE}
-/* Notice here you specify the y variable first and then the x variable */
-/* Also, SAS automatically plots the mean on the boxplot */
+/* Notice here you specify the y variable followed by the x variable */
 proc sgscatter data = student; 
   plot Weight * Height; 
 run; 
@@ -307,7 +321,7 @@ run;
 Output:
 ![output](ScatterLine.png)
 
-[REG Procedure](#reg), [DATA step](#step)([set](#set) statement), [macro variables](https://v8doc.sas.com/sashtml/macro/z1071889.htm), [call symput()](https://v8doc.sas.com/sashtml/macro/z0210266.htm) function
+[REG Procedure](#reg) | [DATA step](#step): [set](#set) statement | [macro variables](https://v8doc.sas.com/sashtml/macro/z1071889.htm) | [call symput()](https://v8doc.sas.com/sashtml/macro/z0210266.htm) function
 
 ## 2.5 Visualize a categorical variable by producing a bar chart.
 
@@ -585,7 +599,7 @@ run;
 ```
 [if-then/else](#if) & [output] statements, [do loop](#do), [end=](#step) & [firstobs=](http://support.sas.com/documentation/cdl/en/ledsoptsref/69751/HTML/default/viewer.htm#p0wjxoxrco6dsgn1ls5n3mbybcng.htm) data set options
 
-## 3.8 Create a user defined function and apply it to a variable in the data set to create a new variable in the data set.
+## 3.8 Create a user-defined function and apply it to a variable in the data set to create a new variable in the data set.
 
 ```{r, echo=18:32}
 proc import out = student
@@ -851,6 +865,23 @@ proc print data = categorysales(obs=5);
 run;
 ```
 [input()](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000180357.htm) function, [SQL Procedure](#sql)
+
+## 4.5 Return all unique values from a text variable.
+```{r, echo = 6:13}
+proc import out = price
+  datafile = 'C:/Users/price.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc iml;
+  use price;
+    read all var {STATE};
+  close price;
+  
+  unique_states = unique(STATE);
+  print(unique_states);
+quit;
+```
 
 ***
 
@@ -1388,7 +1419,7 @@ run;
 
 ### a) Fit a gradient boosting classification model.
 
-Currently, there is not a gradient boosting procedure available in SAS, currently.  Therefore, the best method to create a gradient boosting model currently is using SAS Enterprise Miner.  Create the following diagram in SAS Enterprise Miner:
+Currently, there is not a gradient boosting procedure available in Base SAS  Therefore, the best method to create a gradient boosting model currently is using SAS Enterprise Miner.  Create the following diagram in SAS Enterprise Miner:
 
 Output:
 ![output](EM1.png)
@@ -1408,7 +1439,7 @@ Output:
 
 ### b) Fit a gradient boosting regression model.
 
-Again, there is not a gradient boosting procedure available in SAS, currently.  Create the following diagram in SAS Enterprise Miner:
+Again, there is not a gradient boosting procedure available in Base SAS, currently.  Create the following diagram in SAS Enterprise Miner:
 
 Output:
 ![output](EM2.png)
@@ -1595,7 +1626,7 @@ proc neural data = train dmdbcat = digits random = 29;
   nloptions noprint;
   input _0 - _63 / level = interval;
   target Target / level = nominal;
-  hidden 100;
+  archi MLP hidden=100;
   train maxiter = 200;
   score out = out outfit = fit;
   score data = test out = gridout;
@@ -1603,7 +1634,7 @@ run;
 ```
 
 #### ii) Assess the model against the testing data.
-```{r, echo = 34:43}
+```{r, echo = 33:42}
 proc import out = train
   datafile = 'C:/Users/digits_train.csv'
   dbms = csv replace;
@@ -1629,13 +1660,13 @@ class Target;
 target Target;
 run;
 proc neural data = train dmdbcat = digits random = 29;
-nloptions noprint;
-input _0 - _63 / level = interval;
-target Target / level = nominal;
-hidden 100;
-train maxiter = 200;
-score out = out outfit = fit;
-score data = test out = gridout;
+  nloptions noprint;
+  input _0 - _63 / level = interval;
+  target Target / level = nominal;
+  archi MLP hidden=100;
+  train maxiter = 200;
+  score out = out outfit = fit;
+  score data = test out = gridout;
 run;	
 /* Prediction on testing data */
 data scored;
@@ -1686,16 +1717,16 @@ run;
 	 "nloptions noprint" is specified */
 proc neural data = train dmdbcat = boston random = 29;
   nloptions noprint;
+  archi MLP hidden=100;
   input _0 - _12 / level = interval;
-  hidden 100;
   target Target / level = interval;
-  train maxiter = 200;
+  train maxiter = 250;
   score data = test outfit = netfit out = gridout;
 run;
 ```
 
 #### ii) Assess the model against the testing data.
-```{r, echo = 33:42}
+```{r, echo = 32:41}
 proc import out = train
   datafile = 'C:/Users/boston_train.csv'
   dbms = csv replace;
@@ -1720,12 +1751,12 @@ target Target;
 run;
 ods select none;
 proc neural data = train dmdbcat = boston random = 29;
-nloptions noprint;
-input _0 - _12 / level = interval;
-hidden 100;
-target Target / level = interval;
-train maxiter = 200;
-score data = test outfit = netfit out = gridout;
+  nloptions noprint;
+  archi MLP hidden=100;
+  input _0 - _12 / level = interval;
+  target Target / level = interval;
+  train maxiter = 250;
+  score data = test outfit = netfit out = gridout;
 run;
 ods select all;
 /* Prediction on testing data */
@@ -1742,11 +1773,253 @@ run;
 
 ***
 
-\newpage
+# 7 Unsupervised Machine Learning
 
-# 7 Model Evaluation & Selection
+## 7.1 KMeans Clustering
+```{r}
+proc import out = iris
+	datafile = 'C:/Users/iris.csv'
+	dbms = csv replace;
+	getnames = yes;
+run;
+	
+data iris;
+	length Species $ 20;
+	set iris;
+	if (Target = 0) then Species = "Setosa";
+	if (Target = 1) then Species = "Versicolor";
+	if (Target = 2) then Species = "Virginica";
+run;
 
-## 7.1 Evaluate the accuracy of regression models.
+proc fastclus data=iris maxclusters=3 out=kmeans random = 29; * noprint;
+	var PetalLength PetalWidth SepalLength SepalWidth;
+run;
+
+proc freq data = kmeans;
+	tables Species*Cluster;
+run;
+```
+
+## 7.2 Spectral Clustering
+```{r}
+proc iml;
+  submit / R;
+  	iris = read.csv('C:/Users/iris.csv')
+	  iris$Species = ifelse(iris$Target == 0, "Setosa", 
+	                        ifelse(iris$Target == 1, "Versicolor", "Virginica"))
+	  features <- as.matrix(subset(iris, select = c(PetalLength, 
+	                                                PetalWidth, SepalLength, SepalWidth)))
+  	library(kernlab) 
+  	set.seed(29)
+  	spectral <- specc(features, centers = 3, iterations = 10, nystrom.red = TRUE)
+  	labels <- as.data.frame(spectral) 
+  	table(iris$Species, labels$spectral)
+  endsubmit;
+quit;
+```
+
+## 7.3 Ward Hierarchical Clustering
+```{r, eval = FALSE}
+proc import out = iris
+  datafile = 'C:/Users/iris.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+
+data iris;
+  length Species $ 20;
+  set iris;
+    if (Target = 0) then Species = "Setosa";
+    if (Target = 1) then Species = "Versicolor";
+    if (Target = 2) then Species = "Virginica";
+run;
+
+proc cluster data = iris method = ward print=15 ccc pseudo noprint;
+   var petal: sepal:;
+   copy species;
+run;
+
+proc tree noprint ncl=3 out=out;
+   copy petal: sepal: species;
+run;
+
+proc freq data = out;
+  tables Species*Cluster;
+run;
+```
+
+## 7.4 DBSCAN
+```{r}
+proc iml;
+  submit / R;
+  	iris = read.csv('C:/Users/iris.csv')
+	  iris$Species = ifelse(iris$Target == 0, "Setosa", 
+	                        ifelse(iris$Target == 1, "Versicolor", "Virginica"))
+	  features <- as.matrix(subset(iris, select = c(PetalLength, 
+	                                                PetalWidth, SepalLength, SepalWidth)))
+    library(dbscan)
+	  set.seed(29)
+    dbscan <- dbscan(features, eps = 0.5)
+    labels <- dbscan$cluster 
+    table(iris$Species, labels)
+  endsubmit;
+quit;
+```
+
+## 7.5 Self-organizing map
+
+Currently, there is not a self-organizing map procedure available in Base SAS.  Therefore, the best method to create a self-organizing map currently is using SAS Enterprise Miner.  First, you need to read in the Iris data set, setting the Species/Target variable to be dropped before investigation.
+
+Output:
+![output](DropTarget.png)
+
+Then create the following diagram in SAS Enterprise Miner:
+
+Output:
+![output](SOM Diagram.png)
+
+For the SOM/Kohonen node set the following options:
+
+1. Choose the Kohonen SOM method.
+2. Set row and column to both be 4.
+3. Under the "Kohonen" options section, set "Use Defaults" to "No", and open the Kohonen Options window by clicking the ... box.
+4. Set the following options in the popup window:
+
+Output:
+![output](KohonenOptions.png)
+
+This model produces the following output which is similar to the output of R and Python:
+
+Output:
+![output](SASSOM.png)
+
+***
+
+# 8 Forecasting
+
+## 8.1 Fit an ARIMA model to a timeseries.
+
+### a) Plot the timeseries.
+```{r}
+proc import out = air
+  datafile = 'C:/Users/air.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+  
+proc timeseries data = air plot = series;
+	id date interval = month;
+	var air;
+run;
+```
+Output:
+![output](AirSeries.png)
+
+### b) Fit an ARIMA model, predict 2 years (24 months) out, and plot predictions.
+```{r}
+proc import out = air
+  datafile = 'C:/Users/air.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+  
+proc arima data = air;
+	identify var = air(1,12);
+	estimate q=(1)(12) noint method=ml;
+	forecast id=date interval=month out=forecast;
+run;
+
+/* SAS automatically predicts 2 years out and plots the predictions */
+```
+Output:
+![output](AirForecasts.png)
+
+### c) Plot residuals of predictions and known values.
+```{r, eval = FALSE}
+proc import out = air
+  datafile = 'C:/Users/air.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc timeseries data = air plot = series;
+	id date interval = month;
+	var air;
+run;
+proc arima data = air;
+	identify var = air(1,12);
+	estimate q=(1)(12) noint method=ml;
+	forecast id=date interval=month out=forecast;
+run;
+proc timeseries data = forecast plot = series;
+	id date interval = month;
+	var residual;
+run;
+```
+Output:
+![output](AirResiduals.png)
+
+## 8.2 Fit a Simple Exponential Smoothing model to a timeseries.
+
+### a) Plot the timeseries.
+```{r}
+proc import out = usecon
+  datafile = 'C:/Users/usecon.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc timeseries data = usecon plot = series;
+	id date interval = month;
+	var petrol;
+run;
+```
+Output:
+![output](PetrolSeries.png)
+
+### b) Fit a Simple Exponential Smoothing model, predict 2 years (24 months) out and plot predictions.
+```{r}
+proc import out = usecon
+  datafile = 'C:/Users/usecon.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc esm data = usecon out = forecast lead = 24 plot = forecasts;
+	id date interval = month;
+	forecast petrol / model = simple;
+run;
+```
+Output:
+![output](PetrolForecast.png)
+
+## 8.3 Fit a Holt-Winters model to a timeseries.
+
+### a) Plot the timeseries.
+```{r, eval = FALSE}
+proc import out = usecon
+  datafile = 'C:/Users/usecon.csv'
+  dbms = csv replace;
+  getnames = yes;
+run;
+proc timeseries data = usecon plot = series;
+	id date interval = month;
+	var vehicle;
+run;
+```
+Output:
+![output](VehicleSeries.png)
+
+### b) Fit a Holt-Winters additive model, predict 2 years (24 months) out and plot predictions.
+```{r, eval = FALSE}
+proc esm data = usecon out = forecast lead = 24 plot = forecasts;
+	id date interval = month;
+	forecast vehicle / model = addwinters;
+run;
+```
+Output:
+![output](VehicleForecasts1.png)
+
+# 9 Model Evaluation & Selection
+
+## 9.1 Evaluate the accuracy of regression models.
 
 ### a) Evaluation on training data.
 ```{r}
@@ -1830,7 +2103,7 @@ The formula used here for the coefficient score is based off the Python skearn f
 
 [REG Procedure](#reg), [SCORE Procedure](#score), [IML Procedure](#iml), [HPFOREST Procedure](#hpforest), [HP4SCORE Procedure](#hp4score)
 
-## 7.2 Evaluate the accuracy of classification models.
+## 9.2 Evaluate the accuracy of classification models.
 
 ### a) Evaluation on training data.
 ```{r}
@@ -1878,7 +2151,6 @@ proc iml;
 quit;
 ```
 
-
 ### b) Evaluation on testing data.
 ```{r, echo = 18:39}
 proc import out = train
@@ -1922,7 +2194,7 @@ proc iml;
 quit; 
 ```
 
-## 7.3 Evaluation with cross validation.
+## 9.3 Evaluation with cross validation.
 
 ### a) KFold
 
@@ -2078,103 +2350,13 @@ run;
 
 ***
 
-\newpage
-
-# 8 Unsupervised Machine Learning
-
-## 8.1 KMeans Clustering
-```{r}
-proc import out = iris
-	datafile = 'C:/Users/iris.csv'
-	dbms = csv replace;
-	getnames = yes;
-run;
-	
-data iris;
-	length Species $ 20;
-	set iris;
-	if (Target = 0) then Species = "Setosa";
-	if (Target = 1) then Species = "Versicolor";
-	if (Target = 2) then Species = "Virginica";
-run;
-
-proc fastclus data=iris maxclusters=3 out=kmeans random = 29; * noprint;
-	var PetalLength PetalWidth SepalLength SepalWidth;
-run;
-
-proc freq data = kmeans;
-	tables Cluster*Species;
-run;
-```
-
-## 8.2 Spectral Clustering
-```{r}
-proc iml;
-  submit / R;
-  	iris = read.csv('C:/Users/iris.csv')
-	  iris$Species = ifelse(iris$Target == 0, "Setosa", 
-	                        ifelse(iris$Target == 1, "Versicolor", "Virginica"))
-	  features <- as.matrix(subset(iris, select = c(PetalLength, 
-	                                                PetalWidth, SepalLength, SepalWidth)))
-  	library(kernlab) 
-  	set.seed(29)
-  	spectral <- specc(features, centers = 3)
-  	labels <- as.data.frame(spectral) 
-  	table(labels$spectral, iris$Species)
-  endsubmit;
-quit;
-```
-
-## 8.3 Ward Hierarchical Clustering
-```{r}
-proc import out = iris
-  datafile = '/folders/myfolders/ANZ/iris.csv'
-  dbms = csv replace;
-  getnames = yes;
-run;
-
-data iris;
-  length Species $ 20;
-  set iris;
-    if (Target = 0) then Species = "Setosa";
-    if (Target = 1) then Species = "Versicolor";
-    if (Target = 2) then Species = "Virginica";
-run;
-
-proc cluster data = iris method = ward print=15 ccc pseudo noprint;
-   var petal: sepal:;
-   copy species;
-run;
-
-proc tree noprint ncl=3 out=out;
-   copy petal: sepal: species;
-run;
-
-proc freq data = out;
-  tables Cluster*Species;
-run;
-```
-
-## 8.4 DBSCAN
-```{r}
-proc iml;
-  submit / R;
-  	iris = read.csv('C:/Users/iris.csv')
-	  iris$Species = ifelse(iris$Target == 0, "Setosa", 
-	                        ifelse(iris$Target == 1, "Versicolor", "Virginica"))
-	  features <- as.matrix(subset(iris, select = c(PetalLength, 
-	                                                PetalWidth, SepalLength, SepalWidth)))
-    library(dbscan)
-	  set.seed(29)
-    dbscan <- dbscan(features, eps = 0.5)
-    labels <- dbscan$cluster table(labels, iris$Species)
-  endsubmit;
-quit;
-```
+# 10 Text Analytics
 
 ***
 
-\newpage
+# 11 Deep Learning
+
+***
 
 # Appendix
 
@@ -2244,21 +2426,23 @@ quit;
 
 ## 3 [SAS DATA step](http://support.sas.com/documentation/cdl/en/basess/68381/HTML/default/viewer.htm#n053a58fwk57v7n14h8x7y7u34y4.htm) {#step}
 
-### [%include](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000214504.htm) {#include} statement
+Statements:
 
-### [if-then/else](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202239.htm) {#if} statement
+### [%include](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000214504.htm) {#include} 
 
-### [infile](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146932.htm) {#infile} statement
+### [if-then/else](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202239.htm) {#if} 
 
-### [input](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146292.htm) {#input} statement
+### [infile](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146932.htm) {#infile} 
 
-### [merge](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202970.htm) {#merge} statement
+### [input](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146292.htm) {#input} 
 
-### [output](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000194540.htm) {#output} statement
+### [merge](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202970.htm) {#merge} 
 
-### [set](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000173782.htm) {#set} statement
+### [output](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000194540.htm) {#output} 
 
-### [where](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202951.htm) {#where} statement
+### [set](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000173782.htm) {#set} 
+
+### [where](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202951.htm) {#where} 
 
 \newpage
 
