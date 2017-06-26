@@ -654,7 +654,7 @@ print(table.head())
 ```
 Note: [pd.pivot_table()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.pivot_table.html) is similar to the [pd.pivot()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.pivot.html) function
 
-[sub](#SUB) | [Decimal](#DECIMAL) 
+[re](#re) | [Decimal](#DECIMAL) 
 
 
 ## 4.5 Return all unique values from a text variable.
@@ -1249,7 +1249,7 @@ print(pd.crosstab(index=Results, columns="count"))
 ### b) Fit a support vector regression model.
 
 #### i) Fit a support vector regression model on training data.
-```{python, 3:19}
+```{python, echo = 3:19}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
@@ -1497,6 +1497,8 @@ Output:
 
 ### b) Fit an ARIMA model, predict 2 years (24 months) out and plot predictions.
 ```{python, eval = FALSE}
+import pyflux as pf
+
 # ar = 12 is necessary to indicate the seasonality of data
 model = pf.ARIMA(data = air, ar = 12, ma = 1, integ = 0, target = 'AIR', family = pf.Normal())
 x = model.fit("MLE")
@@ -1773,33 +1775,67 @@ print("Accuracy: %.2f%% +/- %.2f%%" % (results.mean()*100,
 
 ## 1 Built-in Python Data Types
 
-* [Boolean](#Bool)
+* [Boolean](https://docs.python.org/2/library/stdtypes.html#boolean-values)
 
-### Numeric types:
-* [int](#int)
-* [long](#LONG)
-* [float](#float)
-* [complex](#complex)
+#### Numeric types
+* [int](https://docs.python.org/3/library/functions.html#int)
+* [long](https://docs.python.org/2/library/functions.html#long)
+* [float](https://docs.python.org/2/library/functions.html#float)
+* [complex](https://docs.python.org/2/library/functions.html#complex)
 
-### Sequences:
+#### Sequences
 * [str](#str)
 * [bytes](#BYTE)
 * [byte array](#BYTE)
 * [list](#LIST)
 * [tuple](#LIST)
 
-### Sets:
+#### Sets
 * [set](#SET)
 * [frozen set](#SET)
 
-### Mapping:
+#### Mapping:
 * [dictionary](#dict)
 
 ## 2 Python Plotting Packages
 
-### [Bokeh](#bokeh)
-### [PyPlot](#PYPLOT)
-### [Seaborn](#SEABORN)
+#### [Bokeh](http://bokeh.pydata.org/en/latest/) {#bokeh}
+A Python package which is useful for interactive visualizations and is optimized for web browser presentations.
+
+#### [PyPlot](https://matplotlib.org/api/pyplot_api.html) {#PYPLOT}
+A Python package which is useful data plotting and visualization.
+
+#### [Seaborn](https://seaborn.pydata.org/) {#SEABORN}
+A Python package which is useful for data plotting and visualization.  In particular, Seaborn includes tools for drawing attractive statistical graphics.
+
+## 3 Python packages used in this tutorial
+
+#### [pandas](http://pandas.pydata.org/) {#PANDAS}
+Working with data structures and performing data analysis
+
+#### [NumPy](http://www.numpy.org/) {#NUMPY}
+Scientific and mathematical computing
+
+#### [re](https://docs.python.org/2/library/re.html#module-re) {#re}
+Regular expressions
+
+#### [Decimal](https://docs.python.org/2/library/decimal.html) {#DECIMAL}
+Tools for decimal [floating point](#float) arithmetic
+
+#### [sklearn](http://scikit-learn.org/stable/) {#SKLEARN}
+scikit-learn, or more commonly known as sklearn, is useful for basic and advanced data mining, machine learning, and data analysis.  sklearn includes tools for classification, regression, clustering, dimensionality reduction, model selection, and data pre-processing.
+
+#### [statsmodels.api](http://www.statsmodels.org/stable/index.html) {#STATSMODELS}
+Tools for the estimation of many different statistical models
+
+#### [xgboost](http://xgboost.readthedocs.io/en/latest/python/python_intro.html) {#XGBOOST}
+Extreme gradient boosting models
+
+#### [pyclustering](http://pythonhosted.org/pyclustering/) {#PYCLUSTERING}
+Tools for clustering input data
+
+#### [pyflux](http://www.pyflux.com/docs/) {#PYFLUX}
+Tools for time series analysis and prediction
 
 ***
 
@@ -1821,26 +1857,14 @@ my_array = np.array([1, 2, 3, 4])
 print(my_array[3])
 ```
 
-## [Bokeh](http://bokeh.pydata.org/en/latest/) {#bokeh}
-A Python package which is useful for interactive visualizations and is optimized for web browser presentations.
-
-## [Boolean](https://docs.python.org/2/library/stdtypes.html#boolean-values) {#Bool}
-A value that is either True or False, and represents the truth of an expression or statement.  
-
 ## Bytes & Byte arrays {#BYTE}
 A [byte](https://docs.python.org/3.1/library/functions.html#bytes) is a sequence of integers which is immutable, whereas a [byte array](https://docs.python.org/3.1/library/functions.html#bytearray) is its mutable counterpart.  
-
-## [complex](https://docs.python.org/2/library/functions.html#complex) {#complex}
-A number which includes a real part and an imaginary part, both of which are [floating point](#float) numbers.
 
 ## [Data Frame](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html) {#DataFrame}
 A two-dimensional tabular structure with labeled axes (rows and columns), where data observations are represented by rows and data variables are represented by columns.
 
 ## [datetime](https://docs.python.org/2/library/datetime.html)
 A Python module which includes tools for manipulating data and time objects.
-
-## [Decimal](https://docs.python.org/2/library/decimal.html) {#DECIMAL}
-A Python package which provides tools for decimal [floating point](#float) arithmetic.
 
 ## [Dictionary](https://docs.python.org/2/tutorial/datastructures.html#dictionaries) {#DICT}
 An associative array which is indexed by keys which map to values.  Therefore, a dictionary is an unordered set of key:value pairs where each key is unique.  Please see the following example of dictionary creation and access:
@@ -1852,12 +1876,6 @@ class_dict = for_dict.set_index('Name').T.to_dict('list')
 print(class_dict.get('James'))
 ```
 
-## [float](https://docs.python.org/2/library/functions.html#float) {#float}
-A decimal point number.
-
-## [int](https://docs.python.org/3/library/functions.html#int) {#int}
-A positive or negative natural number.  In Python, you can convert to an int from a float by using the int() function.  Python stores ints with at least 32 bits of precision.
-
 ## [List](https://www.tutorialspoint.com/python/python_lists.htm) {#LIST}
 A sequence of comma-separated objects that need not be of the same type.  Please see the following example of list creation and access:
 ```{python}
@@ -1868,23 +1886,7 @@ print(list1)
 list1 = ['item1', 102]
 print(list1[1])
 ```
-
 Python also has what are known as ["Tuples"](https://www.tutorialspoint.com/python/python_tuples.htm), which are immutable lists created in the same way as lists, except with paranthesis instead of brackets.
-
-## [Long](https://docs.python.org/2/library/functions.html#long) {#LONG}
-A type of integer with unlimited precision.  In Python, you can convert to a long using the long() function.
-
-## [NumPy](http://www.numpy.org/) {#NUMPY}
-A Python package which is useful for scientific and mathematical computing.
-
-## [pandas](http://pandas.pydata.org/) {#PANDAS}
-A Python package which is useful for working with data structures and performing data analysis.
-
-## [PyPlot](https://matplotlib.org/api/pyplot_api.html) {#PYPLOT}
-A Python package which is useful data plotting and visualization.
-
-## [Seaborn](https://seaborn.pydata.org/) {#SEABORN}
-A Python package which is useful for data plotting and visualization.  In particular, Seaborn includes tools for drawing attractive statistical graphics.
 
 ## [Series](https://pandas.pydata.org/pandas-docs/stable/dsintro.html)
 
@@ -1913,9 +1915,6 @@ print(fs)
 # fs is a frozenset, which means you cannot add or delete elements from fs
 ```
 
-## [sklearn](http://scikit-learn.org/stable/) {#SKLEARN}
-scikit-learn, or more commonly known as sklearn, is a Python package which is useful for basic and advanced data mining, machine learning, and data analysis.  sklearn includes tools for classification, regression, clustering, dimensionality reduction, model selection, and data pre-processing.
-
 ## [str](https://www.tutorialspoint.com/python/python_strings.htm) {#str}
 A list of characters, though characters are not a type in Python, but rather a string of length 1.  Strings are indexable like arrays.  Please see the following example of String creation and access:
 ```{python}
@@ -1926,11 +1925,6 @@ print(s)
 s = 'My first string!'
 print(s[5])
 ```
-
-Please go [here](https://docs.python.org/3.1/library/functions.html#str) for more information on the str() function.
-
-## [sub](https://docs.python.org/2/library/re.html) {#SUB}
-A function of the re Python package useful for replacing a pattern in a string.
 
 ***
 

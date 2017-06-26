@@ -35,7 +35,7 @@ library(gdata)
 student_xls <- read.xls('/Users/class.xls', 1)
 ```
 
-[read.xls()](https://www.rdocumentation.org/packages/gdata/versions/2.18.0/topics/read.xls)
+[gdata](#GDATA) | [read.xls()](https://www.rdocumentation.org/packages/gdata/versions/2.18.0/topics/read.xls)
 
 ###c) Read the data in as a .json file.
 
@@ -56,7 +56,7 @@ temp$Age <- as.integer(temp$Age)
 student_json <- temp
 ```
 
-[fromJSON()](https://www.rdocumentation.org/packages/rjson/versions/0.2.15/topics/fromJSON)
+[rjson](#RJSON) | [fromJSON()](https://www.rdocumentation.org/packages/rjson/versions/0.2.15/topics/fromJSON)
 
 ## 1.2 Find the dimensions of the data set.
 
@@ -257,7 +257,7 @@ ggplot(data = student, aes(x = Sex, y = Weight, fill = Sex)) +
                                 shape = 18, size = 3)
 ```
 
-[ggplot2](http://www.statmethods.net/advgraphs/ggplot2.html) | [factor()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/factor) | [c()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/c) | [aes()](https://www.rdocumentation.org/packages/ggplot2/versions/2.2.1/topics/aes) | [geom_boxplot()](https://www.rdocumentation.org/packages/ggplot2/versions/2.2.1/topics/geom_boxplot) | [stat_summary()](https://www.rdocumentation.org/packages/ggplot2/versions/2.2.1/topics/stat_summary_bin)
+[ggplot2](#ggplot2) | [factor()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/factor) | [c()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/c) | [aes()](https://www.rdocumentation.org/packages/ggplot2/versions/2.2.1/topics/aes) | [geom_boxplot()](https://www.rdocumentation.org/packages/ggplot2/versions/2.2.1/topics/geom_boxplot) | [stat_summary()](https://www.rdocumentation.org/packages/ggplot2/versions/2.2.1/topics/stat_summary_bin)
 
 ***
 
@@ -464,7 +464,7 @@ all.equal(student, new2)
 price <- read.csv('/Users/price.csv')
 
 # call the dplyr package
-require(dplyr)
+library(dplyr)
 
 # The following code is used to remove the "," and "$" characters from the 
 # ACTUAL column so that values can be summed 
@@ -517,6 +517,9 @@ train_ind <- sample(seq_len(nrow(iris)), size = smp_size)
 
 train <- iris[train_ind, ]
 test <- iris[-train_ind, ]
+
+train2 <- read.csv("/Users/iris_train.csv")
+test2 <- read.csv("/Users/iris_test.csv")
 
 write.csv(train, file = "/Users/iris_train.csv")
 write.csv(test, file = "/Users/iris_test.csv")
@@ -692,7 +695,7 @@ train <- read.csv('/Users/breastcancer_train.csv')
 test <- read.csv('/Users/breastcancer_test.csv')
 
 # call the randomForest package
-require(randomForest)
+library(randomForest)
 set.seed(29)
 
 rfMod <- randomForest(as.factor(Target) ~ ., data = train)
@@ -724,7 +727,7 @@ train <- read.csv('/Users/boston_train.csv')
 test <- read.csv('/Users/boston_test.csv')
 
 # call the randomForest package
-require(randomForest)
+library(randomForest)
 set.seed(29)
 
 rfMod <- randomForest(Target ~ ., data = train)
@@ -762,7 +765,7 @@ train <- read.csv('/Users/breastcancer_train.csv')
 test <- read.csv('/Users/breastcancer_test.csv')
 
 # call the gbm package
-require(gbm)
+library(gbm)
 set.seed(29)
 
 # distribution = "bernoulli" is appropriate when there are only 2 
@@ -799,7 +802,7 @@ train <- read.csv('/Users/boston_train.csv')
 test <- read.csv('/Users/boston_test.csv')
 
 # call the gbm package
-require(gbm)
+library(gbm)
 set.seed(29)
 
 gbMod <- gbm(Target ~ ., data = train, distribution = "gaussian", 
@@ -834,7 +837,7 @@ train <- read.csv('/Users/breastcancer_train.csv')
 test <- read.csv('/Users/breastcancer_test.csv')
 
 # call the xgboost package
-require(xgboost)
+library(xgboost)
 set.seed(29)
 
 # Fit the model
@@ -863,7 +866,7 @@ train <- read.csv('/Users/boston_train.csv')
 test <- read.csv('/Users/boston_test.csv')
 
 # call the xgboost package
-require(xgboost)
+library(xgboost)
 set.seed(29)
 
 # Fit the model
@@ -939,7 +942,7 @@ prediction$sq_diff <- (prediction$predY - test$Target)**2
 print(mean(prediction$sq_diff))
 ```
 
-[e1071](https://cran.r-project.org/web/packages/e1071/e1071.pdf) | [svm()](https://www.rdocumentation.org/packages/e1071/versions/1.6-8/topics/svm)
+[e1071](#e1071) | [svm()](https://www.rdocumentation.org/packages/e1071/versions/1.6-8/topics/svm)
 
 ## 6.8 Fit a neural network model on training data and assess against testing data.
 
@@ -974,7 +977,7 @@ confusionMatrix(testTarget, predictions)
 
 [confusionMatrix()](https://www.rdocumentation.org/packages/RSNNS/versions/0.4-9/topics/confusionMatrix)
 
-### b) Fit a neural network regression model.
+### a) Fit a neural network regression model.
 
 #### i) Fit a neural network regression model on training data.
 ```{r, warning = FALSE, message = FALSE}
@@ -1007,9 +1010,162 @@ print(mean(preds$sq_error))
 
 ***
 
-# 7 Model Evaluation & Selection
+# 7 Unsupervised Machine Learning
 
-## 7.1 Evaluate the accuracy of regression models.
+## 7.1 KMeans Clustering
+
+```{r}
+iris = read.csv('/Users/iris.csv')
+
+iris$Species = ifelse(iris$Target == 0, "Setosa", 
+                      ifelse(iris$Target == 1, "Versicolor", "Virginica"))
+
+features <- as.matrix(subset(iris, select = c(PetalLength, PetalWidth, 
+                                              SepalLength, SepalWidth)))
+
+set.seed(29)
+
+kmeans <- kmeans(features, 3, nstart = 20)
+
+table(iris$Species, kmeans$cluster)
+```
+
+## 7.2 Spectral Clustering
+
+```{r, warning = FALSE, message = FALSE}
+library(kernlab)
+set.seed(29)
+
+spectral <- specc(features, centers = 3, iterations = 10, nystrom.red = TRUE)
+
+labels <- as.data.frame(spectral)
+
+table(iris$Species, labels$spectral)
+```
+
+[kernlab](#KERNLAB) | [specc()](https://artax.karlin.mff.cuni.cz/r-help/library/kernlab/html/specc.html)
+
+## 7.3 Ward Hierarchical Clustering
+
+```{r}
+set.seed(29)
+
+hclust <- hclust(dist(features), method = "ward.D2")
+
+table(iris$Species, cutree(hclust, 3))
+```
+
+[Hierarchical Clustering in R](https://www.r-bloggers.com/hierarchical-clustering-in-r-2/)
+
+## 7.4 DBSCAN
+
+```{r, warning = FALSE, message = FALSE}
+set.seed(29)
+
+library(dbscan)
+
+# eps = 0.5 is default in Python
+dbscan <- dbscan(features, eps = 0.5)
+
+table(iris$Species, dbscan$cluster)
+```
+
+[dbscan](#DBSCAN)
+
+## 7.5 Self-organized map
+
+```{r, warning = FALSE, message = FALSE}
+# Seed chosen to match SAS and R results
+set.seed(5)
+
+library(kohonen)
+
+fit <- som(features, mode = "online", somgrid(4, 4, "rectangular"))
+
+plot(fit, type = "dist.neighbour", shape = "straight")
+```
+[kohonen](#KOHONEN)
+
+***
+
+# 8 Forecasting
+
+## 8.1 Fit an ARIMA model to a timeseries.
+
+### a) Plot the timeseries.
+```{r}
+air <- read.csv('/Users/air.csv')
+
+air_series <- air$AIR
+
+plot.ts(air_series, ylab="Air")
+```
+
+### b) Fit an ARIMA model, predict 2 years (24 months) out and plot predictions.
+```{r, warning = FALSE, message = FALSE}
+a_fit <- arima(air_series, order = c(0,1,1), seasonal = list(order = c(0,1,1), period = 12), method = "ML")
+
+library(forecast)
+
+a_forecast <- forecast(a_fit, 24)
+
+plot(a_forecast, xlab = "Month", ylab = "Air")
+```
+
+### c) Plot residuals of predictions and known values.
+```{r}
+plot(a_fit$residuals, xlab = "Month", ylab = "Residuals", type = 'h')
+```
+
+[forecast](#FORECAST)
+
+## 8.2 Fit a Simple Exponential Smoothing model to a timeseries.
+
+### a) Plot the timeseries.
+```{r}
+usecon <- read.csv('/Users/usecon.csv')
+
+petrol_series <- usecon$PETROL
+
+petrol <- ts(petrol_series, frequency = 12)
+
+plot.ts(petrol, ylab="Petrol")
+```
+
+### b) Fit a Simple Exponential Smoothing model, predict 2 years (24 months) out and plot predictions.
+```{r, message = FALSE, warning = FALSE}
+library(forecast)
+
+ses_fit <- ses(petrol, h=24, alpha = 0.9999)
+
+plot(ses_fit, xlab = "Month", ylab = "Petrol")
+```
+
+[forecast](#FORECAST)
+
+## 8.3 Fit a Holt-Winters model to a timeseries.
+
+### a) Plot the timeseries.
+```{r}
+vehicle_series <- usecon$VEHICLES
+
+vehicle <- ts(vehicle_series, frequency = 12)
+
+plot.ts(vehicle, ylab="Vehicle")
+```
+
+### b) Fit a Holt-Winters additive model, predict 2 years (24 months) out and plot predictions.
+```{r}
+add_fit <- HoltWinters(vehicle, seasonal = "additive")
+add_forecast <- forecast(add_fit, 24)
+plot(add_forecast)
+```
+
+***
+
+# 9 Model Evaluation & Selection
+
+## 9.1 Evaluate the accuracy of regression models.
 
 ### a) Evaluation on training data.
 ```{r}
@@ -1045,7 +1201,7 @@ print(paste0("Random forest regression model r^2 score (coefficient of determina
 ```
 The formula used here for the coefficient score is based off the Python skearn formula for [r2_score](http://scikit-learn.org/stable/modules/model_evaluation.html#r2-score-the-coefficient-of-determination).  For more information about model assessment in R, please review information about the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).
 
-## 7.2 Evaluate the accuracy of classification models.
+## 9.2 Evaluate the accuracy of classification models.
 
 ### a) Evaluation on training data.
 ```{r, message = FALSE, warning = FALSE}
@@ -1082,7 +1238,7 @@ print(paste0("Random forest model accuracy: ", accuracy_rf))
 ```
 The formula used here for the accuracy score is based off the Python skearn formula for [accuracy_score](http://scikit-learn.org/stable/modules/model_evaluation.html#accuracy-score).  For more information about model assessment in R, please review information about the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).
 
-## 7.3 Evaluation with cross validation.
+## 9.3 Evaluation with cross validation.
 
 ### a) KFold
 ```{r, warning = FALSE, message = FALSE}
@@ -1167,108 +1323,82 @@ print(paste0("Accuracy: ", round(mean(accuracy)*100, digits=2), "% +/- ",
 
 [createDataPartition](https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/createDataPartition) 
 
-# 8 Unsupervised Machine Learning
+***
 
-## 8.1 KMeans Clustering
+# 10 Text Analytics
 
-```{r}
-iris = read.csv('/Users/iris.csv')
-
-iris$Species = ifelse(iris$Target == 0, "Setosa", 
-                      ifelse(iris$Target == 1, "Versicolor", "Virginica"))
-
-features <- as.matrix(subset(iris, select = c(PetalLength, PetalWidth, 
-                                              SepalLength, SepalWidth)))
-
-set.seed(29)
-
-kmeans <- kmeans(features, 3, nstart = 20)
-
-table(iris$Species, kmeans$cluster)
-```
-
-## 8.2 Spectral Clustering
-
-```{r, warning = FALSE, message = FALSE}
-library(kernlab)
-set.seed(29)
-
-spectral <- specc(features, centers = 3, iterations = 10, nystrom.red = TRUE)
-
-labels <- as.data.frame(spectral)
-
-table(iris$Species, labels$spectral)
-```
-
-[kernlab](https://cran.r-project.org/web/packages/kernlab/kernlab.pdf) | [specc()](https://artax.karlin.mff.cuni.cz/r-help/library/kernlab/html/specc.html)
-
-## 8.3 Ward Hierarchical Clustering
-
-```{r}
-set.seed(29)
-
-hclust <- hclust(dist(features), method = "ward.D2")
-
-table(iris$Species, cutree(hclust, 3))
-```
-
-[Hierarchical Clustering in R](https://www.r-bloggers.com/hierarchical-clustering-in-r-2/)
-
-## 8.4 DBSCAN
-
-```{r, warning = FALSE, message = FALSE}
-set.seed(29)
-
-library(dbscan)
-
-# eps = 0.5 is default in Python
-dbscan <- dbscan(features, eps = 0.5)
-
-table(iris$Species, dbscan$cluster)
-```
-
-## 8.5 Self-organized map
-
-```{r, warning = FALSE, message = FALSE}
-set.seed(29)
-
-library(som)
-
-som <- som(features, xdim = 1, ydim = 3)
-
-preds <- som$visual
-
-table(iris$Species, preds$y)
-```
-
-
+# 11 Deep Learning
 
 ***
 
-\newpage
-
 # Appendix
 
-## 1 Built-in R-Objects
+## 1 Built-in R Objects
 
-### [Vectors](#vectors)
-* [Logical](#logical)
-* [Numeric](#numeric)
-* [Integer](#int)
-* [Complex](#complex)
-* [Character](#char)
-* [Raw](#raw)
+#### [Vectors](#vectors)
+* [Logical](https://stat.ethz.ch/R-manual/R-devel/library/base/html/logical.html)
+* [Numeric](https://stat.ethz.ch/R-manual/R-devel/library/base/html/numeric.html)
+* [Integer](https://stat.ethz.ch/R-manual/R-devel/library/base/html/integer.html)
+* [Complex](https://stat.ethz.ch/R-manual/R-devel/library/base/html/complex.html)
+* [Character](https://stat.ethz.ch/R-manual/R-devel/library/base/html/character.html)
+* [Raw](https://stat.ethz.ch/R-manual/R-devel/library/base/html/raw.html)
 
-### [Lists](#list)
+#### [Lists](#list)
 
-### [Matrics](#matrix)
+#### [Matrics](https://stat.ethz.ch/R-manual/R-devel/library/base/html/matrix.html)
 
-### [Arrays](#array)
+#### [Arrays](#array)
 
-### [Factors](#factors)
+#### [Factors](https://stat.ethz.ch/R-manual/R-devel/library/base/html/factor.html)
 
-### [Data Frames](#DataFrame)
+#### [Data Frames](#DataFrame)
 
+## 2 R packages used in this tutorial
+
+#### [gdata](https://cran.r-project.org/web/packages/gdata/gdata.pdf) {#GDATA}
+Data manipulation
+
+#### [rjson](https://cran.r-project.org/web/packages/rjson/rjson.pdf) {#RJSON}
+Converting R objects into JSON objects, and JSON objects into R objects
+
+#### [ggplot2](https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf) {#ggplot2}
+Visualizations and graphics
+
+#### [dplyr](https://cran.r-project.org/web/packages/dplyr/dplyr.pdf) {#DPLYR}
+Workng with [data frame](#DataFrame) like objects
+
+#### [tree](https://cran.r-project.org/web/packages/tree/tree.pdf) {#TREE}
+Decision trees models
+
+#### [randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf) {#RANDOM}
+Random forest models
+
+#### [gbm](https://cran.r-project.org/web/packages/gbm/gbm.pdf) {#GBM}
+Gradient boosting models
+
+#### [xgboost](https://cran.r-project.org/web/packages/xgboost/xgboost.pdf) {#XGBOOST}
+Extreme gradient boosting models
+
+#### [e1071](https://cran.r-project.org/web/packages/e1071/e1071.pdf) {#e1071}
+Support vector machine models
+
+#### [RSNNS](https://cran.r-project.org/web/packages/RSNNS/RSNNS.pdf) {#RSNNS}
+Neural network models
+
+#### [kernlab](https://cran.r-project.org/web/packages/kernlab/kernlab.pdf) {#KERNLAB}
+Spectral clustering
+
+#### [dbscan](https://cran.r-project.org/web/packages/dbscan/dbscan.pdf) {#DBSCAN}
+DBSCAN clustering
+
+#### [kohonen](https://cran.r-project.org/web/packages/kohonen/kohonen.pdf) {#KOHONEN}
+Supervised and unsupervised self-organizing maps
+
+#### [forecast](https://cran.r-project.org/web/packages/forecast/forecast.pdf) {#FORECAST}
+Displaying and analyzing time series for forecasting
+
+#### [caret](https://cran.r-project.org/web/packages/caret/caret.pdf) {#CARET}
+Training and plotting classification and regression models
 
 ***
 
@@ -1282,9 +1412,6 @@ print(my_array)
 print(my_array[1])
 ```
 
-## [caret](https://www.rdocumentation.org/packages/caret/versions/6.0-76) {#CARET}
-An R programming package of tools for training and plotting classification and regression models.
-
 ## [Data Frame](https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html) {#DataFrame}
 An R Data Frame is a two-dimensional tabular structure with labeled axes (rows and columns), where data observations are represented by rows and data variables are represented by columns.
 
@@ -1297,15 +1424,6 @@ names(values) <- student$Name
 print(values["James"])
 ```
 
-## [dplyr](https://cran.r-project.org/web/packages/dplyr/dplyr.pdf) {#DPLYR}
-An R programming package of tools for workng with [data frame](#DataFrame) like objects.
-
-## [gbm](https://cran.r-project.org/web/packages/gbm/gbm.pdf) {#GBM}
-An R programming package useful for building and analyzing gradient boosting models.
-
-## [gdata](https://cran.r-project.org/web/packages/gdata/gdata.pdf) {#GDATA}
-An R programming package of tools useful for data manipulation.
-
 ## [List](http://www.r-tutor.com/r-introduction/list) {#list}
 An R list is a sequence of comma-separated objects that need not be of the same type.  Please see the following example of list creation and access:
 
@@ -1315,23 +1433,8 @@ print(list1)
 print(list1[1])
 ```
 
-## [randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf) {#RANDOM}
-An R programming package of tools useful for building and analyzing classification and regression random forest models.
-
-## [RSNNS](https://cran.r-project.org/web/packages/RSNNS/RSNNS.pdf) [#RSNNS]
-An R programming package of tools useful for building and analyzing classification and regression neural network models.
-
-## [rjson](https://cran.r-project.org/web/packages/rjson/rjson.pdf) {#RJSON}
-An R programming package of tools useful for converting R objects into JSON objects, and JSON objects into R objects.
-
-## [tree](https://cran.r-project.org/web/packages/tree/tree.pdf) {#TREE}
-An R programming package of tools useful for building and analyzing classification and regression decision trees.
-
 ## [Vector](https://www.tutorialspoint.com/r/r_data_types.htm) {#vector}
 A one-dimensional data structure which is able to hold different classes of elements, but only one class per vector.
-
-## [xgboost](https://cran.r-project.org/web/packages/xgboost/xgboost.pdf) {#XGBOOST}
-An R programming package of tools useful for building and analyzing classification and regression extreme gradient boosting models.
 
 ***
 

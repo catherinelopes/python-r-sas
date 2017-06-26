@@ -1136,7 +1136,7 @@ run;
 
 ### a) Fit a decision tree classification model.
 
-#### i) Fit a decision tree classification model on training data, plot the tree, and determine variable importance
+#### i) Fit a decision tree classification model on training data and determine variable importance
 ```{r}
 /* Notice we are using new data sets that need to be read into the 
    environment */
@@ -1161,14 +1161,9 @@ proc hpsplit data = train;
 	code file='hpbreastcancer.sas';
 run;
 	
-/* Output of this model gives assessment against training data, a plot of 
-	 the tree, and variable importance */
+/* Output of this model gives assessment against training data
+	 and variable importance */
 ```
-Output:
-![output](DT11.png)
-
-Output:
-![output](DT12.png)
 
 [HPSPLIT Procedure](#hpsplit)
 
@@ -1221,7 +1216,7 @@ run;
 
 ### b) Fit a decision tree regression model.
 
-#### i) Fit a decision tree regression model on training data, plot the tree, and determine variable importance.
+#### i) Fit a decision tree regression model on training data and determine variable importance.
 ```{r}
 /* Notice we are re-using data sets but it is good to re-read the 
    original versions back into the environment */
@@ -1246,15 +1241,9 @@ proc hpsplit data = train;
 	code file='hpboston.sas';
 run;
 	
-/* Output of this model gives assessment against training data, 
-	 a plot of the tree, and variable importance */
+/* Output of this model gives assessment against training data
+	 and variable importance */
 ```
-
-Output:
-![output](DT22.png)
-
-Output:
-![output](DT21.png)
 
 ```{r, echo=16:32}
 proc import out = train
@@ -1319,7 +1308,7 @@ run;
 ```
 
 #### ii) Assess the model against the testing data.
-```{r, echo = 18:33}
+```{r, echo = 18:35}
 proc import out = train
 	datafile = 'C:/Users/breastcancer_train.csv'
 	dbms = csv replace;
@@ -1338,9 +1327,11 @@ proc hpforest data = train;
 run;
 ods select all;
 /* Prediction on testing data */
+ods select none;
 proc hp4score data = test seed = 29;
 	score file = 'hpbreastcancer2.bin' out = scored;
 run;
+ods select all;
 
 /* Determine how many were correctly classified */
 data scored;
@@ -1398,9 +1389,11 @@ proc hpforest data = train;
 run;
 ods select all;
 /* Prediction on testing data */
+ods select none;
 proc hp4score data = test seed = 29;
 	score file = 'hpboston2.bin' out = scored;
 run;
+ods select all;
 	
 /* Compute the squared differences between predicted and target */
 data scored;
@@ -1634,7 +1627,7 @@ run;
 ```
 
 #### ii) Assess the model against the testing data.
-```{r, echo = 33:42}
+```{r, echo = 34:43}
 proc import out = train
   datafile = 'C:/Users/digits_train.csv'
   dbms = csv replace;
@@ -1726,7 +1719,7 @@ run;
 ```
 
 #### ii) Assess the model against the testing data.
-```{r, echo = 32:41}
+```{r, echo = 33:42}
 proc import out = train
   datafile = 'C:/Users/boston_train.csv'
   dbms = csv replace;
@@ -1900,7 +1893,7 @@ Output:
 ## 8.1 Fit an ARIMA model to a timeseries.
 
 ### a) Plot the timeseries.
-```{r}
+```{r, eval = FALSE}
 proc import out = air
   datafile = 'C:/Users/air.csv'
   dbms = csv replace;
@@ -1916,16 +1909,11 @@ Output:
 ![output](AirSeries.png)
 
 ### b) Fit an ARIMA model, predict 2 years (24 months) out, and plot predictions.
-```{r}
-proc import out = air
-  datafile = 'C:/Users/air.csv'
-  dbms = csv replace;
-  getnames = yes;
-run;
-  
+The output of this code has been limited for space reasons.
+```{r, eval = FALSE}
 proc arima data = air;
-	identify var = air(1,12);
-	estimate q=(1)(12) noint method=ml;
+	identify var = air(1,12) noprint;
+	estimate q=(1)(12) noint method=ml noprint;
 	forecast id=date interval=month out=forecast;
 run;
 
@@ -1936,20 +1924,6 @@ Output:
 
 ### c) Plot residuals of predictions and known values.
 ```{r, eval = FALSE}
-proc import out = air
-  datafile = 'C:/Users/air.csv'
-  dbms = csv replace;
-  getnames = yes;
-run;
-proc timeseries data = air plot = series;
-	id date interval = month;
-	var air;
-run;
-proc arima data = air;
-	identify var = air(1,12);
-	estimate q=(1)(12) noint method=ml;
-	forecast id=date interval=month out=forecast;
-run;
 proc timeseries data = forecast plot = series;
 	id date interval = month;
 	var residual;
@@ -1976,7 +1950,7 @@ Output:
 ![output](PetrolSeries.png)
 
 ### b) Fit a Simple Exponential Smoothing model, predict 2 years (24 months) out and plot predictions.
-```{r}
+```{r, echo = 6:9}
 proc import out = usecon
   datafile = 'C:/Users/usecon.csv'
   dbms = csv replace;
@@ -1993,7 +1967,7 @@ Output:
 ## 8.3 Fit a Holt-Winters model to a timeseries.
 
 ### a) Plot the timeseries.
-```{r, eval = FALSE}
+```{r, echo = 6:9}
 proc import out = usecon
   datafile = 'C:/Users/usecon.csv'
   dbms = csv replace;
@@ -2001,7 +1975,7 @@ proc import out = usecon
 run;
 proc timeseries data = usecon plot = series;
 	id date interval = month;
-	var vehicle;
+	var vehicles;
 run;
 ```
 Output:
@@ -2011,7 +1985,7 @@ Output:
 ```{r, eval = FALSE}
 proc esm data = usecon out = forecast lead = 24 plot = forecasts;
 	id date interval = month;
-	forecast vehicle / model = addwinters;
+	forecast vehicles / model = addwinters;
 run;
 ```
 Output:
@@ -2046,9 +2020,11 @@ run;
 ods select all;
 
 /* Evaluation on training data  */
+ods select none;
 proc hp4score data = train;
 	score file = 'rfMod.bin' out = scored_train;
 run;
+ods select all;
 
 /* Determine coefficient of determination score */
 proc iml;
@@ -2063,7 +2039,7 @@ quit;
 ```
 
 ### b) Evaluation on testing data.
-```{r, echo = 18:34}
+```{r, echo = 18:36}
 proc import out = train
   datafile = 'C:/Users/boston_train.csv'
   dbms = csv replace;
@@ -2084,9 +2060,11 @@ ods select all;
 /* Random Forest Regression Model (rfMod) */
 
 /* Evaluation on testing data  */
+ods select none;
 proc hp4score data = test;
 	score file = 'rfMod.bin' out = scored_test;
 run;
+ods select all;
 
 /* Determine coefficient of determination score */
 proc iml;
@@ -2130,9 +2108,11 @@ run;
 ods select all;
 
 /* Evaluation on training data */
+ods select none;
 proc hp4score data = train;
 	score file = 'rfMod.bin' out = scored;
 run;
+ods select all;
 
 data scored(keep = Target I_Target correct);
 	set scored;
@@ -2152,7 +2132,7 @@ quit;
 ```
 
 ### b) Evaluation on testing data.
-```{r, echo = 18:39}
+```{r, echo = 18:41}
 proc import out = train
 	datafile = 'C:/Users/digits_train.csv'
 	dbms = csv replace;
@@ -2173,9 +2153,11 @@ ods select all;
 /* Random Forest Classification Model (rfMod) */
 
 /* Evaluation on testing data */
+ods select none;
 proc hp4score data = test;
 	score file = 'rfMod.bin' out = scored;
 run;
+ods select all;
 
 data scored(keep = Target I_Target correct);
 	set scored;
@@ -2362,94 +2344,89 @@ run;
 
 ## 1 Built-in SAS Data Types
 
-* [CHAR](#char)
+* [CHAR](http://support.sas.com/documentation/cdl/en/fedsqlref/67364/HTML/default/viewer.htm#n19bf2z7e9p646n0z224cokuj567.htm)
+The SAS implementation of a string as a fixed-length character string of length *n*.
 
-* [DOUBLE](#double)
+* [DOUBLE](http://support.sas.com/documentation/cdl/en/fedsqlref/67364/HTML/default/viewer.htm#n19bf2z7e9p646n0z224cokuj567.htm)
+A decimal point number implemented as a 64-bit double precision, floating-point number.
 
 ## 2 SAS Procedures
 
-### [COMPARE Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#n0c1y14wyd3u7yn1dmfcpaejllsn.htm)  {#compare} 
+#### [COMPARE Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#n0c1y14wyd3u7yn1dmfcpaejllsn.htm)  {#compare} 
 
-### [CONTENTS Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#n1hqa4dk5tay0an15nrys1iwr5o2.htm) {#contents}
+#### [CONTENTS Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#n1hqa4dk5tay0an15nrys1iwr5o2.htm) {#contents}
 
-### [CORR Procedure](http://support.sas.com/documentation/cdl/en/procstat/66703/HTML/default/viewer.htm#procstat_corr_overview.htm) {#corr}
+#### [CORR Procedure](http://support.sas.com/documentation/cdl/en/procstat/66703/HTML/default/viewer.htm#procstat_corr_overview.htm) {#corr}
 
-### [FCMP Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#n1aozmc89vjkpzn1q6a54nleh56o.htm) {#fcmp}
+#### [FCMP Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#n1aozmc89vjkpzn1q6a54nleh56o.htm) {#fcmp}
 
-### [EXPORT Procedure](http://support.sas.com/documentation/cdl/en/proc/70377/HTML/default/viewer.htm#p09k160vk93xxhn171zz1z6551w2.htm) {#export}
+#### [EXPORT Procedure](http://support.sas.com/documentation/cdl/en/proc/70377/HTML/default/viewer.htm#p09k160vk93xxhn171zz1z6551w2.htm) {#export}
 
-### [FREQ Procedure](https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_freq_sect006.htm) {#freq}
+#### [FREQ Procedure](https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_freq_sect006.htm) {#freq}
 
-### [GENMOD Procedure](https://support.sas.com/documentation/cdl/en/statuggenmod/61787/PDF/default/statuggenmod.pdf) {#genmod}
+#### [GENMOD Procedure](https://support.sas.com/documentation/cdl/en/statuggenmod/61787/PDF/default/statuggenmod.pdf) {#genmod}
 
-### [HP4SCORE Procedure](https://support.sas.com/documentation/onlinedoc/miner/em14/emhpprcref.pdf) {#hp4score}
+#### [HP4SCORE Procedure](https://support.sas.com/documentation/onlinedoc/miner/em14/emhpprcref.pdf) {#hp4score}
 
-### [HPFOREST Procedure](https://support.sas.com/documentation/onlinedoc/miner/em14/emhpprcref.pdf) {#hpforest}
+#### [HPFOREST Procedure](https://support.sas.com/documentation/onlinedoc/miner/em14/emhpprcref.pdf) {#hpforest}
 
-### [HPSPLIT Procedure](http://support.sas.com/documentation/cdl/en/stathpug/66410/HTML/default/viewer.htm#stathpug_hpsplit_overview.htm) {#hpsplit}
+#### [HPSPLIT Procedure](http://support.sas.com/documentation/cdl/en/stathpug/66410/HTML/default/viewer.htm#stathpug_hpsplit_overview.htm) {#hpsplit}
 
-### [HPSVM Procedure](http://documentation.sas.com/?docsetId=emhpprcref&docsetVersion=14.2&docsetTarget=emhpprcref_hpsvm_overview.htm&locale=en) {#hpsvm}
+#### [HPSVM Procedure](http://documentation.sas.com/?docsetId=emhpprcref&docsetVersion=14.2&docsetTarget=emhpprcref_hpsvm_overview.htm&locale=en) {#hpsvm}
 
-### [IML Procedure](https://support.sas.com/documentation/cdl/en/imlug/63541/PDF/default/imlug.pdf) {#iml}
+#### [IML Procedure](https://support.sas.com/documentation/cdl/en/imlug/63541/PDF/default/imlug.pdf) {#iml}
 
-### [IMPORT Procedure](http://support.sas.com/documentation/cdl/en/acpcref/69731/HTML/default/viewer.htm#p0jf3o1i67m044n1j0kz51ifhpvs.htm) {#import}
+#### [IMPORT Procedure](http://support.sas.com/documentation/cdl/en/acpcref/69731/HTML/default/viewer.htm#p0jf3o1i67m044n1j0kz51ifhpvs.htm) {#import}
 
-### [MEANS Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#p0f0fjpjeuco4gn1ri963f683mi4.htm) {#means}
+#### [MEANS Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#p0f0fjpjeuco4gn1ri963f683mi4.htm) {#means}
 
-### [PRINCOMP Procedure](https://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#princomp_toc.htm) {#princomp}
+#### [PRINCOMP Procedure](https://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#princomp_toc.htm) {#princomp}
 
-### [PRINT Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#p10qiuo2yicr4qn17rav8kptnjpu.htm) {#print}
+#### [PRINT Procedure](http://support.sas.com/documentation/cdl/en/proc/65145/HTML/default/viewer.htm#p10qiuo2yicr4qn17rav8kptnjpu.htm) {#print}
 
-### [REG Procedure](https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.htm#statug_reg_sect007.htm) {#reg}
+#### [REG Procedure](https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.htm#statug_reg_sect007.htm) {#reg}
 
-### [SCORE Procedure](https://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#statug_score_sect001.htm) {#score}
+#### [SCORE Procedure](https://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#statug_score_sect001.htm) {#score}
 
-### [SGPLOT Procedure](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#p1t32i8511t1gfn17sw07yxtazad.htm) {#sgplot}
+#### [SGPLOT Procedure](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#p1t32i8511t1gfn17sw07yxtazad.htm) {#sgplot}
 
 * [histogram](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#n17xrpcduau1f8n1c1nhe477pv18.htm)
-
 * [inset](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#p0hz27ehuzdd6pn0zaic6x52pkav.htm)
-
 * [reg](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#p0mn6vl6clqbgyn1ivs69lezdxhf.htm)
-
 * [scatter](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#p1lcbd3lhs3t3bn1jk6d8sjt2yqx.htm)
-
 * [vbox](http://support.sas.com/documentation/cdl/en/grstatproc/69716/HTML/default/viewer.htm#n1waawwbez01ppn15dn9ehmxzihf.htm)
 
-### [SGSCATTER Procedure](http://support.sas.com/documentation/cdl/en/grstatproc/62603/HTML/default/viewer.htm#sgscatter-syn.htm) {#sgscatter}
+#### [SGSCATTER Procedure](http://support.sas.com/documentation/cdl/en/grstatproc/62603/HTML/default/viewer.htm#sgscatter-syn.htm) {#sgscatter}
 
-### [SORT Procedure](http://support.sas.com/documentation/cdl/en/proc/70377/HTML/default/viewer.htm#p02bhn81rn4u64n1b6l00ftdnxge.htm) {#sort}
+#### [SORT Procedure](http://support.sas.com/documentation/cdl/en/proc/70377/HTML/default/viewer.htm#p02bhn81rn4u64n1b6l00ftdnxge.htm) {#sort}
 
-### [SQL Procedure](https://support.sas.com/documentation/cdl/en/sqlproc/69822/HTML/default/viewer.htm#n1oihmdy7om5rmn1aorxui3kxizl.htm) {#sql}
+#### [SQL Procedure](https://support.sas.com/documentation/cdl/en/sqlproc/69822/HTML/default/viewer.htm#n1oihmdy7om5rmn1aorxui3kxizl.htm) {#sql}
 
-### [SURVEYSELECT Procedure](https://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#statug_surveyselect_sect001.htm) {#surveyselect}
+#### [SURVEYSELECT Procedure](https://support.sas.com/documentation/cdl/en/statug/63347/HTML/default/viewer.htm#statug_surveyselect_sect001.htm) {#surveyselect}
 
 ## 3 [SAS DATA step](http://support.sas.com/documentation/cdl/en/basess/68381/HTML/default/viewer.htm#n053a58fwk57v7n14h8x7y7u34y4.htm) {#step}
 
 Statements:
 
-### [%include](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000214504.htm) {#include} 
+#### [%include](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000214504.htm) {#include} 
 
-### [if-then/else](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202239.htm) {#if} 
+#### [if-then/else](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202239.htm) {#if} 
 
-### [infile](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146932.htm) {#infile} 
+#### [infile](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146932.htm) {#infile} 
 
-### [input](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146292.htm) {#input} 
+#### [input](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000146292.htm) {#input} 
 
-### [merge](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202970.htm) {#merge} 
+#### [merge](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202970.htm) {#merge} 
 
-### [output](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000194540.htm) {#output} 
+#### [output](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000194540.htm) {#output} 
 
-### [set](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000173782.htm) {#set} 
+#### [set](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000173782.htm) {#set} 
 
-### [where](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202951.htm) {#where} 
+#### [where](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202951.htm) {#where} 
 
 \newpage
 
 # Alphabetical Index
-
-## [CHAR](http://support.sas.com/documentation/cdl/en/fedsqlref/67364/HTML/default/viewer.htm#n19bf2z7e9p646n0z224cokuj567.htm) {#char}
-The SAS implementation of a string as a fixed-length character string of length *n*.
 
 ## [Data Frame](http://support.sas.com/documentation/cdl/en/lrcon/62955/HTML/default/viewer.htm#a001005709.htm) {#DATASET}
 A two-dimensional tabular structure with labeled axes (rows and columns), where data observations are represented by rows and data variables are represented by columns.
@@ -2474,9 +2451,6 @@ put rc= Name= Age=;
 ```
 Output:
 ![output](hash.png)
-
-## [DOUBLE](http://support.sas.com/documentation/cdl/en/fedsqlref/67364/HTML/default/viewer.htm#n19bf2z7e9p646n0z224cokuj567.htm) {#double}
-A decimal point number implemented as a 64-bit double precision, floating-point number.
 
 ## [Series](http://support.sas.com/documentation/cdl/en/lestmtsref/69738/HTML/default/viewer.htm#p08do6szetrxe2n136ush727sbuo.htm)
 A series is a one-dimension data frame, which is also called an array in SAS.  Please see the following example.
