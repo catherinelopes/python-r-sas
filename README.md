@@ -6,6 +6,6 @@ Python: pandas, NumPy, Matplotlib.PyPlot, seaborn, re, decimal, sklearn, statsmo
 
 R: gdata, rjson, ggplot2, dplyr, tree, randomForest, gbm, xgboost, e1071, RSNNS, caret, kernlab, dbscan, forecast
 
-In order to run the SAS tutorial successfully, you will need Base SAS, SAS Enterprise Miner, and access within SAS to call R in order to execute R code.  For more information on calling R code within SAS please see [this document](https://www.google.com.au/search?q=calling+R+within+SAS&oq=calling+R+within+SAS&aqs=chrome..69i57j0l3.5127j0j7&sourceid=chrome&ie=UTF-8).
+In order to run the SAS tutorial successfully, you will need Base SAS, SAS Enterprise Miner, and access within SAS to call R in order to execute R code.  For more information on calling R code within SAS please see [this post](https://communities.sas.com/t5/General-SAS-Programming/Run-R-code-inside-SAS-easily/td-p/210116).
 
 Happy programming and analyzing!
