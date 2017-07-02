@@ -1,22 +1,45 @@
 ---
-title: "Python Tutorial"
+title: 'Data Science Using Python, SAS, & R:'
+subtitle: A Rosetta Stone for Analytical Languages
 output:
   word_document:
     toc: yes
+    highlight: kate
     toc_depth: '3'
+  html_document:
+    df_print: paged
+    highlight: kate
+    toc: yes
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, engine = 'python', engine.path="/Users/elaineek/anaconda/bin/python")
+knitr::opts_chunk$set(echo = TRUE, engine = 'python', engine.path="/Users/elaineek/anaconda/bin/python", highlight = TRUE)
 ```
 
-First, you need to import several important Python packages for data manipulation and scientific computing.  The [pandas](#PANDAS) package is helpful for data manipulation and the [NumPy](#NUMPY) package is helpful for scientific computing. 
+# Python Tutorial
+
+Welcome to the Python tutorial version of "Data Science Using Python, SAS, & R: A Rosetta Stone for Analytical Languages".  This tutorial includes examples of common data science tasks, organized in the same way across 3 data science languages.  Before beginning this tutorial, please check to make sure you have Python 3.5.2 installed (this is not required, but this is the release used to generate the following examples).  Also, the following Python packages are used throughout this tutorial.  You may not need all of the following packages to fit your specific needs, but they are listed below, and also in Appendix Section 2 with more detail:
+
+pandas(0.20.2) | NumPy(1.12.1) | Matplotlib.PyPlot | seaborn(0.7.1) | re(2.2.1) | decimal(1.70) | sklearn(0.18.2) | statsmodels.api | xgboost(0.6) | pyclustering | PyFlux(0.4.15)
+
+To install Python packages you will often need to run the following code from a terminal on your computer, and then later in a Python environment you will import the package, which is demonstrated in this tutorial:
+
+```{python, eval = FALSE}
+pip install package_name
+# or #
+conda install package_name
+```
+
+Note: In Python, comments are indicated in code with a "#" character, and arrays and matrices are zero-indexed.
+
+Now let's get started!  First, you need to import several very important Python packages for data manipulation and scientific computing.  The [pandas](#PANDAS) package is useful for data manipulation and the [NumPy](#NUMPY) package is useful for scientific computing. 
 ```{python, eval = FALSE}
 import pandas as pd
 import numpy as np
 ```
 
-In Python, comments are indicated in code with a "#" character, and arrays and matrices are zero-indexed.
+*** 
 
 # 1 Reading in Data and Basic Statistical Functions
 
@@ -65,7 +88,7 @@ student = pd.read_csv('/Users/class.csv')
 print(student.info())
 ```
 
-## 1.4 Look at the first 5 observations.
+## 1.4 Look at the first 5 (last 5) observations.
 
 The first 5 observations of a [DataFrame](#DataFrame) are available by calling the [head()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.head.html) function on the data.  By default, head() returns 5 observations.  To return the first *n* observations, pass the integer *n* into the function.  The [tail()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.tail.html) function is analogous and returns the last observations.
 
@@ -75,9 +98,9 @@ student = pd.read_csv('/Users/class.csv')
 print(student.head())
 ```
 
-## 1.5 Calculate mean of numeric variables.
+## 1.5 Calculate means of numeric variables.
 
-The mean of numeric variables of a [DataFrame](#DataFrame) are available by calling the [mean()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.mean.html) function on the data.
+The means of numeric variables of a [DataFrame](#DataFrame) are available by calling the [mean()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.mean.html) function on the data.
 
 ```{python, echo=3}
 import pandas as pd
@@ -101,7 +124,7 @@ print(student.describe())
 import pandas as pd
 student = pd.read_csv('/Users/class.csv')
 # Notice the subsetting of student with [] and the name of the variable in 
-# quotes 
+# quotes ("")
 print(student["Weight"].std())
 ```
 
@@ -156,7 +179,7 @@ print(pd.crosstab(index=student["Sex"], columns="count"))
 
 ## 1.9 Produce a two-way table to describe the frequency of two categorical or discrete variables.
 
-```{python, echo=3:4}
+```{python, echo=3:5}
 import pandas as pd
 student = pd.read_csv('/Users/class.csv')
 # Notice the specification of a variable for the columns argument, instead 
@@ -253,8 +276,8 @@ plt.scatter(x, y)
 
 # plt.text() prints the equation of the line of best fit, with the first two 
 # arguments specifying the x and y locations of the text, respectively 
-# %f indicates to print a floating point number, that is specified following
-# the string and a % character
+# "%f" indicates to print a floating point number, that is specified following
+# the string and a "%" character
 plt.text(51, 140, "Line: y = %f x + %f"% (m,b))
 plt.plot(x, m*x + b)
 plt.xlabel("Height")
@@ -319,7 +342,7 @@ Output:
 ```{python, eval=FALSE}
 import seaborn as sns
 sns.boxplot(x="Sex", y="Weight", hue="Sex", data = student, showmeans=True)
-plt.show()
+sns.plt.show()
 ```
 
 Output:
@@ -372,7 +395,7 @@ student["BMI Neg"] = np.where(student["BMI"] < 19.0, -student["BMI"],
                               student["BMI"])
 student["BMI Pos"] = np.abs(student["BMI Neg"])
 
-# Create a boolean variable
+# Create a Boolean variable
 student["BMI Check"] = (student["BMI Pos"] == student["BMI"])
 print(student.head())
 ```
@@ -639,7 +662,7 @@ import numpy as np
 # environment 
 price = pd.read_csv('/Users/price.csv')
 
-# The following code is used to remove the ',' and '$' characters from 
+# The following code is used to remove the "," and "$" characters from 
 # the ACTUAL colum so that the values can be summed 
 from re import sub
 from decimal import Decimal
@@ -652,7 +675,7 @@ table = pd.pivot_table(price, index=["COUNTRY", "STATE", "PRODTYPE",
                        aggfunc=np.sum)
 print(table.head())
 ```
-Note: [pd.pivot_table()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.pivot_table.html) is similar to the [pd.pivot()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.pivot.html) function
+Note: [pd.pivot_table()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.pivot_table.html) is similar to the [pd.pivot()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.pivot.html) function.
 
 [re](#re) | [Decimal](#DECIMAL) 
 
@@ -670,7 +693,7 @@ print(np.unique(price["STATE"]))
 
 \newpage
 
-The following sections focus on the Python [sklearn](#SKLEARN) package.  Also, in the following sections several data set will be used more than once for prediction and modeling.  Often, they will be re-read into the environment so we are always going back to the original, raw data.
+The following sections focus on the Python [sklearn](#SKLEARN) package.  Also, in the following sections, several data set will be used more than once for prediction and modeling.  Often, they will be re-read into the environment so we are always going back to the original, raw data.
 
 # 5 Preparation & Basic Regression
 
@@ -693,7 +716,7 @@ pca = PCA(n_components = 4)
 pca = pca.fit(features_scaled)
 print(np.transpose(pca.components_))
 ```
-[PCA](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA) | [np.transpose()](https://docs.scipy.org/doc/numpy-1.12.0/reference/generated/numpy.transpose.html)
+[preprocessing](http://scikit-learn.org/stable/modules/preprocessing.html) | [PCA](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA) | [np.transpose()](https://docs.scipy.org/doc/numpy-1.12.0/reference/generated/numpy.transpose.html)
 
 ## 5.2 Split data into training and testing data and export as a .csv file.
 
@@ -717,13 +740,15 @@ test = pd.concat([test_x, test_y], axis = 1)
 train.to_csv('/Users/iris_train_Python.csv', index = False)
 test.to_csv('/Users/iris_test_Python.csv', index = False)
 ```
-[train_test_split()](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)
+[train_test_split()](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html) | [to_csv()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_csv.html)
 
 ## 5.3 Fit a logistic regression model.
 
-```{python, echo=3:18}
+```{python, echo=5:20}
 import pandas as pd
 import numpy as np
+from pandas import to_datetime
+from pandas import tseries
 # Notice we are using a new data set that needs to be read into the 
 # environment 
 tips = pd.read_csv('/Users/tips.csv')
@@ -749,7 +774,7 @@ A logistic regression model can be implemented using [sklearn](#SKLEARN), howeve
 import pandas as pd
 import numpy as np
 tips = pd.read_csv('/Users/tips.csv')
-# Fit a linear regression model of tip by total_bill on the training data 
+# Fit a linear regression model of tip by total_bill
 from sklearn.linear_model import LinearRegression
 
 # If your data has one feature, you need to reshape the 1D array
@@ -797,7 +822,7 @@ test["greater15"] = np.where(test["tip"] > test["fifteen"], 1, 0)
 import statsmodels.api as sm
 logreg = sm.formula.glm("greater15 ~ total_bill", family=sm.families.Binomial(), 
                      data=train).fit()
-# Predict on testing data
+# Prediction on testing data
 predictions = logreg.predict(test["total_bill"])
 predY = np.where(predictions < 0.5, 0, 1)
 
@@ -839,7 +864,7 @@ test = pd.read_csv('/Users/boston_test.csv')
 from sklearn.linear_model import LinearRegression
 linreg = LinearRegression()
 linreg.fit(train.drop(["Target"], axis = 1), train["Target"])
-# Predict on testing data
+# Prediction on testing data
 prediction = pd.DataFrame()
 prediction["predY"] = linreg.predict(test.drop(["Target"], axis = 1))
 
@@ -1247,7 +1272,7 @@ prediction = svMod.predict(test_scaled.drop(["Target"], axis = 1))
 Results = np.where(test_scaled["Target"] == prediction, "Correct", "Wrong")
 print(pd.crosstab(index=Results, columns="count"))
 ```
-[SVC](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
+[preprocessing](http://scikit-learn.org/stable/modules/preprocessing.html) | [SVC](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
 
 ### b) Fit a support vector regression model.
 
@@ -1275,7 +1300,7 @@ svMod.fit(train_scaled.drop([13], axis = 1), train_scaled[13])
 ```
 
 #### ii) Assess the model against the testing data.
-```{python, echo = 15:21}
+```{python, echo = 15:22}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
@@ -1292,13 +1317,14 @@ svMod = SVR()
 svMod.fit(train_scaled.drop([13], axis = 1), train_scaled[13])
 # Prediction on testing data
 prediction = pd.DataFrame()
+# 13 is the name of the Target variable
 prediction["predY"] = svMod.predict(test_scaled.drop([13], axis = 1))
 
 # Determine mean squared error
 prediction["sq_diff"] = (test_scaled[13] - prediction["predY"])**2
 print(prediction["sq_diff"].mean())
 ```
-[SVR](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)
+[preprocessing](http://scikit-learn.org/stable/modules/preprocessing.html) | [SVR](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)
 
 ## 6.8 Fit a neural network model on training data and assess against testing data.
 
@@ -1308,7 +1334,7 @@ print(prediction["sq_diff"].mean())
 ```{python, echo=3:10}
 import pandas as pd
 import numpy as np
-# Notice we are using new data sets that need to be read into the environment 
+# Notice we are using new data sets
 train = pd.read_csv('/Users/digits_train.csv')
 test = pd.read_csv('/Users/digits_test.csv')
 
@@ -1342,7 +1368,7 @@ print(confusion_matrix(test["Target"], predY))
 ### b) Fit a neural network regression model.
 
 #### i) Fit a neural network regression model on training data.
-```{python, echo = 3:22}
+```{python, echo = 3:24}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
@@ -1355,11 +1381,13 @@ train_features = train.drop(["Target"], axis = 1)
 scaler = StandardScaler().fit(np.array(train_features))
 train_scaled = scaler.transform(np.array(train_features))
 train_scaled = pd.DataFrame(train_scaled)
+train_scaled["Target"] = train["Target"]
 
 test_features = test.drop(["Target"], axis = 1)
 scaler = StandardScaler().fit(np.array(test_features))
 test_scaled = scaler.transform(np.array(test_features))
 test_scaled = pd.DataFrame(test_scaled)
+test_scaled["Target"] = test["Target"]
 
 # Fit neural network regression model, dividing target by 50 for scaling
 from sklearn.neural_network import MLPRegressor
@@ -1368,7 +1396,7 @@ nnMod = nnMod.fit(train_scaled, train["Target"] / 50)
 ```
 
 #### ii) Assess the model against testing data.
-```{python, echo = 17:23}
+```{python, echo = 19:25}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
@@ -1378,10 +1406,12 @@ train_features = train.drop(["Target"], axis = 1)
 scaler = StandardScaler().fit(np.array(train_features))
 train_scaled = scaler.transform(np.array(train_features))
 train_scaled = pd.DataFrame(train_scaled)
+train_scaled["Target"] = train["Target"]
 test_features = test.drop(["Target"], axis = 1)
 scaler = StandardScaler().fit(np.array(test_features))
 test_scaled = scaler.transform(np.array(test_features))
 test_scaled = pd.DataFrame(test_scaled)
+test_scaled["Target"] = test["Target"]
 from sklearn.neural_network import MLPRegressor
 nnMod = MLPRegressor(max_iter = 250, random_state = 29, solver = 'lbfgs')
 nnMod.fit(train_scaled, train["Target"] / 50)
@@ -1393,7 +1423,7 @@ prediction["predY"] = nnMod.predict(test_scaled)*50
 prediction["sq_diff"] = (test["Target"] - prediction["predY"])**2
 print(prediction["sq_diff"].mean())
 ```
-[MLPRegressor](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor)
+[preprocessing](http://scikit-learn.org/stable/modules/preprocessing.html) | [MLPRegressor](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor)
 
 ***
 
@@ -1491,6 +1521,7 @@ Output:
 
 ### a) Plot the timeseries.
 ```{python, eval = FALSE}
+# Read in new data set
 air = pd.read_csv('/Users/air.csv')
 
 air["DATE"] = pd.to_datetime(air["DATE"], infer_datetime_format = True)
@@ -1501,6 +1532,8 @@ plt.show()
 ```
 Output:
 ![output](ARIMASeriess.png)
+
+[to_datetime()](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.to_datetime.html)
 
 ### b) Fit an ARIMA model and predict 2 years (24 months).
 ```{python, eval = FALSE}
@@ -1521,6 +1554,7 @@ Output:
 
 ### a) Plot the timeseries.
 ```{python, eval = FALSE}
+# Read in new data set
 usecon = pd.read_csv('/Users/usecon.csv')
 
 petrol = usecon["PETROL"]
@@ -1603,7 +1637,8 @@ def initial_seasonal_components(series, slen):
             sum_of_vals_over_avg += series[slen*j+i]-season_averages[j]
         seasonals[i] = sum_of_vals_over_avg/n_seasons
     return seasonals
-def triple_exponential_smoothing_add(series, slen, alpha, beta, gamma, n_preds):
+def triple_exponential_smoothing_add(series, slen, alpha, beta, gamma, 
+                                     n_preds):
     result = []
     seasonals = initial_seasonal_components(series, slen)
     for i in range(len(series)+n_preds):
@@ -1617,13 +1652,16 @@ def triple_exponential_smoothing_add(series, slen, alpha, beta, gamma, n_preds):
             result.append((smooth + m*trend) + seasonals[i%slen])
         else:
             val = series[i]
-            last_smooth, smooth = smooth, alpha*(val-seasonals[i%slen]) + (1-alpha)*(smooth+trend)
+            last_smooth, smooth = smooth, alpha*(val-seasonals[i%slen]) 
+                                                 + (1-alpha)*(smooth+trend)
             trend = beta * (smooth-last_smooth) + (1-beta)*trend
-            seasonals[i%slen] = gamma*(val-smooth) + (1-gamma)*seasonals[i%slen]
+            seasonals[i%slen] = gamma*(val-smooth) + 
+                                (1-gamma)*seasonals[i%slen]
             result.append(smooth+trend+seasonals[i%slen])
     return result
     
-add_preds = triple_exponential_smoothing_add(vehicles, 12, 0.5731265, 0, 0.7230956, 24)
+add_preds = triple_exponential_smoothing_add(vehicles, 12, 0.5731265, 0, 
+                                             0.7230956, 24)
 
 plt.plot(pd.DataFrame(add_preds), color = "red")
 plt.plot(vehicles, color = "blue")
@@ -1694,7 +1732,6 @@ test = pd.read_csv('/Users/digits_test.csv')
 
 # Random Forest Classification Model
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
 rfMod = RandomForestClassifier(random_state=29)
 rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 
@@ -1702,6 +1739,7 @@ rfMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 predY = rfMod.predict(train.drop(["Target"], axis = 1))
 
 # Determine accuracy score
+from sklearn.metrics import accuracy_score
 accuracy_rf = accuracy_score(train["Target"], predY)
 print("Random forest model accuracy: %f" % accuracy_rf)
 ```
@@ -1752,7 +1790,7 @@ results = model_selection.cross_val_score(rfMod, X, Y, cv = kfold)
 print("Accuracy: %.2f%% +/- %.2f%%" % (results.mean()*100, 
                                        results.std()*100))
 ```
-[RandomForestClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)
+[RandomForestClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) | [KFold](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html)
 
 ### b) ShuffleSplit
 
@@ -1771,7 +1809,7 @@ results = model_selection.cross_val_score(rfMod, X, Y, cv = shuffle)
 print("Accuracy: %.2f%% +/- %.2f%%" % (results.mean()*100, 
                                        results.std()*100))
 ```
-[RandomForestClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)
+[RandomForestClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) | [ShuffleSplit](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ShuffleSplit.html)
 
 ***
 
@@ -1817,7 +1855,7 @@ print("Accuracy: %.2f%% +/- %.2f%%" % (results.mean()*100,
 A Python package which is useful for interactive visualizations and is optimized for web browser presentations.
 
 #### [PyPlot](https://matplotlib.org/api/pyplot_api.html) {#PYPLOT}
-A Python package which is useful data plotting and visualization.
+A Python package which is useful for data plotting and visualization.
 
 #### [Seaborn](https://seaborn.pydata.org/) {#SEABORN}
 A Python package which is useful for data plotting and visualization.  In particular, Seaborn includes tools for drawing attractive statistical graphics.
@@ -1859,7 +1897,7 @@ Tools for time series analysis and prediction
 
 ## [Array](https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html)
 
-A NumPy array is a data type implemented by the [NumPy](#NUMPY) package in which the elements of the array are all of the same type.  Please see the following example of array creation and access:
+A [NumPy](#NUMPY) array is a data type in which the elements of the array are all of the same type.  Please see the following example of array creation and access:
 ```{python}
 import numpy as np
 my_array = np.array([1, 2, 3, 4])
@@ -1876,9 +1914,6 @@ A [byte](https://docs.python.org/3.1/library/functions.html#bytes) is a sequence
 
 ## [Data Frame](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html) {#DataFrame}
 A two-dimensional tabular structure with labeled axes (rows and columns), where data observations are represented by rows and data variables are represented by columns.
-
-## [datetime](https://docs.python.org/2/library/datetime.html)
-A Python module which includes tools for manipulating data and time objects.
 
 ## [Dictionary](https://docs.python.org/2/tutorial/datastructures.html#dictionaries) {#DICT}
 An associative array which is indexed by keys which map to values.  Therefore, a dictionary is an unordered set of key:value pairs where each key is unique.  Please see the following example of dictionary creation and access:
@@ -1920,13 +1955,20 @@ print(my_array[1])
 A set is a unordered collection of immutable objects.  The difference between a [set and a frozen set](http://www.python-course.eu/sets_frozensets.php) is that the former is mutable, while the latter is immutable.  Please see the following example of set and frozen set creation and access:
 ```{python}
 s = set(["1", "2", "3"])
-print(s)
 # s is a set, which means you can add or delete elements from s
+print(s)
 ```
+
+```{python, echo = 2:3}
+s = set(["1", "2", "3"])
+s.add("4")
+print(s)
+```
+
 ```{python}
 fs = frozenset(["1", "2", "3"])
-print(fs)
 # fs is a frozenset, which means you cannot add or delete elements from fs
+print(fs)
 ```
 
 ## [str](https://www.tutorialspoint.com/python/python_strings.htm) {#str}
