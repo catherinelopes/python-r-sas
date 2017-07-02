@@ -1,6 +1,10 @@
 ---
-title: "SAS Tutorial"
+title: "Data Science Using Python, SAS, & R:"
+subtitle: "A Rosetta Stone for Analytical Languages"
 output:
+  html_document:
+    toc: yes
+    toc_float: true
   word_document:
     toc: yes
     toc_depth: '3'
@@ -10,18 +14,26 @@ output:
 require(knitr)
 saspath <- "C:/Program Files/SASHome/SASFoundation/9.4/sas.exe"
 sasopts <- "-nosplash -ls 75"
-opts_chunk$set(engine="sas", engine.path=saspath, engine.opts=sasopts, comment="")
+opts_chunk$set(engine="sas", engine.path=saspath, engine.opts=sasopts, comment="", highlight=TRUE)
 
 ```
 
-Before beginning this tutorial, you need to insure that your [SAS environment is connected with an R environment](https://communities.sas.com/t5/General-SAS-Programming/Run-R-code-inside-SAS-easily/td-p/210116) so that the R code that SAS calls at the end of this tutorial from the [IML Procedure](#iml) run successfully.
+# SAS Tutorial
 
-In SAS, 
+Welcome to the SAS tutorial version of "Data Science Using Python, SAS, & R: A Rosetta Stone for Analytical Languages".  This tutorial includes examples of common data science tasks, organized in the same way across 3 data science languages.  Before beginning this tutorial, please check to make sure you have SAS 14.2 installed (this is not required, but this is the release used to generate the following examples).  SAS Enterprise Miner Workstation 14.2 was used to produce some of the following results.
+
+You also may need to insure that your [SAS environment is connected with an R environment](https://communities.sas.com/t5/General-SAS-Programming/Run-R-code-inside-SAS-easily/td-p/210116) so that the R code that SAS calls at the end of this tutorial from the [IML Procedure](#iml) runs successfully.
+
+Note: In SAS, 
 ```{r}
 *  This is a single line comment ;
 /* This is a paragraph 
    comment */
 ```
+
+Now let's get started!
+
+***
 
 # 1 Reading in Data and Basic Statistical Functions
 
@@ -94,10 +106,10 @@ proc contents data = student;
 run;
 ```
 
-## 1.4 Look at the first 5 observations.
+## 1.4 Look at the first 5 (last 5) observations.
 
 The [PRINT procedure](#print) prints a [SAS data set](#DATASET), according to the specifications and options provided.
-```{r, echo=6:9}
+```{r, echo=6:13}
 proc import out = student
 datafile = 'C:/Users/class.csv'
 dbms = csv replace;
@@ -109,9 +121,22 @@ proc print data = student (obs=5);
 run;
 ```
 
-## 1.5 Calculate mean of numeric variables.
+--
 
-The [MEANS procedure](#means) prints the mean of all numeric variables of a [SAS data set](#DATASET), as well as other descriptive statistics.
+```{r, echo=6:8}
+proc import out = student
+datafile = 'C:/Users/class.csv'
+dbms = csv replace;
+getnames = yes;
+run;
+/* print the last 5 observations */
+proc print data = student(firstobs=15); 
+run; 
+```
+
+## 1.5 Calculate means of numeric variables.
+
+The [MEANS procedure](#means) prints the means of all numeric variables of a [SAS data set](#DATASET), as well as other descriptive statistics.
 ```{r, echo=6:7}
 proc import out = student
 datafile = 'C:/Users/class.csv'
@@ -184,8 +209,6 @@ run;
 
 The tables statement allows you to specify multiple variables at once, separated only by a space, so both of these tables could have been created with one [FREQ procedure](#freq) call. The options on the tables statement (nopercent norow nocol) prevent SAS from printing percents in the table, which are printed by default.  
 
-**TRY THIS AT HOME**: Run this procedure without the options on the tables statment.
-
 ## 1.9 Produce a two-way table to visualize the frequency of two categorical (or discrete) variables.
 
 ```{r, echo=6:10}
@@ -220,8 +243,6 @@ run;
 ```
 [DATA step](#step): [set](#set) & [where](#where) statements
 
-**TRY THIS AT HOME**: Run this procedure to return all *male* students.
-
 ## 1.11 Determine the correlation between two continuous variables.
 
 ```{r, echo=6:9}
@@ -236,8 +257,6 @@ var Height Weight;
 run; 
 ```
 [CORR Procedure](#corr)
-
-**TRY THIS AT HOME**: Run this procedure and do not reduce the output.
 
 ***
 
@@ -321,7 +340,7 @@ run;
 Output:
 ![output](ScatterLine.png)
 
-[REG Procedure](#reg) | [set](#set) statement | [macro variables](https://v8doc.sas.com/sashtml/macro/z1071889.htm) | [call symput()](https://v8doc.sas.com/sashtml/macro/z0210266.htm) function
+[REG Procedure](#reg) | [set](#set) statement | [macro variables](https://v8doc.sas.com/sashtml/macro/z1071889.htm) | [call symput()](https://v8doc.sas.com/sashtml/macro/z0210266.htm)
 
 ## 2.5 Visualize a categorical variable by producing a bar chart.
 
@@ -421,7 +440,7 @@ data student;
   if (BMI < 19.0) then BMI_Neg = -BMI; 
   else BMI_Neg = BMI; 
   BMI_Pos = abs(BMI_Neg); 
-  /* Create a boolean variable, which is handled differently
+  /* Create a Boolean variable, which is handled differently
      in SAS than in Python and R */
   BMI_Check = (BMI_Pos = BMI); 
 run; 
@@ -880,7 +899,7 @@ proc iml;
   print(unique_states);
 quit;
 ```
-[IML Procedure](#iml)
+[IML Procedure](#iml) | [unique()](http://support.sas.com/documentation/cdl/en/imlug/67502/HTML/default/viewer.htm#imlug_langref_sect482.htm) function
 
 ***
 
@@ -927,13 +946,10 @@ proc surveyselect data = iris outall out = all method = srs samprate = 0.7
                               seed = 29;
 run;
 
-data train (drop = selected);
+data train (drop = selected) test (drop = selected);
 	set all;
-	where (selected = 1);
-run;
-data test (drop = selected);
-	set all;
-	where (selected = 0);
+	if (selected = 1) then output train;
+  else output test;
 run;
 
 proc export data = train
@@ -1072,7 +1088,7 @@ data preds;
 run;
 
 proc freq data = preds;
-tables Result;
+tables Result / nopercent norow nocol;
 run;
 ```
 
@@ -1210,7 +1226,7 @@ run;
 
 /* Determine how many were correctly classified */
 proc freq data = scored;
-  tables Result;
+  tables Result / nopercent norow nocol;
 run;
 ```
 [HPSPLIT Procedure](#hpsplit) | [%include](#include) & [if-then/else](#if) statements | [FREQ Procedure](#freq)
@@ -1219,8 +1235,6 @@ run;
 
 #### i) Fit a decision tree regression model on training data and determine variable importance.
 ```{r}
-/* Notice we are re-using data sets but it is good to re-read the 
-   original versions back into the environment */
 proc import out = train
 	datafile = 'C:/Users/boston_train.csv'
 	dbms = csv replace;
@@ -1290,8 +1304,6 @@ run;
 
 #### i) Fit a random forest classification model on training data and determine variable importance.
 ```{r}
-/* Notice we are re-using data sets but it is good to re-read the 
-   original version back into the environment */
 proc import out = train
 	datafile = 'C:/Users/breastcancer_train.csv'
 	dbms = csv replace;
@@ -1345,7 +1357,7 @@ data scored;
 run;
 
 proc freq data = scored;
-  tables Result;
+  tables Result / nopercent norow nocol;
 run;	
 ```
 
@@ -1355,8 +1367,6 @@ run;
 
 #### i) Fit a random forest regression model on training data and determine variable importance.
 ```{r}
-/* Notice we are re-using data sets but it is good to re-read the original 
-   versions back into the environment */
 proc import out = train
 	datafile = 'C:/Users/boston_train.csv'
 	dbms = csv replace;
@@ -1419,9 +1429,9 @@ run;
 
 ### a) Fit a gradient boosting classification model.
 
-Currently, there is not a gradient boosting procedure available in Base SAS  Therefore, the best method to create a gradient boosting model currently is using SAS Enterprise Miner.  Create the following diagram in SAS Enterprise Miner:
+Currently, there is not a gradient boosting procedure available in Base SAS  Therefore, the best method to create a gradient boosting model as of now is using SAS Enterprise Miner.  Create the following diagram in SAS Enterprise Miner:
 
-Output:
+Diagram:
 ![output](EM1.png)
 
 For the Gradient Boosting node, set Seed = 29, set Shrinkage = 0.01, and set Train Proportion = 100.
@@ -1437,11 +1447,13 @@ Output:
 Output:
 ![output](Misclassification2.png)
 
+[Gradient Boosting node](http://support.sas.com/documentation/cdl/en/emgsj/66018/HTML/default/viewer.htm#p03iy98sk0c9bvn1r6x7ppx8uj08.htm)
+
 ### b) Fit a gradient boosting regression model.
 
 Again, there is not a gradient boosting procedure available in Base SAS, currently.  Create the following diagram in SAS Enterprise Miner:
 
-Output:
+Diagram:
 ![output](EM2.png)
 
 For the Gradient Boosting node, set Seed = 29, set Shrinkage = 0.01, and set Train Proportion = 100.
@@ -1453,6 +1465,8 @@ Output:
 
 Output:
 ![output](Misclassification3.png)
+
+[Gradient Boosting node](http://support.sas.com/documentation/cdl/en/emgsj/66018/HTML/default/viewer.htm#p03iy98sk0c9bvn1r6x7ppx8uj08.htm)
 
 ## 6.6 Fit an extreme gradient boosting model on taining data and assess against testing data.
 
@@ -1525,8 +1539,6 @@ quit;
 
 #### i) Fit a support vector classification model on training data.
 ```{r} 
-/* Notice we are re-using data sets but it is good to re-read the original 
-   versions back into the environment */
 proc import out = train
 	datafile = 'C:/Users/breastcancer_train.csv'
 	dbms = csv replace;
@@ -1581,7 +1593,7 @@ data scored;
 run;
 
 proc freq data = scored;
-  tables Result;
+  tables Result / nopercent norow nocol;
 run;	
 ```
 [%include](#include) & [if-then/else](#if) statements | [FREQ Procedure](#freq)
@@ -1596,8 +1608,7 @@ Not available in this current release.
 
 #### i) Fit a neural network classification model on training data.
 ```{r}
-/* Notice we are using new data sets that need to be read into the 
-   environment */
+/* Notice we are using new data sets */
 proc import out = train
   datafile = 'C:/Users/digits_train.csv'
   dbms = csv replace;
@@ -1694,8 +1705,6 @@ run;
 
 #### i) Fit a neural network regression model on training data.
 ```{r}
-/* Notice we are re-using data sets but it is good to re-read the original 
-   versions back into the environment */
 proc import out = train
   datafile = 'C:/Users/boston_train.csv'
   dbms = csv replace;
@@ -1864,9 +1873,12 @@ proc tree noprint ncl=3 out=out;
 run;
 
 proc freq data = out;
-  tables Species*Cluster;
+  tables Species*Cluster / nopercent norow nocol;
 run;
 ```
+
+Output:
+![output](Wald.png)
 
 [CLUSTER Procedure](#cluster) | [TREE Procedure](#tree) | [FREQ Procedure](#freq)
 
@@ -1895,14 +1907,14 @@ quit;
 
 ## 7.5 Self-organizing map
 
-Currently, there is not a self-organizing map procedure available in Base SAS.  Therefore, the best method to create a self-organizing map currently is using SAS Enterprise Miner.  First, you need to read in the Iris data set, setting the Species/Target variable to be dropped before investigation.
+Currently, there is not a self-organizing map procedure available in Base SAS.  Therefore, the best method to create a self-organizing map as of now is using SAS Enterprise Miner.  First, you need to read in the Iris data set, setting the Species/Target variable to be dropped before investigation.
 
-Output:
+Setup:
 ![output](DropTarget.png)
 
 Then create the following diagram in SAS Enterprise Miner:
 
-Output:
+Diagram:
 ![output](SOM Diagram.png)
 
 For the SOM/Kohonen node set the following options:
@@ -1912,7 +1924,7 @@ For the SOM/Kohonen node set the following options:
 3. Under the "Kohonen" options section, set "Use Defaults" to "No", and open the Kohonen Options window by clicking the ... box.
 4. Set the following options in the popup window:
 
-Output:
+Options:
 ![output](KohonenOptions.png)
 
 This model produces the following output which is similar to the output of R and Python:
@@ -1928,6 +1940,7 @@ Output:
 
 ### a) Plot the timeseries.
 ```{r, eval = FALSE}
+/* Read in new data set */
 proc import out = air
   datafile = 'C:/Users/air.csv'
   dbms = csv replace;
@@ -2033,8 +2046,6 @@ Output:
 
 ### a) Evaluation on training data.
 ```{r}
-/* Notice we are re-using data sets but it is good to re-read the original 
-   version back into the environment */
 proc import out = train
   datafile = 'C:/Users/boston_train.csv'
   dbms = csv replace;

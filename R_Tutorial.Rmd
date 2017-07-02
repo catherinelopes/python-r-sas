@@ -1,18 +1,39 @@
 ---
-title: "R Tutorial"
+title: 'Data Science Using Python, SAS, & R:'
+subtitle: A Rosetta Stone for Analytical Languages
 output:
-  word_document: 
-    toc: true
+  word_document:
+    highlight: tango
+    toc: yes
     toc_depth: 3
+  html_document:
+    df_print: paged
+    highlight: tango
+    toc: yes
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, highlight = TRUE)
 ```
 
-Before beginning this tutorial, the packages listed in the README file should be downloaded and installed properly.
+# R Tutorial
 
-In R, comments are indicated in code with a "#" character, and arrays and matrices begin with index 1.
+Welcome to the R tutorial version of "Data Science Using Python, SAS, & R: A Rosetta Stone for Analytical Languages".  This tutorial includes examples of common data science tasks, organized in the same way across 3 data science languages.  Before beginning this tutorial, please check to make sure you have R 3.3.1 installed (this is not required, but this is the release used to generate the following examples).  Also, the following R packages are used throughout this tutorial.  You may not need all of the following packages to fit your specific needs, but they are listed below, and also in Appendix Section 2 with more detail:
+
+gdata | rjson | ggplot2 | dplyr | tree |randomForest | gbm | xgboost | e1071 | RSNNS | caret | kernlab | dbscan |forecast
+
+To install R packages you need to run the following in the R console:
+
+```{r, eval = FALSE}
+install.packages("name_of_package")
+```
+
+Note: In R, comments are indicated in code with a "#" character, and arrays and matrices begin with index 1.  Also, "<-" and "=" can be used interchangeably.
+
+Now let's get started!
+
+***
 
 # 1 Reading in Data and Basic Statistical Functions
 
@@ -39,7 +60,7 @@ student_xls <- read.xls('/Users/class.xls', 1)
 
 ###c) Read the data in as a .json file.
 
-There is more code involved in reading a .json file into R so it becomes a proper data frame, however we will not at this time dive into the explanation for all this code, but it should become evident throughout the tutorial.
+There is more code involved in reading a .json file into R so it becomes a proper [data frame](#DataFrame).  Also, this code is specific for a certain .json format, so you may have to change it to fix your needs.
 ```{r, eval = FALSE}
 # call the rjson package
 library(rjson)
@@ -72,21 +93,21 @@ Information about an R [data frame](#DataFrame) is available by calling the [str
 str(student)
 ```
 
-## 1.4 Look at the first 5 observations.
+## 1.4 Look at the first 5 (last 5) observations.
 
-The first 5 observations of a [data frame](#DataFrame) are available by calling the [head()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function, with the data name as an argument.  By default, head() returns 4 observations, but we can alter the function to return 5 observations in the way shown below.  The [tail()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function is analogous and returns the last observations.
+The first 5 observations of a [data frame](#DataFrame) are available by calling the [head()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function, with the data name as an argument.  By default, head() returns 4 observations, but we can alter the function to return 5 observations in the way shown below (*n*= ).  The [tail()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function is analogous and returns the last observations.
 ```{r head}
 head(student, n=5)
 ```
 
-## 1.5 Calculate mean of numeric variables.
+## 1.5 Calculate means of numeric variables.
 
 ```{r mean, include=TRUE}
 # We must apply the is.numeric() function to the data set which returns a 
 # matrix of booleans that we then use to subset the data set to return 
 # only numeric variables  
 
-# Then we can use the colMeans() function to return the mean of 
+# Then we can use the colMeans() function to return the means of 
 # column variables
 colMeans(student[sapply(student, is.numeric)])
 ```
@@ -103,7 +124,7 @@ summary(student)
 ## 1.7 Descriptive statistics functions applied to columns of the data set.
 
 ```{r stats}
-# Notice the subsetting of student with the $ character 
+# Notice the subsetting of student with the "$" character 
 sd(student$Weight)
 sum(student$Weight)
 length(student$Weight)
@@ -208,7 +229,7 @@ abline(lm(Weight~Height))
 # text() prints the equation of the line of best fit, with the first 
 # two arguments specifying the x and y location, respectively, of where 
 # the text should be printed on the graph 
-text(60, 140, bquote(Line: y == .(slope) * x + .(intercept)))
+text(55, 140, bquote(Line: y == .(slope) * x + .(intercept)))
 ```
 
 [lm()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/lm) | [coef()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/coef) | [as.matrix()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/matrix) | [abline()](https://www.rdocumentation.org/packages/graphics/versions/3.4.0/topics/abline) | [text()](https://www.rdocumentation.org/packages/graphics/versions/3.4.0/topics/text) | [bquote()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/bquote)
@@ -247,7 +268,9 @@ points(means, col= "blue")
 
 ### b) More advanced side-by-side boxplot with color.
 ```{r, message = FALSE, warning = FALSE}
+# call the ggplot2 package
 library(ggplot2)
+
 student$Sex <- factor(student$Sex, levels = c("F","M"), 
                       labels = c("Female", "Male"))
 ggplot(data = student, aes(x = Sex, y = Weight, fill = Sex)) + 
@@ -293,7 +316,7 @@ student$SqrtHeight <- sqrt(student$Height)
 student$BMI_Neg <- ifelse(student$BMI < 19.0, -student$BMI, student$BMI)
 student$BMI_Pos <- abs(student$BMI_Neg)
 
-# Create a boolean variable
+# Create a Boolean variable
 student$BMI_Check <- (student$BMI == student$BMI_Pos)
 head(student, n=5)
 ```
@@ -485,7 +508,7 @@ print(unique(price$STATE))
 
 ***
 
-In the following sections several data set will be used more than once for prediction and modeling. Often, they will be re-read into the environment so we are always going back to the original, raw data.
+In the following sections, several data set will be used more than once for prediction and modeling. Often, they will be re-read into the environment so we are always going back to the original, raw data.
 
 # 5 Preparation & Basic Regression
 
@@ -535,6 +558,8 @@ tips$fifteen <- 0.15 * tips$total_bill
 tips$greater15 <- ifelse(tips$tip > tips$fifteen, 1, 0)
 
 # Notice the syntax of greater15 as a function of total_bill 
+# You could fit the model of greater15 as a function of all
+# other variables with "greater15 ~ ."
 logreg <- glm(greater15 ~ total_bill, data = tips, 
               family = "binomial"(link='logit'))
 summary(logreg)
@@ -548,6 +573,8 @@ summary(logreg)
 linreg <- lm(tip ~ total_bill, data = tips)
 summary(linreg)
 ```
+
+[lm()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/lm)
 
 # 6 Supervised Machine Learning
 
@@ -587,6 +614,8 @@ Results <- ifelse(predY == test$greater15, "Correct", "Wrong")
 table(Results)
 ```
 
+[glm()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/glm)
+
 ## 6.2 Fit a linear regression model on training data and assess against testing data.
 
 ### a) Fit a linear regression model on training data.
@@ -617,11 +646,13 @@ mean_sq_error <- mean(prediction$sq_diff)
 print(mean_sq_error)
 ```
 
+[lm()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/lm)
+
 ## 6.3 Fit a decision tree model on training data and assess against testing data.
 
 ### a) Fit a decision tree classification model.
 
-#### i) Fit a decision tree classification model on training data, plot the tree, and determine variable importance.
+#### i) Fit a decision tree classification model on training data and determine variable importance.
 ```{r, message = FALSE, warning = FALSE}
 # Notice we are using new data sets that need to be read into the environment
 train <- read.csv('/Users/breastcancer_train.csv')
@@ -652,9 +683,11 @@ Results <- ifelse(test$Target == predY, "Correct", "Wrong")
 table(Results)
 ```
 
+[tree](#TREE)
+
 ### b) Fit a decision tree regression model.
 
-#### i) Fit a decision tree regression model on training data, plot the tree, and determine variable importance.
+#### i) Fit a decision tree regression model on training data and determine variable importance.
 ```{r, message = FALSE, warning = FALSE}
 train <- read.csv('/Users/boston_train.csv')
 test <- read.csv('/Users/boston_test.csv')
@@ -696,6 +729,7 @@ test <- read.csv('/Users/breastcancer_test.csv')
 library(randomForest)
 set.seed(29)
 
+# as.factor() since classification model
 rfMod <- randomForest(as.factor(Target) ~ ., data = train)
 
 # Determine variable importance
@@ -718,7 +752,7 @@ Results <- ifelse(test$Target == predY, "Correct", "Wrong")
 table(Results)
 ```
 
-[randomForest](#RANDOM)
+[randomForest](#RANDOM) | [as.factor()](https://stat.ethz.ch/R-manual/R-devel/library/base/html/factor.html)
 
 ### b) Fit a random forest regression model.
 
@@ -745,7 +779,7 @@ head(var_import, n=5)
 
 #### ii) Assess the model against the testing data.
 ```{r}
-# Predict the Target in the testing data 
+# Prediction on testing data
 prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
 prediction$predY = predict(rfMod, newdata = test)
 
@@ -795,6 +829,8 @@ predY <- ifelse(out < 0.5, 0, 1)
 Results <- ifelse(test$Target == predY, "Correct", "Wrong")
 table(Results)
 ```
+
+[gbm](#GBM)
 
 ### b) Fit a gradient boosting regression model.
 
@@ -862,6 +898,8 @@ Results <- ifelse(test$Target == predY, "Correct", "Wrong")
 table(Results)
 ```
 
+[xgboost](#XGBOOST)
+
 ### b) Fit an extreme gradient boosting regression model.
 
 #### i) Fit an extreme gradient boosting regression model on training data.
@@ -881,8 +919,7 @@ xgbMod <- xgboost(data.matrix(subset(train, select = -c(Target))),
 
 #### ii) Assess the model against the testing data.
 ```{r}
-# Predict the target in the testing data, remembering to 
-# multiply by 50 
+# Prediction on testing
 prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
 prediction$predY <- predict(xgbMod, 
                     data.matrix(subset(test, select = -c(Target))))
@@ -924,6 +961,8 @@ Results <- ifelse(test$Target == predY, "Correct", "Wrong")
 table(Results)
 ```
 
+[e1071](#e1071) | [svm()](https://www.rdocumentation.org/packages/e1071/versions/1.6-8/topics/svm)
+
 ### b) Fit a support vector regression model.
 
 #### i) Fit a support vector regression model on training data.
@@ -954,6 +993,7 @@ print(mean(prediction$sq_diff))
 
 #### i) Fit a neural network classification model on training data.
 ```{r, warning = FALSE, message = FALSE}
+# Notice we are using new data sets
 train <- read.csv('/Users/digits_train.csv')
 test <- read.csv('/Users/digits_test.csv')
 
@@ -1041,7 +1081,9 @@ table(iris$Species, kmeans$cluster)
 ## 7.2 Spectral Clustering
 
 ```{r, warning = FALSE, message = FALSE}
+# call the kernlab package
 library(kernlab)
+
 set.seed(29)
 
 spectral <- specc(features, centers = 3, iterations = 10, nystrom.red = TRUE)
@@ -1063,14 +1105,15 @@ hclust <- hclust(dist(features), method = "ward.D2")
 table(iris$Species, cutree(hclust, 3))
 ```
 
-[Hierarchical Clustering in R](https://www.r-bloggers.com/hierarchical-clustering-in-r-2/)
+[Hierarchical Clustering in R](https://www.r-bloggers.com/hierarchical-clustering-in-r-2/) | [hclust()](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/hclust.html)
 
 ## 7.4 DBSCAN
 
 ```{r, warning = FALSE, message = FALSE}
-set.seed(29)
-
+# call the dbscan package
 library(dbscan)
+
+set.seed(29)
 
 # eps = 0.5 is default in Python
 dbscan <- dbscan(features, eps = 0.5)
@@ -1083,15 +1126,17 @@ table(iris$Species, dbscan$cluster)
 ## 7.5 Self-organized map
 
 ```{r, warning = FALSE, message = FALSE}
+# call the kohonen package
+library(kohonen)
+
 # Seed chosen to match SAS and R results
 set.seed(5)
-
-library(kohonen)
 
 fit <- som(features, mode = "online", somgrid(4, 4, "rectangular"))
 
 plot(fit, type = "dist.neighbour", shape = "straight")
 ```
+
 [kohonen](#KOHONEN)
 
 ***
@@ -1102,6 +1147,7 @@ plot(fit, type = "dist.neighbour", shape = "straight")
 
 ### a) Plot the timeseries.
 ```{r}
+# Read in new data set
 air <- read.csv('/Users/air.csv')
 
 air_series <- air$AIR
@@ -1111,12 +1157,13 @@ plot.ts(air_series, ylab="Air")
 
 [plot.ts()](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/plot.ts.html)
 
-### b) Fit an ARIMA model and predict 2 years (24 months).
+### b) Fit an ARIMA (0, 1, 1) model and predict 2 years (24 months).
 ```{r, warning = FALSE, message = FALSE}
 a_fit <- arima(air_series, order = c(0,1,1), 
                seasonal = list(order = c(0,1,1), period = 12),
                method = "ML")
 
+# call the forecast package
 library(forecast)
 
 a_forecast <- forecast(a_fit, 24)
@@ -1130,6 +1177,7 @@ plot(a_forecast, xlab = "Month", ylab = "Air")
 
 ### a) Plot the timeseries.
 ```{r}
+# Read in new data set
 usecon <- read.csv('/Users/usecon.csv')
 
 petrol_series <- usecon$PETROL
@@ -1139,8 +1187,11 @@ petrol <- ts(petrol_series, frequency = 12)
 plot.ts(petrol, ylab="Petrol")
 ```
 
+[ts()](http://www.statmethods.net/advstats/timeseries.html) | [plot.ts()](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/plot.ts.html)
+
 ### b) Fit a Simple Exponential Smoothing model, predict 2 years (24 months) out and plot predictions.
 ```{r, message = FALSE, warning = FALSE}
+# call the forecast package
 library(forecast)
 
 ses_fit <- ses(petrol, h=24, alpha = 0.9999)
@@ -1161,12 +1212,21 @@ vehicle <- ts(vehicle_series, frequency = 12)
 plot.ts(vehicle, ylab="Vehicle")
 ```
 
+[ts()](http://www.statmethods.net/advstats/timeseries.html) | [plot.ts()](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/plot.ts.html)
+
 ### b) Fit a Holt-Winters additive model, predict 2 years (24 months) out and plot predictions.
-```{r}
+```{r, warning = FALSE, message = FALSE}
+# call the forecast package
+library(forecast)
+
 add_fit <- HoltWinters(vehicle, seasonal = "additive")
+
 add_forecast <- forecast(add_fit, 24)
+
 plot(add_forecast)
 ```
+
+[forecast](#FORECAST)
 
 ***
 
@@ -1175,12 +1235,16 @@ plot(add_forecast)
 ## 9.1 Evaluate the accuracy of regression models.
 
 ### a) Evaluation on training data.
-```{r}
+```{r, warning = FALSE, message = FALSE}
 train <- read.csv('/Users/boston_train.csv')
 test <- read.csv('/Users/boston_test.csv')
 
-# Random Forest Regression Model
 set.seed(29)
+
+# Random Forest Regression Model
+# call the randomForest package
+library(randomForest)
+
 rfMod <- randomForest(Target ~ ., data = train)
 
 # Evaluation on training data
@@ -1193,8 +1257,6 @@ r2_rf <- 1 - ( (sum((train$Target -
                                            mean(train$Target))**2)) )
 print(paste0("Random forest regression model r^2 score (coefficient of determination): ", r2_rf))
 ```
-
-[unname()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/unname)
 
 ### b) Evaluation on testing data.
 ```{r}
@@ -1210,7 +1272,10 @@ r2_rf = 1 - ( (sum((test$Target -
                                           mean(test$Target))**2)) )
 print(paste0("Random forest regression model r^2 score (coefficient of determination): ", r2_rf))
 ```
-The formula used here for the coefficient score is based off the Python skearn formula for [r2_score](http://scikit-learn.org/stable/modules/model_evaluation.html#r2-score-the-coefficient-of-determination).  For more information about model assessment in R, please review information about the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).
+
+[randomForest](#RANDOM) | [predict()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/predict) | [unname()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/unname)
+
+The formula used here for the coefficient of determination score is based off the Python skearn formula for [r2_score](http://scikit-learn.org/stable/modules/model_evaluation.html#r2-score-the-coefficient-of-determination).  For more information about model assessment in R, please review information about the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).
 
 ## 9.2 Evaluate the accuracy of classification models.
 
@@ -1222,6 +1287,8 @@ test <- read.csv('/Users/digits_test.csv')
 set.seed(29)
 
 # Random Forest Classification Model
+# call the randomForest package
+library(randomForest)
 
 rfMod <- randomForest(as.factor(Target) ~ ., data = train)
 
@@ -1247,6 +1314,9 @@ predY <- unname(predY)
 accuracy_rf <- (1/nrow(test)) * sum(as.numeric(predY == test$Target))
 print(paste0("Random forest model accuracy: ", accuracy_rf))
 ```
+
+[randomForest](#RANDOM) | [predict()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/predict) | [unname()](https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/unname)
+
 The formula used here for the accuracy score is based off the Python skearn formula for [accuracy_score](http://scikit-learn.org/stable/modules/model_evaluation.html#accuracy-score).  For more information about model assessment in R, please review information about the R package [caret](https://cran.r-project.org/web/packages/caret/index.html).
 
 ## 9.3 Evaluation with cross validation.
@@ -1377,7 +1447,7 @@ Converting R objects into JSON objects, and JSON objects into R objects
 Visualizations and graphics
 
 #### [dplyr](https://cran.r-project.org/web/packages/dplyr/dplyr.pdf) {#DPLYR}
-Workng with [data frame](#DataFrame) like objects
+Working with [data frame](#DataFrame) like objects
 
 #### [tree](https://cran.r-project.org/web/packages/tree/tree.pdf) {#TREE}
 Decision trees models
@@ -1446,7 +1516,7 @@ print(list1[1])
 ```
 
 ## [Vector](https://www.tutorialspoint.com/r/r_data_types.htm) {#vector}
-A one-dimensional data structure which is able to hold different classes of elements, but only one class per vector.
+A vector is a one-dimensional data structure which is able to hold different classes of elements, but only one class per vector.
 
 ***
 
