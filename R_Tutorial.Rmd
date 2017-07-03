@@ -1228,6 +1228,30 @@ plot(add_forecast)
 
 [forecast](#FORECAST)
 
+## 8.4 Fit a Facebook Prophet forecasting model to a timeseries.
+```{r, warning=FALSE, message=FALSE}
+air <- read.csv('/Users/air.csv')
+
+# call the prophet & dplyr packages
+library(prophet)
+library(dplyr)
+
+air_df <- data.frame(matrix(ncol = 0, nrow = nrow(air)))
+
+air_df$ds <- as.Date(air$DATE, format = "%m/%d/%Y")
+air_df$y <- air$AIR
+
+m <- prophet(air_df, yearly.seasonality = TRUE, weekly.seasonality = FALSE)
+
+future <- make_future_dataframe(m, periods = 24, freq = "month")
+
+forecast <- predict(m, future)
+
+plot(m, forecast)
+```
+
+[Facebook Prophet R API](https://facebookincubator.github.io/prophet/docs/quick_start.html#r-api)
+
 ***
 
 # 9 Model Evaluation & Selection
