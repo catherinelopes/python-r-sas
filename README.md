@@ -4,12 +4,12 @@ To the extent possible, all three tutorials follow the same progression and can 
 
 Python: <a href="http://pandas.pydata.org/">pandas (0.20.2)</a>, <a href="http://www.numpy.org/">NumPy (1.12.1)</a>, <a href="https://matplotlib.org/api/pyplot_api.html">Matplotlib.PyPlot</a>, <a href="https://seaborn.pydata.org/">seaborn (0.7.1)</a>, <a href=https://docs.python.org/2/library/re.html#module-re>re (2.2.1)</a>, <a href="https://docs.python.org/2/library/decimal.html">decimal (1.70)</a>, <a href="http://scikit-learn.org/stable/">sklearn (0.18.2)</a>, <a href="http://www.statsmodels.org/stable/index.html">statsmodels.api</a>, <a href="http://xgboost.readthedocs.io/en/latest/python/python_intro.html">xgboost (0.6)</a>, <a href="http://pythonhosted.org/pyclustering/">pyclustering</a>, <a href="http://www.pyflux.com/docs/">PyFlux (0.4.15)</a>, <a href="https://facebookincubator.github.io/prophet/docs/quick_start.html#python-api">FBProphet</a>
 
---- I used pip install ____ or conda install ____ where appropriate.
+--- I used pip or conda to install the packages where appropriate.
 
-R: gdata, rjson, ggplot2, dplyr, tree, randomForest, gbm, xgboost, e1071, RSNNS, caret, kernlab, dbscan, forecast
+R: <a href="https://cran.r-project.org/web/packages/gdata/gdata.pdf">gdata</a>, <a href="https://cran.r-project.org/web/packages/rjson/rjson.pdf">rjson</a>, <a href="https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf">ggplot2</a>, <a href="https://cran.r-project.org/web/packages/dplyr/dplyr.pdf">dplyr</a>, <a href="https://cran.r-project.org/web/packages/tree/tree.pdf">tree</a>, <a href="https://cran.r-project.org/web/packages/randomForest/randomForest.pdf">randomForest</a>, <a href="https://cran.r-project.org/web/packages/gbm/gbm.pdf">gbm</a>, <a href="https://cran.r-project.org/web/packages/xgboost/xgboost.pdf">xgboost</a>, <a href="https://cran.r-project.org/web/packages/e1071/e1071.pdf">e1071</a>, <a href="https://cran.r-project.org/web/packages/RSNNS/RSNNS.pdf">RSNNS</a>, <a href="https://cran.r-project.org/web/packages/caret/caret.pdf">caret</a>, <a href="https://cran.r-project.org/web/packages/kernlab/kernlab.pdf">kernlab</a>, <a href="https://cran.r-project.org/web/packages/dbscan/dbscan.pdf">dbscan</a>, <a href="https://cran.r-project.org/web/packages/kohonen/kohonen.pdf">kohonen</a>, <a href="https://cran.r-project.org/web/packages/forecast/forecast.pdf">forecast</a>, <a href="https://facebookincubator.github.io/prophet/docs/quick_start.html#r-api">prophet</a>
 
 --- I used install.packages("name_of_package")
 
-In order to run the SAS tutorial successfully, you will need Base SAS, SAS Enterprise Miner, and access within SAS to call R in order to execute R code.  For more information on calling R code within SAS please see [this post](https://communities.sas.com/t5/General-SAS-Programming/Run-R-code-inside-SAS-easily/td-p/210116).
+More detailed information specific to each programming language is available within the tutorials.
 
 Happy programming and analyzing!
