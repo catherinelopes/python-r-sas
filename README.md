@@ -2,7 +2,7 @@ Welcome to Data <em>Data Science Using Python, SAS, &amp; R: A Rosetta Stone for
 
 To the extent possible, all three tutorials follow the same progression and can be compared by example number.  The tutorials also include extensive helpful links to the documentation for the programming languages. All data used in these examples is included in this folder as well.  Finally, there are several Python &amp; R packages that need to be installed in order to go through the tutorial successfully.
 
-Python: <a href="http://pandas.pydata.org/">pandas(0.20.2)</a> NumPy(1.12.1), Matplotlib.PyPlot, seaborn(0.7.1), re(2.2.1), decimal(1.70), sklearn(0.18.2), statsmodels.api, xgboost(0.6), pyclustering, PyFlux(0.4.15)
+Python: <a href="http://pandas.pydata.org/">pandas (0.20.2)</a>, <a href="http://www.numpy.org/">NumPy (1.12.1)</a>, <a href="https://matplotlib.org/api/pyplot_api.html">Matplotlib.PyPlot</a>, <a href="https://seaborn.pydata.org/">seaborn (0.7.1)</a>, re(2.2.1), decimal(1.70), sklearn(0.18.2), statsmodels.api, xgboost(0.6), pyclustering, PyFlux(0.4.15)
 
 --- I used pip install ____ or conda install ____ where appropriate.
 
