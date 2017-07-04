@@ -1,10 +1,11 @@
 ---
-title: 'Data Science Using Python, SAS, & R:'
+title: "Data Science Using Python, SAS, & R"
+author: "Elaine Kearney"
 subtitle: A Rosetta Stone for Analytical Languages
 output:
   word_document:
-    toc: yes
     highlight: kate
+    toc: yes
     toc_depth: '3'
   html_document:
     df_print: paged
@@ -19,11 +20,11 @@ knitr::opts_chunk$set(echo = TRUE, engine = 'python', engine.path="/Users/elaine
 
 # Python Tutorial
 
-Welcome to the Python tutorial version of "Data Science Using Python, SAS, & R: A Rosetta Stone for Analytical Languages".  This tutorial includes examples of common data science tasks, organized in the same way across 3 data science languages.  Before beginning this tutorial, please check to make sure you have Python 3.5.2 installed (this is not required, but this is the release used to generate the following examples).  Also, the following Python packages are used throughout this tutorial.  You may not need all of the following packages to fit your specific needs, but they are listed below, and also in Appendix Section 2 with more detail:
+Welcome to the Python tutorial version of *Data Science Using Python, SAS, & R: A Rosetta Stone for Analytical Languages*.  This tutorial includes examples of common data science tasks, organized in the same way across 3 data science languages.  Before beginning this tutorial, please check to make sure you have Python 3.5.2 installed (this is not required, but this was the release used to generate the following examples).  Also, the following Python packages are used throughout this tutorial.  You may not need all of the following packages to fit your specific needs, but they are listed below, and also in Appendix Section 2 with more detail, for your information:
 
-pandas(0.20.2) | NumPy(1.12.1) | Matplotlib.PyPlot | seaborn(0.7.1) | re(2.2.1) | decimal(1.70) | sklearn(0.18.2) | statsmodels.api | xgboost(0.6) | pyclustering | PyFlux(0.4.15)
+[pandas (0.20.2)](#PANDAS) | [NumPy (1.12.1)](#NUMPY) | [Matplotlib.PyPlot](#PYPLOT) | [seaborn (0.7.1)](#SEABORN) | [re (2.2.1)](#re) | [decimal (1.70)](#DECIMAL) | [sklearn (0.18.2)](#SKLEARN) | [statsmodels.api](#STATSMODELS) | [xgboost (0.6)](#XGBOOST) | [pyclustering](#PYCLUSTERING) | [PyFlux (0.4.15)](#PYFLUX) | [fbprophet](#FBPROPHET)
 
-To install Python packages you will often need to run the following code from a terminal on your computer, and then later in a Python environment you will import the package, which is demonstrated in this tutorial:
+To install Python packages you will often need to run the following code from a terminal/command line on your computer, and then later in a Python environment you will import the package, which is demonstrated in this tutorial:
 
 ```{python, eval = FALSE}
 pip install package_name
@@ -347,6 +348,7 @@ sns.plt.show()
 
 Output:
 ![output](snsboxplot.png)
+
 [seaborn](#SEABORN)
 
 ***
@@ -785,6 +787,8 @@ print(linreg.intercept_)
 ```
 [LinearRegression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
 
+***
+
 # 6 Supervised Machine Learning
 
 ## 6.1 Fit a logistic regression model on training data and assess against testing data.
@@ -1144,9 +1148,7 @@ print(prediction["sq_diff"].mean())
 ### a) Fit an extreme gradient boosting classification model on training data and assess against testing data.
 
 #### i) Fit an extreme gradient boosting classification model on training data.
-```{python, echo = 3:11}
-import pandas as pd
-import numpy as np
+```{python, eval = FALSE}
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
 
@@ -1179,9 +1181,7 @@ print(pd.crosstab(index=Results, columns="count"))
 ### b) Fit an extreme gradient boosting regression model on training data and assess against testing data.
 
 #### i) Fit an extreme gradient boosting regression model on training data.
-```{python, echo = 3:11}
-import pandas as pd
-import numpy as np
+```{python, eval = FALSE}
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
 
@@ -1217,123 +1217,76 @@ print(prediction["sq_diff"].mean())
 ### a) Fit a support vector classification model.
 
 #### i) Fit a support vector classification model on training data.
-```{python, echo = 3:25}
-import pandas as pd
-import numpy as np
+
+Note: In implementation scaling should be used.
+```{python, eval = FALSE}
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
-
-# First we should scale the data, since R does
-from sklearn.preprocessing import StandardScaler
-
-train_features = train.drop(["Target"], axis = 1)
-scaler = StandardScaler().fit(np.array(train_features))
-train_scaled = scaler.transform(np.array(train_features))
-train_scaled = pd.DataFrame(train_scaled)
-train_scaled["Target"] = train["Target"]
-
-test_features = test.drop(["Target"], axis = 1)
-scaler = StandardScaler().fit(np.array(test_features))
-test_scaled = scaler.transform(np.array(test_features))
-test_scaled = pd.DataFrame(test_scaled)
-test_scaled["Target"] = test["Target"]
 
 # Fit a support vector classification model
 from sklearn.svm import SVC
 svMod = SVC(random_state = 29, kernel = 'linear')
-svMod.fit(train_scaled.drop(["Target"], axis = 1), 
-                  train_scaled["Target"])
+svMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 ```
 
 #### ii) Assess the model against the testing data.
-```{python, echo = 19:24}
+```{python, echo = 8:13}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/breastcancer_train.csv')
 test = pd.read_csv('/Users/breastcancer_test.csv')
-from sklearn.preprocessing import StandardScaler
-train_features = train.drop(["Target"], axis = 1)
-scaler = StandardScaler().fit(np.array(train_features))
-train_scaled = scaler.transform(np.array(train_features))
-train_scaled = pd.DataFrame(train_scaled)
-train_scaled["Target"] = train["Target"]
-test_features = test.drop(["Target"], axis = 1)
-scaler = StandardScaler().fit(np.array(test_features))
-test_scaled = scaler.transform(np.array(test_features))
-test_scaled = pd.DataFrame(test_scaled)
-test_scaled["Target"] = test["Target"]
 from sklearn.svm import SVC
 svMod = SVC(random_state = 29, kernel = 'linear')
-svMod.fit(train_scaled.drop(["Target"], axis = 1), train_scaled["Target"])
+svMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
-prediction = svMod.predict(test_scaled.drop(["Target"], axis = 1))
+prediction = svMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine how many were correctly classified
-Results = np.where(test_scaled["Target"] == prediction, "Correct", "Wrong")
+Results = np.where(test["Target"] == prediction, "Correct", "Wrong")
 print(pd.crosstab(index=Results, columns="count"))
 ```
-[preprocessing](http://scikit-learn.org/stable/modules/preprocessing.html) | [SVC](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
+[SVC](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
 
 ### b) Fit a support vector regression model.
 
 #### i) Fit a support vector regression model on training data.
-```{python, echo = 3:19}
-import pandas as pd
-import numpy as np
+
+Note: In implementation scaling should be used.
+```{python, eval = FALSE}
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
-
-from sklearn.preprocessing import StandardScaler 
-
-scaler = StandardScaler().fit(np.array(train)) 
-train_scaled = scaler.transform(np.array(train)) 
-train_scaled = pd.DataFrame(train_scaled) 
-
-scaler = StandardScaler().fit(np.array(test)) 
-test_scaled = scaler.transform(np.array(test)) 
-test_scaled = pd.DataFrame(test_scaled) 
 
 # Fit a support vector regression model
 from sklearn.svm import SVR
 svMod = SVR()
-svMod.fit(train_scaled.drop([13], axis = 1), train_scaled[13])
+svMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 ```
 
 #### ii) Assess the model against the testing data.
-```{python, echo = 15:22}
+```{python, echo = 8:14}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
-from sklearn.preprocessing import StandardScaler 
-scaler = StandardScaler().fit(np.array(train)) 
-train_scaled = scaler.transform(np.array(train)) 
-train_scaled = pd.DataFrame(train_scaled) 
-scaler = StandardScaler().fit(np.array(test)) 
-test_scaled = scaler.transform(np.array(test)) 
-test_scaled = pd.DataFrame(test_scaled) 
 from sklearn.svm import SVR
 svMod = SVR()
-svMod.fit(train_scaled.drop([13], axis = 1), train_scaled[13])
+svMod.fit(train.drop(["Target"], axis = 1), train["Target"])
 # Prediction on testing data
 prediction = pd.DataFrame()
-# 13 is the name of the Target variable
-prediction["predY"] = svMod.predict(test_scaled.drop([13], axis = 1))
+prediction["predY"] = svMod.predict(test.drop(["Target"], axis = 1))
 
 # Determine mean squared error
-prediction["sq_diff"] = (test_scaled[13] - prediction["predY"])**2
+prediction["sq_diff"] = (test["Target"] - prediction["predY"])**2
 print(prediction["sq_diff"].mean())
 ```
-[preprocessing](http://scikit-learn.org/stable/modules/preprocessing.html) | [SVR](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)
+[SVR](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html)
 
 ## 6.8 Fit a neural network model on training data and assess against testing data.
 
 ### a) Fit a neural network classification model.
 
 #### i) Fit a neural network classification model on training data.
-```{python, echo=3:10}
-import pandas as pd
-import numpy as np
+```{python, eval = FALSE}
 # Notice we are using new data sets
 train = pd.read_csv('/Users/digits_train.csv')
 test = pd.read_csv('/Users/digits_test.csv')
@@ -1368,9 +1321,7 @@ print(confusion_matrix(test["Target"], predY))
 ### b) Fit a neural network regression model.
 
 #### i) Fit a neural network regression model on training data.
-```{python, echo = 3:24}
-import pandas as pd
-import numpy as np
+```{python, eval = FALSE}
 train = pd.read_csv('/Users/boston_train.csv')
 test = pd.read_csv('/Users/boston_test.csv')
 
@@ -1381,13 +1332,11 @@ train_features = train.drop(["Target"], axis = 1)
 scaler = StandardScaler().fit(np.array(train_features))
 train_scaled = scaler.transform(np.array(train_features))
 train_scaled = pd.DataFrame(train_scaled)
-train_scaled["Target"] = train["Target"]
 
 test_features = test.drop(["Target"], axis = 1)
 scaler = StandardScaler().fit(np.array(test_features))
 test_scaled = scaler.transform(np.array(test_features))
 test_scaled = pd.DataFrame(test_scaled)
-test_scaled["Target"] = test["Target"]
 
 # Fit neural network regression model, dividing target by 50 for scaling
 from sklearn.neural_network import MLPRegressor
@@ -1396,7 +1345,7 @@ nnMod = nnMod.fit(train_scaled, train["Target"] / 50)
 ```
 
 #### ii) Assess the model against testing data.
-```{python, echo = 19:25}
+```{python, echo = 17:23}
 import pandas as pd
 import numpy as np
 train = pd.read_csv('/Users/boston_train.csv')
@@ -1406,15 +1355,13 @@ train_features = train.drop(["Target"], axis = 1)
 scaler = StandardScaler().fit(np.array(train_features))
 train_scaled = scaler.transform(np.array(train_features))
 train_scaled = pd.DataFrame(train_scaled)
-train_scaled["Target"] = train["Target"]
 test_features = test.drop(["Target"], axis = 1)
 scaler = StandardScaler().fit(np.array(test_features))
 test_scaled = scaler.transform(np.array(test_features))
 test_scaled = pd.DataFrame(test_scaled)
-test_scaled["Target"] = test["Target"]
 from sklearn.neural_network import MLPRegressor
 nnMod = MLPRegressor(max_iter = 250, random_state = 29, solver = 'lbfgs')
-nnMod.fit(train_scaled, train["Target"] / 50)
+nnMod = nnMod.fit(train_scaled, train["Target"] / 50)
 # Prediction on testing data, remembering to multiply by 50
 prediction = pd.DataFrame()
 prediction["predY"] = nnMod.predict(test_scaled)*50
@@ -1670,6 +1617,33 @@ plt.show()
 Output:
 ![output](VehiclesForecasts1.png)
 
+## 8.4 Fit a Facebook Prophet forecasting model to a timeseries.
+```{python, eval = FALSE}
+from fbprophet import Prophet
+
+air = pd.read_csv("/Users/air.csv")
+
+air_df = pd.DataFrame()
+
+air_df["ds"] = pd.to_datetime(air["DATE"], infer_datetime_format = True)
+air_df["y"] = air["AIR"]
+
+m = Prophet(yearly_seasonality = True, weekly_seasonality = False)
+
+m.fit(air_df)
+
+future = m.make_future_dataframe(periods = 24, freq = "M")
+
+forecast = m.predict(future)
+
+m.plot(forecast)
+```
+
+Output:
+![output](prophet_air.png)
+
+[Facebook Prophet Python API](#FBPROPHET)
+
 ***
 
 # 9 Model Evaluation & Selection
@@ -1813,14 +1787,6 @@ print("Accuracy: %.2f%% +/- %.2f%%" % (results.mean()*100,
 
 ***
 
-# 10 Text Analytics
-
-***
-
-# 11 Deep Learning
-
-***
-
 \newpage
 
 # Appendix
@@ -1888,6 +1854,9 @@ Tools for clustering input data
 
 #### [PyFlux](http://www.pyflux.com/docs/) {#PYFLUX}
 Tools for time series analysis and prediction
+
+#### [FBProphet](https://facebookincubator.github.io/prophet/docs/quick_start.html#python-api) {#FBPROPHET}
+Tools for forecasting using the Facebook Prophet model
 
 ***
 

@@ -1,6 +1,7 @@
 ---
-title: "Data Science Using Python, SAS, & R:"
-subtitle: "A Rosetta Stone for Analytical Languages"
+title: Data Science Using Python, SAS, & R
+subtitle: A Rosetta Stone for Analytical Languages
+author: Elaine Kearney
 output:
   html_document:
     toc: yes
@@ -20,7 +21,7 @@ opts_chunk$set(engine="sas", engine.path=saspath, engine.opts=sasopts, comment="
 
 # SAS Tutorial
 
-Welcome to the SAS tutorial version of "Data Science Using Python, SAS, & R: A Rosetta Stone for Analytical Languages".  This tutorial includes examples of common data science tasks, organized in the same way across 3 data science languages.  Before beginning this tutorial, please check to make sure you have SAS 14.2 installed (this is not required, but this is the release used to generate the following examples).  SAS Enterprise Miner Workstation 14.2 was used to produce some of the following results.
+Welcome to the SAS tutorial version of *Data Science Using Python, SAS, & R: A Rosetta Stone for Analytical Languages*.  This tutorial includes examples of common data science tasks, organized in the same way across 3 data science languages.  Before beginning this tutorial, please check to make sure you have SAS 14.2 installed (this is not required, but this was the release used to generate the following examples).  SAS Enterprise Miner Workstation 14.2 was used to produce some of the following results.
 
 You also may need to insure that your [SAS environment is connected with an R environment](https://communities.sas.com/t5/General-SAS-Programming/Run-R-code-inside-SAS-easily/td-p/210116) so that the R code that SAS calls at the end of this tutorial from the [IML Procedure](#iml) runs successfully.
 
@@ -109,7 +110,7 @@ run;
 ## 1.4 Look at the first 5 (last 5) observations.
 
 The [PRINT procedure](#print) prints a [SAS data set](#DATASET), according to the specifications and options provided.
-```{r, echo=6:13}
+```{r, echo=6:9}
 proc import out = student
 datafile = 'C:/Users/class.csv'
 dbms = csv replace;
@@ -1005,6 +1006,8 @@ quit;
 ```
 [REG Procedure](#reg)
 
+***
+
 # 6 Supervised Machine Learning
 
 ## 6.1 Fit a logistic regression model on training data and assess against testing data.
@@ -1538,6 +1541,8 @@ quit;
 ### a) Fit a support vector classification model.
 
 #### i) Fit a support vector classification model on training data.
+
+Note: In implementation scaling should be used.
 ```{r} 
 proc import out = train
 	datafile = 'C:/Users/breastcancer_train.csv'
@@ -1551,7 +1556,7 @@ proc import out = test
 run;
 	
 /* Fit a support vector classification model */
-proc hpsvm data = train;
+proc hpsvm data = train noscale;
   input _0-_29 / level = interval;
 	target Target / level = nominal;
 	code file='hpbreastcancer3.sas';
@@ -1573,7 +1578,7 @@ proc import out = test
 	getnames = yes;
 run;
 ods select none;
-proc hpsvm data = train;
+proc hpsvm data = train noscale;
   input _0-_29 / level = interval;
 	target Target / level = nominal;
 	code file='hpbreastcancer3.sas';
@@ -2040,6 +2045,8 @@ Output:
 
 [ESM Procedure](#esm)
 
+***
+
 # 9 Model Evaluation & Selection
 
 ## 9.1 Evaluate the accuracy of regression models.
@@ -2296,7 +2303,7 @@ proc means data = FreqCount mean std;
   var PERCENT;
 run;
 ```
-[HPFOREST Procedure](#hpforest) | [HP4SCORE Procedure](#hp4score) | [FREQ Procedure](#freq) | [MEANS Procedure](#means)
+[HPFOREST Procedure](#hpforest) | [HP4SCORE Procedure](#hp4score) | [FREQ Procedure](#freq) | [MEANS Procedure](#means) | [macro programming](http://www2.sas.com/proceedings/sugi29/243-29.pdf)
 
 ### b) ShuffleSplit
 
@@ -2376,15 +2383,7 @@ proc means data = FreqCount mean std;
   var PERCENT;
 run;
 ```
-[SURVEYSELECT Procedure](#surveyselect) | [HPFOREST Procedure](#hpforest) | [HP4SCORE Procedure](#hp4score) | [FREQ Procedure](#freq) | [MEANS Procedure](#means)
-
-***
-
-# 10 Text Analytics
-
-***
-
-# 11 Deep Learning
+[SURVEYSELECT Procedure](#surveyselect) | [HPFOREST Procedure](#hpforest) | [HP4SCORE Procedure](#hp4score) | [FREQ Procedure](#freq) | [MEANS Procedure](#means) | [macro programming](http://www2.sas.com/proceedings/sugi29/243-29.pdf)
 
 ***
 
@@ -2491,6 +2490,8 @@ Statements:
 #### [where](http://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000202951.htm) {#where} 
 
 \newpage
+
+***
 
 # Alphabetical Index
 

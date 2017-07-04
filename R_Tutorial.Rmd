@@ -1,5 +1,6 @@
 ---
-title: 'Data Science Using Python, SAS, & R:'
+title: "Data Science Using Python, SAS, & R"
+author: "Elaine Kearney"
 subtitle: A Rosetta Stone for Analytical Languages
 output:
   word_document:
@@ -19,9 +20,9 @@ knitr::opts_chunk$set(echo = TRUE, highlight = TRUE)
 
 # R Tutorial
 
-Welcome to the R tutorial version of "Data Science Using Python, SAS, & R: A Rosetta Stone for Analytical Languages".  This tutorial includes examples of common data science tasks, organized in the same way across 3 data science languages.  Before beginning this tutorial, please check to make sure you have R 3.3.1 installed (this is not required, but this is the release used to generate the following examples).  Also, the following R packages are used throughout this tutorial.  You may not need all of the following packages to fit your specific needs, but they are listed below, and also in Appendix Section 2 with more detail:
+Welcome to the R tutorial version of *Data Science Using Python, SAS, & R: A Rosetta Stone for Analytical Languages*.  This tutorial includes examples of common data science tasks, organized in the same way across 3 data science languages.  Before beginning this tutorial, please check to make sure you have R 3.3.1 installed (this is not required, but this was the release used to generate the following examples).  Also, the following R packages are used throughout this tutorial.  You may not need all of the following packages to fit your specific needs, but they are listed below, and also in Appendix Section 2 with more detail, for your information:
 
-gdata | rjson | ggplot2 | dplyr | tree |randomForest | gbm | xgboost | e1071 | RSNNS | caret | kernlab | dbscan |forecast
+[gdata](#GDATA) | [rjson](#RJSON) | [ggplot2](#ggplot2) | [dplyr](#DPLYR) | [tree](#TREE) | [randomForest](#RANDOM) | [gbm](#GBM) | [xgboost](#XGBOOST) | [e1071](#e1071) | [RSNNS](#RSNNS) | [caret](#CARET) | [kernlab](#KERNLAB) | [dbscan](#DBSCAN) | [kohonen](#KOHONEN) | [forecast](#FORECAST) | [prophet](#PROPHET) 
 
 To install R packages you need to run the following in the R console:
 
@@ -576,6 +577,8 @@ summary(linreg)
 
 [lm()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/lm)
 
+***
+
 # 6 Supervised Machine Learning
 
 Many of the following models will make use of the [predict()](https://www.rdocumentation.org/packages/stats/versions/3.4.0/topics/predict) function.
@@ -940,6 +943,8 @@ print(mean_sq_error)
 ### a) Fit a support vector classification model.
 
 #### i) Fit a support vector classification model on training data.
+
+Note: In implementation scaling should be used.
 ```{r, warning = FALSE, message = FALSE}
 train <- read.csv('/Users/breastcancer_train.csv')
 test <- read.csv('/Users/breastcancer_test.csv')
@@ -948,7 +953,7 @@ test <- read.csv('/Users/breastcancer_test.csv')
 library(e1071)
 
 # Fit a support vector classification model 
-svMod <- svm(Target ~ ., train, type = 'C-classification', kernel = 'linear')
+svMod <- svm(Target ~ ., train, type = 'C-classification', kernel = 'linear', scale = FALSE)
 ```
 
 #### ii) Assess the model against the testing data.
@@ -966,6 +971,8 @@ table(Results)
 ### b) Fit a support vector regression model.
 
 #### i) Fit a support vector regression model on training data.
+
+Note: In implementation scaling should be used.
 ```{r, warning = FALSE, message = FALSE}
 train <- read.csv('/Users/boston_train.csv')
 test <- read.csv('/Users/boston_test.csv')
@@ -973,7 +980,7 @@ test <- read.csv('/Users/boston_test.csv')
 # call the e1071 package
 library(e1071)
 
-svMod <- svm(Target ~ ., train)
+svMod <- svm(Target ~ ., train, scale = FALSE)
 ```
 
 #### ii) Assess the model against the testing data.
@@ -1007,8 +1014,8 @@ set.seed(29)
 trainTarget <- decodeClassLabels(train$Target)
 testTarget <- decodeClassLabels(test$Target)
 
-nnMod <- mlp(trainInputs, trainTarget, inputsTest=testInputs, 
-             targetsTest=testTarget, size = 100, maxit = 200)
+# Fit neural network regression model
+nnMod <- mlp(trainInputs, trainTarget, size = c(100), maxit = 200)
 ```
 
 #### ii) Assess the model against the testing data.
@@ -1038,8 +1045,7 @@ scaled_train <- data.frame(scale(subset(train, select = -c(Target))))
 scaled_test <- data.frame(scale(subset(test, select = -c(Target))))
 
 # Fit neural network regression model, dividing target by 50 for scaling
-nnMod <- mlp(scaled_train, train$Target / 50, inputsTest=scaled_test, 
-             targetsTest=test$Target / 50, maxit = 1000)
+nnMod <- mlp(scaled_train, train$Target / 50, maxit = 250, size = c(100))
 ```
 
 [scale()](https://www.rdocumentation.org/packages/raster/versions/2.5-8/topics/scale)
@@ -1250,7 +1256,7 @@ forecast <- predict(m, future)
 plot(m, forecast)
 ```
 
-[Facebook Prophet R API](https://facebookincubator.github.io/prophet/docs/quick_start.html#r-api)
+[Facebook Prophet R API](#PROPHET)
 
 ***
 
@@ -1385,7 +1391,7 @@ print(paste0("Accuracy: ", round(mean(accuracy)*100, digits=2), "% +/- ",
              round(sd(accuracy)*100, digits=2), "%"))
 ```
 
-[caret](#CARET) | [randomForest](#RANDOM)
+[caret](#CARET) | [randomForest](#RANDOM) | [trainControl()](https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/trainControl)
 
 ### b) ShuffleSplit
 ```{r, warning = FALSE, message = FALSE}
@@ -1427,13 +1433,7 @@ print(paste0("Accuracy: ", round(mean(accuracy)*100, digits=2), "% +/- ",
              round(sd(accuracy)*100, digits=2), "%"))
 ```
 
-[caret](#CARET) | [randomForest](#RANDOM) | [createDataPartition](https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/createDataPartition) 
-
-***
-
-# 10 Text Analytics
-
-# 11 Deep Learning
+[caret](#CARET) | [randomForest](#RANDOM) | [createDataPartition()](https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/createDataPartition) 
 
 ***
 
@@ -1491,6 +1491,9 @@ Support vector machine models
 #### [RSNNS](https://cran.r-project.org/web/packages/RSNNS/RSNNS.pdf) {#RSNNS}
 Neural network models
 
+#### [caret](https://cran.r-project.org/web/packages/caret/caret.pdf) {#CARET}
+Training and plotting classification and regression models
+
 #### [kernlab](https://cran.r-project.org/web/packages/kernlab/kernlab.pdf) {#KERNLAB}
 Spectral clustering
 
@@ -1503,8 +1506,8 @@ Supervised and unsupervised self-organizing maps
 #### [forecast](https://cran.r-project.org/web/packages/forecast/forecast.pdf) {#FORECAST}
 Displaying and analyzing time series for forecasting
 
-#### [caret](https://cran.r-project.org/web/packages/caret/caret.pdf) {#CARET}
-Training and plotting classification and regression models
+#### [prophet](https://facebookincubator.github.io/prophet/docs/quick_start.html#r-api) {#PROPHET}
+Tools for forecasting using the Facebook Prophet model
 
 ***
 
