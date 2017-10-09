@@ -59,7 +59,7 @@ student_xls <- read.xls('/Users/class.xls', 1)
 
 [gdata](#GDATA) | [read.xls()](https://www.rdocumentation.org/packages/gdata/versions/2.18.0/topics/read.xls)
 
-###c) Read the data in as a .json file.
+### c) Read the data in as a .json file.
 
 There is more code involved in reading a .json file into R so it becomes a proper [data frame](#DataFrame).  Also, this code is specific for a certain .json format, so you may have to change it to fix your needs.
 ```{r, eval = FALSE}
@@ -96,7 +96,7 @@ str(student)
 
 ## 1.4 Look at the first 5 (last 5) observations.
 
-The first 5 observations of a [data frame](#DataFrame) are available by calling the [head()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function, with the data name as an argument.  By default, head() returns 4 observations, but we can alter the function to return 5 observations in the way shown below (*n*= ).  The [tail()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function is analogous and returns the last observations.
+The first 5 observations of a [data frame](#DataFrame) are available by calling the [head()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function, with the data name as an argument.  By default, head() returns 6 observations, but we can alter the function to return 5 observations in the way shown below (*n*= ).  The [tail()](https://www.rdocumentation.org/packages/utils/versions/3.4.0/topics/head) function is analogous and returns the last observations.
 ```{r head}
 head(student, n=5)
 ```
@@ -494,8 +494,8 @@ library(dplyr)
 price$ACTUAL <- gsub('[$]', '', price$ACTUAL)
 price$ACTUAL <- as.numeric(gsub(',', '', price$ACTUAL))
 
-filtered = group_by(price, COUNTRY, STATE, PRODTYPE, PRODUCT)
-basic_sum = summarise(filtered, REVENUE = sum(ACTUAL))
+filtered <- group_by(price, COUNTRY, STATE, PRODTYPE, PRODUCT)
+basic_sum <- summarise(filtered, REVENUE = sum(ACTUAL))
 head(basic_sum, n=5)
 ```
 
@@ -637,8 +637,8 @@ summary(linreg)
 ### b) Assess the model against the testing data.
 ```{r }
 # Predict on testing data
-prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
-prediction$predY = predict(linreg, newdata = test)
+prediction <- data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction$predY <- predict(linreg, newdata = test)
 
 # Compute the squared difference between predicted tip and actual tip 
 prediction$sq_diff <- (prediction$predY - test$Target)**2
@@ -708,8 +708,8 @@ summary(treeMod)
 #### ii) Assess the model against the testing data.
 ```{r}
 # Prediction on testing data
-prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
-prediction$predY = predict(treeMod, newdata = test)
+prediction <- data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction$predY <- predict(treeMod, newdata = test)
 
 # Determine mean squared error
 prediction$sq_diff <- (prediction$predY - test$Target)**2
@@ -783,8 +783,8 @@ head(var_import, n=5)
 #### ii) Assess the model against the testing data.
 ```{r}
 # Prediction on testing data
-prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
-prediction$predY = predict(rfMod, newdata = test)
+prediction <- data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction$predY <- predict(rfMod, newdata = test)
 
 # Determine mean squared error
 prediction$sq_diff <- (prediction$predY - test$Target)**2
@@ -856,7 +856,7 @@ head(var_import, n=5)
 #### ii) Assess the model against the testing data.
 ```{r}
 # Predict the Target in the testing data, remembeing to multiply by 50
-prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction <- data.frame(matrix(ncol = 0, nrow = nrow(test)))
 prediction$predY <- predict(object = gbMod, newdata = test, 
                             type = "response", n.trees = 2500)
 
@@ -923,7 +923,7 @@ xgbMod <- xgboost(data.matrix(subset(train, select = -c(Target))),
 #### ii) Assess the model against the testing data.
 ```{r}
 # Prediction on testing
-prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction <- data.frame(matrix(ncol = 0, nrow = nrow(test)))
 prediction$predY <- predict(xgbMod, 
                     data.matrix(subset(test, select = -c(Target))))
 
@@ -986,7 +986,7 @@ svMod <- svm(Target ~ ., train, scale = FALSE)
 #### ii) Assess the model against the testing data.
 ```{r}
 # Prediction on testing data
-prediction = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+prediction <- data.frame(matrix(ncol = 0, nrow = nrow(test)))
 prediction$predY <- unname(predict(svMod, test))
 prediction$sq_diff <- (prediction$predY - test$Target)**2
 print(mean(prediction$sq_diff))
@@ -1052,7 +1052,7 @@ nnMod <- mlp(scaled_train, train$Target / 50, maxit = 250, size = c(100))
 
 ```{r}
 # Assess against testing data, remembering to multiply by 50
-preds = data.frame(matrix(ncol = 0, nrow = nrow(test)))
+preds <- data.frame(matrix(ncol = 0, nrow = nrow(test)))
 preds$predY <- predict(nnMod, scaled_test)*50
 preds$sq_error <- (preds$predY - test$Target)**2
 print(mean(preds$sq_error))
@@ -1067,9 +1067,9 @@ print(mean(preds$sq_error))
 ## 7.1 KMeans Clustering
 
 ```{r}
-iris = read.csv('/Users/iris.csv')
+iris <- read.csv('/Users/iris.csv')
 
-iris$Species = ifelse(iris$Target == 0, "Setosa", 
+iris$Species <- ifelse(iris$Target == 0, "Setosa", 
                       ifelse(iris$Target == 1, "Versicolor", "Virginica"))
 
 features <- as.matrix(subset(iris, select = c(PetalLength, PetalWidth, 
@@ -1297,7 +1297,7 @@ predY <- predict(rfMod, test)
 predY <- unname(predY)
 
 # Determine coefficient of determination score
-r2_rf = 1 - ( (sum((test$Target - 
+r2_rf <- 1 - ( (sum((test$Target - 
                       predY)**2)) / (sum((test$Target - 
                                           mean(test$Target))**2)) )
 print(paste0("Random forest regression model r^2 score (coefficient of determination): ", r2_rf))
@@ -1355,7 +1355,7 @@ The formula used here for the accuracy score is based off the Python skearn form
 ```{r, warning = FALSE, message = FALSE}
 # Notice we are using a new data set that needs to be read into the 
 # environment 
-breastcancer = read.csv('/Users/breastcancer.csv')
+breastcancer <- read.csv('/Users/breastcancer.csv')
 
 # call the caret and randomForest packages
 library(caret)
@@ -1401,8 +1401,8 @@ library(randomForest)
 
 set.seed(29)
 
-X = subset(breastcancer, select = -c(Target))
-Y = breastcancer$Target
+X <- subset(breastcancer, select = -c(Target))
+Y <- breastcancer$Target
 
 # Create the data partition
 trainIndex <- createDataPartition(Y, times = 5, p = 0.7, list = FALSE)

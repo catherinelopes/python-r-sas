@@ -281,7 +281,7 @@ conda install package_name</code></pre></div>
 <h3>b) Read the data in as a .xls file.</h3>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Notice you must specify the file location, as well as the name of the sheet </span>
 <span class="co"># of the .xls file you want to import</span>
-student_xls <span class="op">=</span> pd.read_excel(<span class="bu">open</span>(<span class="st">'/Users/class.xls'</span>, <span class="st">'rb'</span>), 
+student_xls <span class="op">=</span> pd.read_excel(<span class="bu">open</span>(<span class="st">'/Users/class.xls'</span>, <span class="st">'rb'</span>),
                             sheetname<span class="op">=</span><span class="st">'class'</span>)</code></pre></div>
 </div>
 <div id="c-read-the-data-in-as-a-.json-file." class="section level3">
@@ -370,7 +370,7 @@ student_xls <span class="op">=</span> pd.read_excel(<span class="bu">open</span>
 <span class="co"># the counts of each level of the index variable</span>
 <span class="bu">print</span>(pd.crosstab(index<span class="op">=</span>student[<span class="st">&quot;Age&quot;</span>], columns<span class="op">=</span><span class="st">&quot;count&quot;</span>))</code></pre></div>
 <pre><code>## col_0  count
-## Age         
+## Age
 ## 11         2
 ## 12         5
 ## 13         3
@@ -382,7 +382,7 @@ student_xls <span class="op">=</span> pd.read_excel(<span class="bu">open</span>
 <h3>b) Produce a one-way table of a categorical variable.</h3>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span>(pd.crosstab(index<span class="op">=</span>student[<span class="st">&quot;Sex&quot;</span>], columns<span class="op">=</span><span class="st">&quot;count&quot;</span>))</code></pre></div>
 <pre><code>## col_0  count
-## Sex         
+## Sex
 ## F          9
 ## M         10</code></pre>
 <p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.crosstab.html">pd.crosstab()</a></p>
@@ -394,7 +394,7 @@ student_xls <span class="op">=</span> pd.read_excel(<span class="bu">open</span>
 <span class="co"># of &quot;count&quot;</span>
 <span class="bu">print</span>(pd.crosstab(index<span class="op">=</span>student[<span class="st">&quot;Age&quot;</span>], columns<span class="op">=</span>student[<span class="st">&quot;Sex&quot;</span>]))</code></pre></div>
 <pre><code>## Sex  F  M
-## Age      
+## Age
 ## 11   1  1
 ## 12   2  3
 ## 13   2  1
@@ -551,7 +551,7 @@ student[<span class="st">&quot;BMI&quot;</span>] <span class="op">=</span> stude
 <div id="create-a-new-variable-in-a-data-set-using-ifelse-logic-of-existing-variables-in-the-data-set." class="section level2">
 <h2>3.2 Create a new variable in a data set using if/else logic of existing variables in the data set.</h2>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Notice the use of the np.where() function for a single condition </span>
-student[<span class="st">&quot;BMI Class&quot;</span>] <span class="op">=</span> np.where(student[<span class="st">&quot;BMI&quot;</span>] <span class="op">&lt;</span> <span class="fl">19.0</span>, <span class="st">&quot;Underweight&quot;</span>, 
+student[<span class="st">&quot;BMI Class&quot;</span>] <span class="op">=</span> np.where(student[<span class="st">&quot;BMI&quot;</span>] <span class="op">&lt;</span> <span class="fl">19.0</span>, <span class="st">&quot;Underweight&quot;</span>,
                                 <span class="st">&quot;Healthy&quot;</span>)
 <span class="bu">print</span>(student.head())</code></pre></div>
 <pre><code>##       Name Sex  Age  Height  Weight        BMI    BMI Class
@@ -568,30 +568,30 @@ student[<span class="st">&quot;BMI Class&quot;</span>] <span class="op">=</span>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">student[<span class="st">&quot;LogWeight&quot;</span>] <span class="op">=</span> np.log(student[<span class="st">&quot;Weight&quot;</span>])
 student[<span class="st">&quot;ExpAge&quot;</span>] <span class="op">=</span> np.exp(student[<span class="st">&quot;Age&quot;</span>])
 student[<span class="st">&quot;SqrtHeight&quot;</span>] <span class="op">=</span> np.sqrt(student[<span class="st">&quot;Height&quot;</span>])
-student[<span class="st">&quot;BMI Neg&quot;</span>] <span class="op">=</span> np.where(student[<span class="st">&quot;BMI&quot;</span>] <span class="op">&lt;</span> <span class="fl">19.0</span>, <span class="op">-</span>student[<span class="st">&quot;BMI&quot;</span>], 
+student[<span class="st">&quot;BMI Neg&quot;</span>] <span class="op">=</span> np.where(student[<span class="st">&quot;BMI&quot;</span>] <span class="op">&lt;</span> <span class="fl">19.0</span>, <span class="op">-</span>student[<span class="st">&quot;BMI&quot;</span>],
                               student[<span class="st">&quot;BMI&quot;</span>])
 student[<span class="st">&quot;BMI Pos&quot;</span>] <span class="op">=</span> np.<span class="bu">abs</span>(student[<span class="st">&quot;BMI Neg&quot;</span>])
 
 <span class="co"># Create a Boolean variable</span>
 student[<span class="st">&quot;BMI Check&quot;</span>] <span class="op">=</span> (student[<span class="st">&quot;BMI Pos&quot;</span>] <span class="op">==</span> student[<span class="st">&quot;BMI&quot;</span>])</code></pre></div>
 <pre><code>##       Name Sex  Age  Height  Weight        BMI    BMI Class  LogWeight  \
-## 0   Alfred   M   14    69.0   112.5  16.611531  Underweight   4.722953   
-## 1    Alice   F   13    56.5    84.0  18.498551  Underweight   4.430817   
-## 2  Barbara   F   13    65.3    98.0  16.156788  Underweight   4.584967   
-## 3    Carol   F   14    62.8   102.5  18.270898  Underweight   4.629863   
-## 4    Henry   M   14    63.5   102.5  17.870296  Underweight   4.629863   
-## 
-##          ExpAge  SqrtHeight    BMI Neg    BMI Pos  BMI Check  
-## 0  1.202604e+06    8.306624 -16.611531  16.611531       True  
-## 1  4.424134e+05    7.516648 -18.498551  18.498551       True  
-## 2  4.424134e+05    8.080842 -16.156788  16.156788       True  
-## 3  1.202604e+06    7.924645 -18.270898  18.270898       True  
+## 0   Alfred   M   14    69.0   112.5  16.611531  Underweight   4.722953
+## 1    Alice   F   13    56.5    84.0  18.498551  Underweight   4.430817
+## 2  Barbara   F   13    65.3    98.0  16.156788  Underweight   4.584967
+## 3    Carol   F   14    62.8   102.5  18.270898  Underweight   4.629863
+## 4    Henry   M   14    63.5   102.5  17.870296  Underweight   4.629863
+##
+##          ExpAge  SqrtHeight    BMI Neg    BMI Pos  BMI Check
+## 0  1.202604e+06    8.306624 -16.611531  16.611531       True
+## 1  4.424134e+05    7.516648 -18.498551  18.498551       True
+## 2  4.424134e+05    8.080842 -16.156788  16.156788       True
+## 3  1.202604e+06    7.924645 -18.270898  18.270898       True
 ## 4  1.202604e+06    7.968689 -17.870296  17.870296       True</code></pre>
 </div>
 <div id="drop-variables-from-a-data-set." class="section level2">
 <h2>3.4 Drop variables from a data set.</h2>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># axis = 1 indicates to drop columns instead of rows</span>
-student <span class="op">=</span> student.drop([<span class="st">&quot;LogWeight&quot;</span>, <span class="st">&quot;ExpAge&quot;</span>, <span class="st">&quot;SqrtHeight&quot;</span>, <span class="st">&quot;BMI Neg&quot;</span>, 
+student <span class="op">=</span> student.drop([<span class="st">&quot;LogWeight&quot;</span>, <span class="st">&quot;ExpAge&quot;</span>, <span class="st">&quot;SqrtHeight&quot;</span>, <span class="st">&quot;BMI Neg&quot;</span>,
                         <span class="st">&quot;BMI Pos&quot;</span>, <span class="st">&quot;BMI Check&quot;</span>], axis <span class="op">=</span> <span class="dv">1</span>)
 <span class="bu">print</span>(student.head())</code></pre></div>
 <pre><code>##       Name Sex  Age  Height  Weight        BMI    BMI Class
@@ -635,7 +635,7 @@ student <span class="op">=</span> student.sort_values(by<span class="op">=</span
 <h2>3.6 Compute descriptive statistics of continuous variables, grouped by a categorical variable.</h2>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span>(student.groupby(by<span class="op">=</span><span class="st">&quot;Sex&quot;</span>).mean())</code></pre></div>
 <pre><code>##            Age     Height      Weight        BMI
-## Sex                                             
+## Sex
 ## F    13.222222  60.588889   90.111111  17.051039
 ## M    13.400000  63.910000  108.950000  18.594243</code></pre>
 <p><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.groupby.html">groupby()</a></p>
@@ -650,9 +650,9 @@ student <span class="op">=</span> student.sort_values(by<span class="op">=</span
 ## 16   Ronald   M   15    67.0   133.0  20.828470      Healthy
 ## 18  William   M   15    66.5   112.0  17.804511  Underweight
 ## 14   Philip   M   16    72.0   150.0  20.341435      Healthy</code></pre>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">student <span class="op">=</span> student.append({<span class="st">'Name'</span>:<span class="st">'Jane'</span>, <span class="st">'Sex'</span>:<span class="st">'F'</span>, <span class="st">'Age'</span>:<span class="dv">14</span>, <span class="st">'Height'</span>:<span class="fl">56.3</span>, 
-                          <span class="st">'Weight'</span>:<span class="fl">77.0</span>, <span class="st">'BMI'</span>:<span class="fl">17.077695</span>, 
-                          <span class="st">'BMI Class'</span>: <span class="st">'Underweight'</span>}, 
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">student <span class="op">=</span> student.append({<span class="st">'Name'</span>:<span class="st">'Jane'</span>, <span class="st">'Sex'</span>:<span class="st">'F'</span>, <span class="st">'Age'</span>:<span class="dv">14</span>, <span class="st">'Height'</span>:<span class="fl">56.3</span>,
+                          <span class="st">'Weight'</span>:<span class="fl">77.0</span>, <span class="st">'BMI'</span>:<span class="fl">17.077695</span>,
+                          <span class="st">'BMI Class'</span>: <span class="st">'Underweight'</span>},
                          ignore_index<span class="op">=</span><span class="va">True</span>)
 
 <span class="co"># Notice the change in the indices because of the ignore_index=True option </span>
@@ -719,7 +719,7 @@ fish <span class="op">=</span> fish.sort_values(by<span class="op">=</span><span
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Notice the use of the student data set again, however we want to reload it</span>
 <span class="co"># without the changes we've made previously </span>
 student <span class="op">=</span> pd.read_csv(<span class="st">'/Users/class.csv'</span>)
-student1 <span class="op">=</span> pd.concat([student[<span class="st">&quot;Name&quot;</span>], student[<span class="st">&quot;Sex&quot;</span>], student[<span class="st">&quot;Age&quot;</span>]], 
+student1 <span class="op">=</span> pd.concat([student[<span class="st">&quot;Name&quot;</span>], student[<span class="st">&quot;Sex&quot;</span>], student[<span class="st">&quot;Age&quot;</span>]],
                     axis <span class="op">=</span> <span class="dv">1</span>)
 <span class="bu">print</span>(student1.head())</code></pre></div>
 <pre><code>##       Name Sex  Age
@@ -729,7 +729,7 @@ student1 <span class="op">=</span> pd.concat([student[<span class="st">&quot;Nam
 ## 3    Carol   F   14
 ## 4    Henry   M   14</code></pre>
 <p>–</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">student2 <span class="op">=</span> pd.concat([student[<span class="st">&quot;Name&quot;</span>], student[<span class="st">&quot;Height&quot;</span>], student[<span class="st">&quot;Weight&quot;</span>]], 
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">student2 <span class="op">=</span> pd.concat([student[<span class="st">&quot;Name&quot;</span>], student[<span class="st">&quot;Height&quot;</span>], student[<span class="st">&quot;Weight&quot;</span>]],
                     axis <span class="op">=</span> <span class="dv">1</span>)
 <span class="bu">print</span>(student2.head())</code></pre></div>
 <pre><code>##       Name  Height  Weight
@@ -762,7 +762,7 @@ student1 <span class="op">=</span> pd.concat([student[<span class="st">&quot;Nam
 <h2>4.3 Merge two data sets together by index number only.</h2>
 <div id="a-first-select-specific-columns-of-a-data-set-to-create-two-smaller-data-sets.-1" class="section level3">
 <h3>a) First, select specific columns of a data set to create two smaller data sets.</h3>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">newstudent1 <span class="op">=</span> pd.concat([student[<span class="st">&quot;Name&quot;</span>], student[<span class="st">&quot;Sex&quot;</span>], student[<span class="st">&quot;Age&quot;</span>]], 
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">newstudent1 <span class="op">=</span> pd.concat([student[<span class="st">&quot;Name&quot;</span>], student[<span class="st">&quot;Sex&quot;</span>], student[<span class="st">&quot;Age&quot;</span>]],
                         axis <span class="op">=</span> <span class="dv">1</span>)
 <span class="bu">print</span>(newstudent1.head())</code></pre></div>
 <pre><code>##       Name Sex  Age
@@ -813,12 +813,12 @@ price <span class="op">=</span> pd.read_csv(<span class="st">'/Users/price.csv'<
     <span class="cf">return</span>(<span class="bu">float</span>(Decimal(sub(<span class="vs">r'[^\d.]'</span>, <span class="st">''</span>, money))))
 
 price[<span class="st">&quot;REVENUE&quot;</span>] <span class="op">=</span> price[<span class="st">&quot;ACTUAL&quot;</span>].<span class="bu">apply</span>(trim_money)
-table <span class="op">=</span> pd.pivot_table(price, index<span class="op">=</span>[<span class="st">&quot;COUNTRY&quot;</span>, <span class="st">&quot;STATE&quot;</span>, <span class="st">&quot;PRODTYPE&quot;</span>, 
-                                     <span class="st">&quot;PRODUCT&quot;</span>], values<span class="op">=</span><span class="st">&quot;REVENUE&quot;</span>, 
+table <span class="op">=</span> pd.pivot_table(price, index<span class="op">=</span>[<span class="st">&quot;COUNTRY&quot;</span>, <span class="st">&quot;STATE&quot;</span>, <span class="st">&quot;PRODTYPE&quot;</span>,
+                                     <span class="st">&quot;PRODUCT&quot;</span>], values<span class="op">=</span><span class="st">&quot;REVENUE&quot;</span>,
                        aggfunc<span class="op">=</span>np.<span class="bu">sum</span>)
 <span class="bu">print</span>(table.head())</code></pre></div>
 <pre><code>##                                              REVENUE
-## COUNTRY STATE            PRODTYPE  PRODUCT          
+## COUNTRY STATE            PRODTYPE  PRODUCT
 ## Canada  British Columbia FURNITURE BED      197706.6
 ##                                    SOFA     216282.6
 ##                          OFFICE    CHAIR    200905.2
@@ -869,8 +869,8 @@ pca <span class="op">=</span> pca.fit(features_scaled)
 target <span class="op">=</span> iris[<span class="st">&quot;Target&quot;</span>]
 
 <span class="co"># The following code splits the iris data set into 70% train and 30% test</span>
-X_train, X_test, Y_train, Y_test <span class="op">=</span> train_test_split(features, target, 
-                                                    test_size <span class="op">=</span> <span class="fl">0.3</span>, 
+X_train, X_test, Y_train, Y_test <span class="op">=</span> train_test_split(features, target,
+                                                    test_size <span class="op">=</span> <span class="fl">0.3</span>,
                                                     random_state <span class="op">=</span> <span class="dv">29</span>)
 train_x <span class="op">=</span> pd.DataFrame(X_train)
 train_y <span class="op">=</span> pd.DataFrame(Y_train)
@@ -898,12 +898,12 @@ tips[<span class="st">&quot;greater15&quot;</span>] <span class="op">=</span> np
 <span class="im">import</span> statsmodels.api <span class="im">as</span> sm
 
 <span class="co"># Notice the syntax of greater15 as a function of total_bill </span>
-logreg <span class="op">=</span> sm.formula.glm(<span class="st">&quot;greater15 ~ total_bill&quot;</span>, 
-                       family<span class="op">=</span>sm.families.Binomial(), 
+logreg <span class="op">=</span> sm.formula.glm(<span class="st">&quot;greater15 ~ total_bill&quot;</span>,
+                       family<span class="op">=</span>sm.families.Binomial(),
                        data<span class="op">=</span>tips).fit()
 <span class="bu">print</span>(logreg.summary())</code></pre></div>
 <pre><code>
-##                  Generalized Linear Model Regression Results                  
+##                  Generalized Linear Model Regression Results
 ## ==============================================================================
 ## Dep. Variable:              greater15   No. Observations:                  244
 ## Model:                            GLM   Df Residuals:                      242
@@ -912,7 +912,7 @@ logreg <span class="op">=</span> sm.formula.glm(<span class="st">&quot;greater15
 ## Method:                          IRLS   Log-Likelihood:                -156.87
 ## Date:                Wed, 05 Jul 2017   Deviance:                       313.74
 ## Time:                        13:50:25   Pearson chi2:                     247.
-## No. Iterations:                     4                                         
+## No. Iterations:                     4
 ## ==============================================================================
 ##                  coef    std err          z      P&gt;|z|      [0.025      0.975]
 ## ------------------------------------------------------------------------------
@@ -952,12 +952,12 @@ train[<span class="st">&quot;greater15&quot;</span>] <span class="op">=</span> n
 test[<span class="st">&quot;fifteen&quot;</span>] <span class="op">=</span> <span class="fl">0.15</span> <span class="op">*</span> test[<span class="st">&quot;total_bill&quot;</span>]
 test[<span class="st">&quot;greater15&quot;</span>] <span class="op">=</span> np.where(test[<span class="st">&quot;tip&quot;</span>] <span class="op">&gt;</span> test[<span class="st">&quot;fifteen&quot;</span>], <span class="dv">1</span>, <span class="dv">0</span>)
 
-logreg <span class="op">=</span> sm.formula.glm(<span class="st">&quot;greater15 ~ total_bill&quot;</span>, 
-                       family<span class="op">=</span>sm.families.Binomial(), 
+logreg <span class="op">=</span> sm.formula.glm(<span class="st">&quot;greater15 ~ total_bill&quot;</span>,
+                       family<span class="op">=</span>sm.families.Binomial(),
                        data<span class="op">=</span>train).fit()
 <span class="bu">print</span>(logreg.summary())</code></pre></div>
 <pre><code>
-##                  Generalized Linear Model Regression Results                  
+##                  Generalized Linear Model Regression Results
 ## ==============================================================================
 ## Dep. Variable:              greater15   No. Observations:                  195
 ## Model:                            GLM   Df Residuals:                      193
@@ -966,7 +966,7 @@ logreg <span class="op">=</span> sm.formula.glm(<span class="st">&quot;greater15
 ## Method:                          IRLS   Log-Likelihood:                -125.29
 ## Date:                Wed, 05 Jul 2017   Deviance:                       250.58
 ## Time:                        13:50:28   Pearson chi2:                     197.
-## No. Iterations:                     4                                         
+## No. Iterations:                     4
 ## ==============================================================================
 ##                  coef    std err          z      P&gt;|z|      [0.025      0.975]
 ## ------------------------------------------------------------------------------
@@ -977,7 +977,7 @@ logreg <span class="op">=</span> sm.formula.glm(<span class="st">&quot;greater15
 <div id="b-assess-the-model-against-the-testing-data." class="section level3">
 <h3>b) Assess the model against the testing data.</h3>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Prediction on testing data</span>
-predictions <span class="op">=</span> logreg.predict(test[<span class="st">&quot;total_bill&quot;</span>])
+predictions <span class="op">=</span> logreg.predict({<span class="st">&quot;total_bill&quot;</span>: test[<span class="st">&quot;total_bill&quot;</span>]})
 predY <span class="op">=</span> np.where(predictions <span class="op">&lt;</span> <span class="fl">0.5</span>, <span class="dv">0</span>, <span class="dv">1</span>)
 
 <span class="co"># If the prediction probability is less than 0.5, classify this as a 0</span>
@@ -990,7 +990,7 @@ Results <span class="op">=</span> np.where(predY <span class="op">==</span> test
 <span class="bu">print</span>(pd.crosstab(index<span class="op">=</span>Results, columns<span class="op">=</span><span class="st">&quot;count&quot;</span>))</code></pre></div>
 <pre><code>
 ## col_0    count
-## row_0         
+## row_0
 ## Correct     34
 ## Wrong       15</code></pre>
 <p>A logistic regression model can be implemented using <a href="#SKLEARN">sklearn</a>, however <a href="http://www.statsmodels.org/stable/glm.html#technical-documentation">statsmodels.api</a> provides a helpful summary about the model, so it is preferable for this example.</p>
@@ -1049,7 +1049,7 @@ treeMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span 
 var_import <span class="op">=</span> treeMod.feature_importances_
 var_import <span class="op">=</span> pd.DataFrame(var_import)
 var_import <span class="op">=</span> var_import.rename(columns <span class="op">=</span> {<span class="dv">0</span>:<span class="st">'Importance'</span>})
-var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>, 
+var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>,
                                     ascending <span class="op">=</span> <span class="va">False</span>)
 <span class="bu">print</span>(var_import.head())</code></pre></div>
 <pre><code>##     Importance
@@ -1068,7 +1068,7 @@ predY <span class="op">=</span> treeMod.predict(test.drop([<span class="st">&quo
 Results <span class="op">=</span> np.where(test[<span class="st">&quot;Target&quot;</span>] <span class="op">==</span> predY, <span class="st">&quot;Correct&quot;</span>, <span class="st">&quot;Wrong&quot;</span>)
 <span class="bu">print</span>(pd.crosstab(index<span class="op">=</span>Results, columns<span class="op">=</span><span class="st">&quot;count&quot;</span>))</code></pre></div>
 <pre><code>## col_0    count
-## row_0         
+## row_0
 ## Correct    161
 ## Wrong       10</code></pre>
 <p><a href="http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html">DecisionTreeClassifier</a></p>
@@ -1090,7 +1090,7 @@ treeMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span 
 var_import <span class="op">=</span> treeMod.feature_importances_
 var_import <span class="op">=</span> pd.DataFrame(var_import)
 var_import <span class="op">=</span> var_import.rename(columns <span class="op">=</span> {<span class="dv">0</span>:<span class="st">'Importance'</span>})
-var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>, 
+var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>,
                                     ascending <span class="op">=</span> <span class="va">False</span>)
 <span class="bu">print</span>(var_import.head())</code></pre></div>
 <pre><code>##     Importance
@@ -1132,7 +1132,7 @@ rfMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span cl
 var_import <span class="op">=</span> rfMod.feature_importances_
 var_import <span class="op">=</span> pd.DataFrame(var_import)
 var_import <span class="op">=</span> var_import.rename(columns <span class="op">=</span> {<span class="dv">0</span>:<span class="st">'Importance'</span>})
-var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>, 
+var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>,
                                     ascending <span class="op">=</span> <span class="va">False</span>)
 <span class="bu">print</span>(var_import.head())</code></pre></div>
 <pre><code>##     Importance
@@ -1151,7 +1151,7 @@ predY <span class="op">=</span> rfMod.predict(test.drop([<span class="st">&quot;
 Results <span class="op">=</span> np.where(test[<span class="st">&quot;Target&quot;</span>] <span class="op">==</span> predY, <span class="st">&quot;Correct&quot;</span>, <span class="st">&quot;Wrong&quot;</span>)
 <span class="bu">print</span>(pd.crosstab(index<span class="op">=</span>Results, columns<span class="op">=</span><span class="st">&quot;count&quot;</span>))</code></pre></div>
 <pre><code>## col_0    count
-## row_0         
+## row_0
 ## Correct    165
 ## Wrong        6</code></pre>
 <p><a href="http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html">RandomForestClassifier</a></p>
@@ -1173,7 +1173,7 @@ rfMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span cl
 var_import <span class="op">=</span> rfMod.feature_importances_
 var_import <span class="op">=</span> pd.DataFrame(var_import)
 var_import <span class="op">=</span> var_import.rename(columns <span class="op">=</span> {<span class="dv">0</span>:<span class="st">'Importance'</span>})
-var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>, 
+var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>,
                                     ascending <span class="op">=</span> <span class="va">False</span>)
 <span class="bu">print</span>(var_import.head())</code></pre></div>
 <pre><code>##     Importance
@@ -1212,7 +1212,7 @@ test <span class="op">=</span> pd.read_csv(<span class="st">'/Users/breastcancer
 <span class="co"># number of iterations</span>
 <span class="co"># learning_rate = shrinkage or step-size reduction, where a lower </span>
 <span class="co"># learning rate requires more iterations</span>
-gbMod <span class="op">=</span> GradientBoostingClassifier(random_state <span class="op">=</span> <span class="dv">29</span>, learning_rate <span class="op">=</span> .<span class="dv">01</span>, 
+gbMod <span class="op">=</span> GradientBoostingClassifier(random_state <span class="op">=</span> <span class="dv">29</span>, learning_rate <span class="op">=</span> .<span class="dv">01</span>,
                                   n_estimators <span class="op">=</span> <span class="dv">2500</span>)
 gbMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span class="op">=</span> <span class="dv">1</span>), train[<span class="st">&quot;Target&quot;</span>])
 
@@ -1220,7 +1220,7 @@ gbMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span cl
 var_import <span class="op">=</span> gbMod.feature_importances_
 var_import <span class="op">=</span> pd.DataFrame(var_import)
 var_import <span class="op">=</span> var_import.rename(columns <span class="op">=</span> {<span class="dv">0</span>:<span class="st">'Importance'</span>})
-var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>, 
+var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>,
                                     ascending <span class="op">=</span> <span class="va">False</span>)
 <span class="bu">print</span>(var_import.head())</code></pre></div>
 <pre><code>##     Importance
@@ -1239,7 +1239,7 @@ predY <span class="op">=</span> gbMod.predict(test.drop([<span class="st">&quot;
 Results <span class="op">=</span> np.where(test[<span class="st">&quot;Target&quot;</span>] <span class="op">==</span> predY, <span class="st">&quot;Correct&quot;</span>, <span class="st">&quot;Wrong&quot;</span>)
 <span class="bu">print</span>(pd.crosstab(index<span class="op">=</span>Results, columns<span class="op">=</span><span class="st">&quot;count&quot;</span>))</code></pre></div>
 <pre><code>## col_0    count
-## row_0         
+## row_0
 ## Correct    164
 ## Wrong        7</code></pre>
 <p><a href="http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html">GradientBoostingClassifier</a></p>
@@ -1254,7 +1254,7 @@ test <span class="op">=</span> pd.read_csv(<span class="st">'/Users/boston_test.
 
 <span class="im">from</span> sklearn.ensemble <span class="im">import</span> GradientBoostingRegressor
 
-gbMod <span class="op">=</span> GradientBoostingRegressor(random_state <span class="op">=</span> <span class="dv">29</span>, learning_rate <span class="op">=</span> .<span class="dv">01</span>, 
+gbMod <span class="op">=</span> GradientBoostingRegressor(random_state <span class="op">=</span> <span class="dv">29</span>, learning_rate <span class="op">=</span> .<span class="dv">01</span>,
                                   n_estimators <span class="op">=</span> <span class="dv">2500</span>)
 gbMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span class="op">=</span> <span class="dv">1</span>), train[<span class="st">&quot;Target&quot;</span>])
 
@@ -1262,7 +1262,7 @@ gbMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span cl
 var_import <span class="op">=</span> gbMod.feature_importances_
 var_import <span class="op">=</span> pd.DataFrame(var_import)
 var_import <span class="op">=</span> var_import.rename(columns <span class="op">=</span> {<span class="dv">0</span>:<span class="st">'Importance'</span>})
-var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>, 
+var_import <span class="op">=</span> var_import.sort_values(by<span class="op">=</span><span class="st">&quot;Importance&quot;</span>, kind <span class="op">=</span> <span class="st">&quot;mergesort&quot;</span>,
                                     ascending <span class="op">=</span> <span class="va">False</span>)
 <span class="bu">print</span>(var_import.head())</code></pre></div>
 <pre><code>##     Importance
@@ -1297,7 +1297,7 @@ test <span class="op">=</span> pd.read_csv(<span class="st">'/Users/breastcancer
 <span class="im">from</span> xgboost <span class="im">import</span> XGBClassifier
 
 <span class="co"># Fit XGBClassifier model on training data</span>
-xgbMod <span class="op">=</span> XGBClassifier(seed <span class="op">=</span> <span class="dv">29</span>, learning_rate <span class="op">=</span> <span class="fl">0.01</span>, 
+xgbMod <span class="op">=</span> XGBClassifier(seed <span class="op">=</span> <span class="dv">29</span>, learning_rate <span class="op">=</span> <span class="fl">0.01</span>,
                        n_estimators <span class="op">=</span> <span class="dv">2500</span>)
 xgbMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span class="op">=</span> <span class="dv">1</span>), train[<span class="st">&quot;Target&quot;</span>])</code></pre></div>
 </div>
@@ -1311,7 +1311,7 @@ Results <span class="op">=</span> np.where(test[<span class="st">&quot;Target&qu
 <span class="bu">print</span>(pd.crosstab(index<span class="op">=</span>Results, columns<span class="op">=</span><span class="st">&quot;count&quot;</span>))</code></pre></div>
 <pre><code>
 ## col_0    count
-## row_0         
+## row_0
 ## Correct    165
 ## Wrong        6</code></pre>
 <p><a href="#XGBOOST">xgboost</a></p>
@@ -1327,7 +1327,7 @@ test <span class="op">=</span> pd.read_csv(<span class="st">'/Users/boston_test.
 <span class="im">from</span> xgboost <span class="im">import</span> XGBRegressor
 
 <span class="co"># Fit XGBRegressor model on training data</span>
-xgbMod <span class="op">=</span> XGBRegressor(seed <span class="op">=</span> <span class="dv">29</span>, learning_rate <span class="op">=</span> <span class="fl">0.01</span>, 
+xgbMod <span class="op">=</span> XGBRegressor(seed <span class="op">=</span> <span class="dv">29</span>, learning_rate <span class="op">=</span> <span class="fl">0.01</span>,
                       n_estimators <span class="op">=</span> <span class="dv">2500</span>)
 xgbMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span class="op">=</span> <span class="dv">1</span>), train[<span class="st">&quot;Target&quot;</span>])</code></pre></div>
 </div>
@@ -1370,7 +1370,7 @@ prediction <span class="op">=</span> svMod.predict(test.drop([<span class="st">&
 Results <span class="op">=</span> np.where(test[<span class="st">&quot;Target&quot;</span>] <span class="op">==</span> prediction, <span class="st">&quot;Correct&quot;</span>, <span class="st">&quot;Wrong&quot;</span>)
 <span class="bu">print</span>(pd.crosstab(index<span class="op">=</span>Results, columns<span class="op">=</span><span class="st">&quot;count&quot;</span>))</code></pre></div>
 <pre><code>## col_0    count
-## row_0         
+## row_0
 ## Correct    162
 ## Wrong        9</code></pre>
 <p><a href="http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html">SVC</a></p>
@@ -1415,7 +1415,7 @@ test <span class="op">=</span> pd.read_csv(<span class="st">'/Users/digits_test.
 
 <span class="co"># Fit a neural network classification model on training data</span>
 <span class="im">from</span> sklearn.neural_network <span class="im">import</span> MLPClassifier
-nnMod <span class="op">=</span> MLPClassifier(max_iter <span class="op">=</span> <span class="dv">200</span>, hidden_layer_sizes<span class="op">=</span>(<span class="dv">100</span>,), 
+nnMod <span class="op">=</span> MLPClassifier(max_iter <span class="op">=</span> <span class="dv">200</span>, hidden_layer_sizes<span class="op">=</span>(<span class="dv">100</span>,),
                       random_state <span class="op">=</span> <span class="dv">29</span>)
 nnMod.fit(train.drop([<span class="st">&quot;Target&quot;</span>], axis <span class="op">=</span> <span class="dv">1</span>), train[<span class="st">&quot;Target&quot;</span>])</code></pre></div>
 </div>
@@ -1488,10 +1488,10 @@ prediction[<span class="st">&quot;sq_diff&quot;</span>] <span class="op">=</span
 <div id="kmeans-clustering" class="section level2">
 <h2>7.1 KMeans Clustering</h2>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">iris <span class="op">=</span> pd.read_csv(<span class="st">'/Users/iris.csv'</span>)
-iris[<span class="st">&quot;Species&quot;</span>] <span class="op">=</span> np.where(iris[<span class="st">&quot;Target&quot;</span>] <span class="op">==</span> <span class="dv">0</span>, <span class="st">&quot;Setosa&quot;</span>, 
-                           np.where(iris[<span class="st">&quot;Target&quot;</span>] <span class="op">==</span> <span class="dv">1</span>, <span class="st">&quot;Versicolor&quot;</span>, 
+iris[<span class="st">&quot;Species&quot;</span>] <span class="op">=</span> np.where(iris[<span class="st">&quot;Target&quot;</span>] <span class="op">==</span> <span class="dv">0</span>, <span class="st">&quot;Setosa&quot;</span>,
+                           np.where(iris[<span class="st">&quot;Target&quot;</span>] <span class="op">==</span> <span class="dv">1</span>, <span class="st">&quot;Versicolor&quot;</span>,
                                     <span class="st">&quot;Virginica&quot;</span>))
-features <span class="op">=</span> pd.concat([iris[<span class="st">&quot;PetalLength&quot;</span>], iris[<span class="st">&quot;PetalWidth&quot;</span>], 
+features <span class="op">=</span> pd.concat([iris[<span class="st">&quot;PetalLength&quot;</span>], iris[<span class="st">&quot;PetalWidth&quot;</span>],
                      iris[<span class="st">&quot;SepalLength&quot;</span>], iris[<span class="st">&quot;SepalWidth&quot;</span>]], axis <span class="op">=</span> <span class="dv">1</span>)
 
 <span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans
@@ -1499,7 +1499,7 @@ kmeans <span class="op">=</span> KMeans(n_clusters <span class="op">=</span> <sp
 
 <span class="bu">print</span>(pd.crosstab(index <span class="op">=</span> iris[<span class="st">&quot;Species&quot;</span>], columns <span class="op">=</span> kmeans.labels_))</code></pre></div>
 <pre><code>## col_0        0   1   2
-## Species               
+## Species
 ## Setosa       0  50   0
 ## Versicolor   2   0  48
 ## Virginica   36   0  14</code></pre>
@@ -1509,12 +1509,12 @@ kmeans <span class="op">=</span> KMeans(n_clusters <span class="op">=</span> <sp
 <h2>7.2 Spectral Clustering</h2>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.cluster <span class="im">import</span> SpectralClustering
 
-spectral <span class="op">=</span> SpectralClustering(n_clusters <span class="op">=</span> <span class="dv">3</span>, 
+spectral <span class="op">=</span> SpectralClustering(n_clusters <span class="op">=</span> <span class="dv">3</span>,
                               random_state <span class="op">=</span> <span class="dv">29</span>).fit(features)
 
 <span class="bu">print</span>(pd.crosstab(index <span class="op">=</span> iris[<span class="st">&quot;Species&quot;</span>], columns <span class="op">=</span> spectral.labels_))</code></pre></div>
 <pre><code>## col_0        0   1   2
-## Species               
+## Species
 ## Setosa       0  50   0
 ## Versicolor  48   0   2
 ## Virginica   13   0  37</code></pre>
@@ -1528,7 +1528,7 @@ aggl <span class="op">=</span> AgglomerativeClustering(n_clusters <span class="o
 
 <span class="bu">print</span>(pd.crosstab(index <span class="op">=</span> iris[<span class="st">&quot;Species&quot;</span>], columns <span class="op">=</span> aggl.labels_))</code></pre></div>
 <pre><code>## col_0        0   1   2
-## Species               
+## Species
 ## Setosa       0  50   0
 ## Versicolor  49   0   1
 ## Virginica   15   0  35</code></pre>
@@ -1542,7 +1542,7 @@ dbscan <span class="op">=</span> DBSCAN().fit(features)
 
 <span class="bu">print</span>(pd.crosstab(index <span class="op">=</span> iris[<span class="st">&quot;Species&quot;</span>], columns <span class="op">=</span> dbscan.labels_))</code></pre></div>
 <pre><code>## col_0       -1   0   1
-## Species               
+## Species
 ## Setosa       1  49   0
 ## Versicolor   6   0  44
 ## Virginica   10   0  40</code></pre>
@@ -1584,7 +1584,7 @@ plt.show()</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pyflux <span class="im">as</span> pf
 
 <span class="co"># ar = 12 is necessary to indicate the seasonality of data</span>
-model <span class="op">=</span> pf.ARIMA(data <span class="op">=</span> air, ar <span class="op">=</span> <span class="dv">12</span>, ma <span class="op">=</span> <span class="dv">1</span>, integ <span class="op">=</span> <span class="dv">0</span>, target <span class="op">=</span> <span class="st">'AIR'</span>, 
+model <span class="op">=</span> pf.ARIMA(data <span class="op">=</span> air, ar <span class="op">=</span> <span class="dv">12</span>, ma <span class="op">=</span> <span class="dv">1</span>, integ <span class="op">=</span> <span class="dv">0</span>, target <span class="op">=</span> <span class="st">'AIR'</span>,
                  family <span class="op">=</span> pf.Normal())
 x <span class="op">=</span> model.fit(<span class="st">&quot;MLE&quot;</span>)
 model.plot_predict(h <span class="op">=</span> <span class="dv">24</span>)</code></pre></div>
@@ -1623,7 +1623,7 @@ plt.show()</code></pre></div>
         <span class="cf">else</span>:
             output.append(alpha <span class="op">*</span> output[i<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> alpha) <span class="op">*</span> output[i<span class="op">-</span><span class="dv">2</span>])
     <span class="cf">return</span> output
-    
+
 pred <span class="op">=</span> simple_exp_smoothing(petrol, <span class="fl">0.9999</span>, <span class="dv">24</span>)
 
 plt.plot(pd.DataFrame(pred), color <span class="op">=</span> <span class="st">&quot;red&quot;</span>)
@@ -1637,7 +1637,7 @@ plt.show()</code></pre></div>
 <h2>8.3 Fit a Holt-Winters model to a timeseries.</h2>
 <div id="a-plot-the-timeseries.-2" class="section level3">
 <h3>a) Plot the timeseries.</h3>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">vehicle <span class="op">=</span> usecon[<span class="st">&quot;VEHICLE&quot;</span>]
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">vehicle <span class="op">=</span> usecon[<span class="st">&quot;VEHICLES&quot;</span>]
 
 plt.plot(vehicle)
 plt.show()</code></pre></div>
@@ -1666,7 +1666,7 @@ plt.show()</code></pre></div>
             sum_of_vals_over_avg <span class="op">+=</span> series[slen<span class="op">*</span>j<span class="op">+</span>i]<span class="op">-</span>season_averages[j]
         seasonals[i] <span class="op">=</span> sum_of_vals_over_avg<span class="op">/</span>n_seasons
     <span class="cf">return</span> seasonals
-<span class="kw">def</span> triple_exponential_smoothing_add(series, slen, alpha, beta, gamma, 
+<span class="kw">def</span> triple_exponential_smoothing_add(series, slen, alpha, beta, gamma,
                                      n_preds):
     result <span class="op">=</span> []
     seasonals <span class="op">=</span> initial_seasonal_components(series, slen)
@@ -1681,19 +1681,19 @@ plt.show()</code></pre></div>
             result.append((smooth <span class="op">+</span> m<span class="op">*</span>trend) <span class="op">+</span> seasonals[i<span class="op">%</span>slen])
         <span class="cf">else</span>:
             val <span class="op">=</span> series[i]
-            last_smooth, smooth <span class="op">=</span> smooth, alpha<span class="op">*</span>(val<span class="op">-</span>seasonals[i<span class="op">%</span>slen]) 
+            last_smooth, smooth <span class="op">=</span> smooth, alpha<span class="op">*</span>(val<span class="op">-</span>seasonals[i<span class="op">%</span>slen])
                                                  <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>alpha)<span class="op">*</span>(smooth<span class="op">+</span>trend)
             trend <span class="op">=</span> beta <span class="op">*</span> (smooth<span class="op">-</span>last_smooth) <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>beta)<span class="op">*</span>trend
-            seasonals[i<span class="op">%</span>slen] <span class="op">=</span> gamma<span class="op">*</span>(val<span class="op">-</span>smooth) <span class="op">+</span> 
+            seasonals[i<span class="op">%</span>slen] <span class="op">=</span> gamma<span class="op">*</span>(val<span class="op">-</span>smooth) <span class="op">+</span>
                                 (<span class="dv">1</span><span class="op">-</span>gamma)<span class="op">*</span>seasonals[i<span class="op">%</span>slen]
             result.append(smooth<span class="op">+</span>trend<span class="op">+</span>seasonals[i<span class="op">%</span>slen])
     <span class="cf">return</span> result
-    
-add_preds <span class="op">=</span> triple_exponential_smoothing_add(vehicles, <span class="dv">12</span>, <span class="fl">0.5731265</span>, <span class="dv">0</span>, 
+
+add_preds <span class="op">=</span> triple_exponential_smoothing_add(vehicle, <span class="dv">12</span>, <span class="fl">0.5731265</span>, <span class="dv">0</span>,
                                              <span class="fl">0.7230956</span>, <span class="dv">24</span>)
 
 plt.plot(pd.DataFrame(add_preds), color <span class="op">=</span> <span class="st">&quot;red&quot;</span>)
-plt.plot(vehicles, color <span class="op">=</span> <span class="st">&quot;blue&quot;</span>)
+plt.plot(vehicle, color <span class="op">=</span> <span class="st">&quot;blue&quot;</span>)
 plt.show()</code></pre></div>
 <p>Output: <img src="data:image/png;base64,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" alt="output" /></p>
 </div>
@@ -1815,7 +1815,7 @@ kfold <span class="op">=</span> model_selection.KFold(n_splits <span class="op">
 rfMod <span class="op">=</span> RandomForestClassifier(random_state <span class="op">=</span> <span class="dv">29</span>)
 results <span class="op">=</span> model_selection.cross_val_score(rfMod, X, Y, cv <span class="op">=</span> kfold)
 
-<span class="bu">print</span>(<span class="st">&quot;Accuracy: </span><span class="sc">%.2f%%</span><span class="st"> +/- </span><span class="sc">%.2f%%</span><span class="st">&quot;</span> <span class="op">%</span> (results.mean()<span class="op">*</span><span class="dv">100</span>, 
+<span class="bu">print</span>(<span class="st">&quot;Accuracy: </span><span class="sc">%.2f%%</span><span class="st"> +/- </span><span class="sc">%.2f%%</span><span class="st">&quot;</span> <span class="op">%</span> (results.mean()<span class="op">*</span><span class="dv">100</span>,
                                        results.std()<span class="op">*</span><span class="dv">100</span>))</code></pre></div>
 <pre><code>## Accuracy: 94.38% +/- 2.39%</code></pre>
 <p><a href="http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html">RandomForestClassifier</a> | <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html">KFold</a></p>
@@ -1826,7 +1826,7 @@ results <span class="op">=</span> model_selection.cross_val_score(rfMod, X, Y, c
 rfMod <span class="op">=</span> RandomForestClassifier(random_state <span class="op">=</span> <span class="dv">29</span>)
 results <span class="op">=</span> model_selection.cross_val_score(rfMod, X, Y, cv <span class="op">=</span> shuffle)
 
-<span class="bu">print</span>(<span class="st">&quot;Accuracy: </span><span class="sc">%.2f%%</span><span class="st"> +/- </span><span class="sc">%.2f%%</span><span class="st">&quot;</span> <span class="op">%</span> (results.mean()<span class="op">*</span><span class="dv">100</span>, 
+<span class="bu">print</span>(<span class="st">&quot;Accuracy: </span><span class="sc">%.2f%%</span><span class="st"> +/- </span><span class="sc">%.2f%%</span><span class="st">&quot;</span> <span class="op">%</span> (results.mean()<span class="op">*</span><span class="dv">100</span>,
                                        results.std()<span class="op">*</span><span class="dv">100</span>))</code></pre></div>
 <pre><code>## Accuracy: 95.09% +/- 0.70%</code></pre>
 <p><a href="http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html">RandomForestClassifier</a> | <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ShuffleSplit.html">ShuffleSplit</a></p>
