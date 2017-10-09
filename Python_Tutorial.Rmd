@@ -827,7 +827,7 @@ import statsmodels.api as sm
 logreg = sm.formula.glm("greater15 ~ total_bill", family=sm.families.Binomial(), 
                      data=train).fit()
 # Prediction on testing data
-predictions = logreg.predict(test["total_bill"])
+predictions = logreg.predict({'total_bill': test["total_bill"]})
 predY = np.where(predictions < 0.5, 0, 1)
 
 # If the prediction probability is less than 0.5, classify this as a 0
@@ -1551,7 +1551,7 @@ Output:
 
 ### a) Plot the timeseries.
 ```{python, eval = FALSE}
-vehicle = usecon["VEHICLE"]
+vehicle = usecon["VEHICLES"]
 
 plt.plot(vehicle)
 plt.show()
@@ -1607,11 +1607,11 @@ def triple_exponential_smoothing_add(series, slen, alpha, beta, gamma,
             result.append(smooth+trend+seasonals[i%slen])
     return result
     
-add_preds = triple_exponential_smoothing_add(vehicles, 12, 0.5731265, 0, 
+add_preds = triple_exponential_smoothing_add(vehicle, 12, 0.5731265, 0, 
                                              0.7230956, 24)
 
 plt.plot(pd.DataFrame(add_preds), color = "red")
-plt.plot(vehicles, color = "blue")
+plt.plot(vehicle, color = "blue")
 plt.show()
 ```
 Output:
